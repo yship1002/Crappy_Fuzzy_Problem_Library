@@ -1,4 +1,4 @@
-#include "example/STModel.h"
+#include "STModel.h"
 class Ex844Model:public STModel {
     public:
 

@@ -1,4 +1,4 @@
-#include "example/STModel.h"
+#include "STModel.h"
 
 // Provide definitions for base-class virtuals and constructor so the
 // vtable for STModel is emitted (fixes linker undefined vtable errors).

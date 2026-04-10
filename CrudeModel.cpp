@@ -1,4 +1,4 @@
-#include "example/CrudeModel.h"
+#include "CrudeModel.h"
 CrudeModel::CrudeModel(BranchingStrategy branching_strategy):STModel() {
 
     this->branching_strategy = branching_strategy;

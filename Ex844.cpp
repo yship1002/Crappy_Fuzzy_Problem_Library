@@ -1,4 +1,4 @@
-#include "example/Ex844.h"
+#include "Ex844.h"
 
 Ex844Model::Ex844Model(BranchingStrategy branching_strategy):STModel() {
 

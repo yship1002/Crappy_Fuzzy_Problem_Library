@@ -1,4 +1,4 @@
-#include "example/ProcessModel.h"
+#include "ProcessModel.h"
 ProcessModel::ProcessModel(BranchingStrategy branching_strategy):STModel() {
 
     this->branching_strategy = branching_strategy;
