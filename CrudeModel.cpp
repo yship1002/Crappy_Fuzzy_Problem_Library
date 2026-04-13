@@ -4,10 +4,11 @@ CrudeModel::CrudeModel(BranchingStrategy branching_strategy):STModel() {
     this->branching_strategy = branching_strategy;
     this->scenario_names = {ScenarioNames::SCENARIO1
         , ScenarioNames::SCENARIO2, ScenarioNames::SCENARIO3
-        // ,ScenarioNames::SCENARIO4, ScenarioNames::SCENARIO5
+        ,ScenarioNames::SCENARIO4, ScenarioNames::SCENARIO5
+        ,ScenarioNames::SCENARIO6, ScenarioNames::SCENARIO7, ScenarioNames::SCENARIO8, ScenarioNames::SCENARIO9, ScenarioNames::SCENARIO10
     };
     this->scenario_name = ScenarioNames::SCENARIO1; //default
-    this->probability = 0.333333333333; //default
+    this->probability = 0.1; //default
     std::vector<double> scenario1_coeff = {
         // g_1_1: CrudeQuantity[1..10]
         0.0020105335707024776,// CrudeQty[1]
@@ -408,7 +409,12 @@ CrudeModel::CrudeModel(BranchingStrategy branching_strategy):STModel() {
         {ScenarioNames::SCENARIO2, scenario2_coeff},
         {ScenarioNames::SCENARIO3, scenario1_coeff},
         {ScenarioNames::SCENARIO4, scenario2_coeff},
-        {ScenarioNames::SCENARIO5, scenario1_coeff}
+        {ScenarioNames::SCENARIO5, scenario1_coeff},
+        {ScenarioNames::SCENARIO6, scenario2_coeff},
+        {ScenarioNames::SCENARIO7, scenario1_coeff},
+        {ScenarioNames::SCENARIO8, scenario2_coeff},
+        {ScenarioNames::SCENARIO9, scenario1_coeff},
+        {ScenarioNames::SCENARIO10, scenario2_coeff}
     };
     this->first_stage_map = {
         {"CrudeQuantity[1]",0},
