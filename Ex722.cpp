@@ -10,16 +10,16 @@ Ex722Model::Ex722Model(BranchingStrategy branching_strategy):STModel() {
     this->scenario_name = ScenarioNames::SCENARIO1; //default
     this->probability = 0.1; // equal probability for each scenario
     this->perturb = {
-        {ScenarioNames::SCENARIO1, -1}, 
-        {ScenarioNames::SCENARIO2, -1}, 
-        {ScenarioNames::SCENARIO3, -1},
-        {ScenarioNames::SCENARIO4, -1}, 
-        {ScenarioNames::SCENARIO5, -1}, 
-        {ScenarioNames::SCENARIO6, -1},
-        {ScenarioNames::SCENARIO7, -1}, 
-        {ScenarioNames::SCENARIO8, -1}, 
-        {ScenarioNames::SCENARIO9, -1},
-        {ScenarioNames::SCENARIO10, -1}
+        {ScenarioNames::SCENARIO1, 4}, 
+        {ScenarioNames::SCENARIO2, 3}, 
+        {ScenarioNames::SCENARIO3, 4},
+        {ScenarioNames::SCENARIO4, 3}, 
+        {ScenarioNames::SCENARIO5, 4}, 
+        {ScenarioNames::SCENARIO6, 3},
+        {ScenarioNames::SCENARIO7, 4}, 
+        {ScenarioNames::SCENARIO8, 3}, 
+        {ScenarioNames::SCENARIO9, 4},
+        {ScenarioNames::SCENARIO10, 3}
         // {ScenarioNames::SCENARIO11, -1}, 
         // {ScenarioNames::SCENARIO12, -1}, 
         // {ScenarioNames::SCENARIO13, 0.2602763376071644},
@@ -116,9 +116,9 @@ void Ex722Model::buildDAG() {
         nc4=-c4;
 
         // x5**0.5 + x6**0.5 =L= 4;
-        c5=pow(this->X[scenario_name][4], 0.5)+pow(this->X[scenario_name][5], 0.5)-4;
+        c5=pow(this->X[scenario_name][4], 0.5)+pow(this->X[scenario_name][5], 0.5)-this->perturb[scenario_name];
 
-        mc::FFVar objective =-this->probability*this->X[scenario_name][3];
+        mc::FFVar objective =-1000*this->probability*this->X[scenario_name][3];
         this->F[scenario_name]={objective,c1,c2,c3,c4,c5,nc1,nc2,nc3,nc4};
     }
 }
@@ -163,9 +163,9 @@ void Ex722Model::buildFullModelDAG(){
         nc4=-c4;
 
         // x5**0.5 + x6**0.5 =L= 4;
-        c5=pow(this->X[ScenarioNames::SCENARIO1][second_stage_start_idx], 0.5)+pow(this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1], 0.5)-4;
+        c5=pow(this->X[ScenarioNames::SCENARIO1][second_stage_start_idx], 0.5)+pow(this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1], 0.5)-this->perturb[this->scenario_names[s_idx]];
 
-        objective +=-this->probability*this->X[ScenarioNames::SCENARIO1][3];
+        objective +=-1000*this->probability*this->X[ScenarioNames::SCENARIO1][3];
 
         std::vector<mc::FFVar> scenario_constraints = {c1,c2,c3,c4,nc1,nc2,nc3,nc4,c5};
         this->F[ScenarioNames::SCENARIO1].insert(this->F[ScenarioNames::SCENARIO1].end(), scenario_constraints.begin(), scenario_constraints.end());
