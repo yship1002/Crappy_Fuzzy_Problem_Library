@@ -258,10 +258,11 @@ void Ex844Model::buildFullModelDAG(){
         objective +=1000*this->probability*(pow((-5 + this->X[ScenarioNames::SCENARIO1][second_stage_start_idx]),2) + pow((5 + this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1]),2) + pow((-3 + this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+2]),2) + pow((2 + this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3]),2) + pow((-2 + this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+4]),2)
                             + pow((1 + this->X[ScenarioNames::SCENARIO1][0]),2) + pow((-1.5 + this->X[ScenarioNames::SCENARIO1][1]),2) + pow((0.5 + this->X[ScenarioNames::SCENARIO1][2]),2) + pow((-1.2 + this->X[ScenarioNames::SCENARIO1][3]),2) + pow((0.2 + this->X[ScenarioNames::SCENARIO1][4]),2)
                             + pow((-1.1 + this->X[ScenarioNames::SCENARIO1][5]),2) + pow((0.1 + this->X[ScenarioNames::SCENARIO1][6]),2));
-        std::vector<mc::FFVar> scenario_constraints = {nc1,nc2,nc3,nc4,nc5,nc6,nc7,nc8,nc9,nc10,nc11,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11};
+        std::vector<mc::FFVar> scenario_constraints = {c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,nc1,nc2,nc3,nc4,nc5,nc6,nc7,nc8,nc9,nc10,nc11};
         this->F[ScenarioNames::SCENARIO1].insert(this->F[ScenarioNames::SCENARIO1].end(), scenario_constraints.begin(), scenario_constraints.end());
     }
     this->F[ScenarioNames::SCENARIO1].insert(this->F[ScenarioNames::SCENARIO1].begin(), objective);
+    this->full_model_built = true;
 }
 Ipopt::SmartPtr<STModel> Ex844Model::clone(){
     Ipopt::SmartPtr<Ex844Model> p = new Ex844Model();
@@ -273,6 +274,10 @@ Ipopt::SmartPtr<STModel> Ex844Model::clone(){
     p->scenario_names=this->scenario_names;
     p->probability=this->probability;
     p->clearDAG(); // clear the DAG of the cloned model
-    p->buildDAG(); // rebuild DAG for the cloned model
+    if (this->full_model_built) {
+        p->buildFullModelDAG();
+    } else {
+        p->buildDAG();
+    }
     return p;
 }

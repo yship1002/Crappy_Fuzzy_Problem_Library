@@ -1998,6 +1998,7 @@ void CrudeModel::buildFullModelDAG(){
         
     }
     this->F[ScenarioNames::SCENARIO1].insert(this->F[ScenarioNames::SCENARIO1].begin(), objective);
+    this->full_model_built = true;
 }
 
 
@@ -2014,7 +2015,11 @@ Ipopt::SmartPtr<STModel> CrudeModel::clone(){
     p->first_stage_map=this->first_stage_map;
     p->second_stage_map=this->second_stage_map;
     p->clearDAG(); // clear the DAG of the cloned model
-    p->buildDAG(); // rebuild DAG for the cloned model
+    if (this->full_model_built) {
+        p->buildFullModelDAG();
+    } else {
+        p->buildDAG();
+    }
     return p;
 }
 

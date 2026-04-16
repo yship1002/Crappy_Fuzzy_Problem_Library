@@ -92,6 +92,7 @@ class STModel:public Ipopt::TNLP{
         std::vector<mc::Interval> second_stage_IX;
 
         ScenarioNames scenario_name; //by default
+        bool full_model_built = false;
         virtual Ipopt::SmartPtr<STModel> clone() = 0;
         virtual void buildDAG() = 0;
         virtual void buildFullModelDAG() = 0;
