@@ -234,9 +234,10 @@ void STModel::generateLP(IloEnv* cplex_env,IloModel* cplexmodel,
         if (pc->type() == 1) { // <=
             cplex_constraints->add(expr <= pc->rhs());
         }else if (pc->type() == 2) { // >=
-            cplex_constraints->add(expr >= pc->rhs());
+            cplex_constraints->add(-expr <= -pc->rhs());
         }else { // ==
-            cplex_constraints->add(expr == pc->rhs());
+            cplex_constraints->add(expr <= pc->rhs());
+            cplex_constraints->add(-expr <= -pc->rhs());
         }
         expr.end();
     }
