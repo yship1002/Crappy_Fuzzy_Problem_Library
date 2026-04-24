@@ -118,7 +118,7 @@ void Ex722Model::buildDAG() {
         // x5**0.5 + x6**0.5 =L= 4;
         c5=pow(this->X[scenario_name][4], 0.5)+pow(this->X[scenario_name][5], 0.5)-this->perturb[scenario_name];
 
-        mc::FFVar objective =-1000*this->probability*this->X[scenario_name][3];
+        mc::FFVar objective =-10000*this->probability*this->X[scenario_name][3];
         this->F[scenario_name]={objective,c1,c2,c3,c4,c5,nc1,nc2,nc3,nc4};
     }
 }
@@ -165,7 +165,7 @@ void Ex722Model::buildFullModelDAG(){
         // x5**0.5 + x6**0.5 =L= 4;
         c5=pow(this->X[ScenarioNames::SCENARIO1][second_stage_start_idx], 0.5)+pow(this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1], 0.5)-this->perturb[this->scenario_names[s_idx]];
 
-        objective +=-1000*this->probability*this->X[ScenarioNames::SCENARIO1][3];
+        objective +=-10000*this->probability*this->X[ScenarioNames::SCENARIO1][3];
 
         std::vector<mc::FFVar> scenario_constraints = {c1,c2,c3,c4,nc1,nc2,nc3,nc4,c5};
         this->F[ScenarioNames::SCENARIO1].insert(this->F[ScenarioNames::SCENARIO1].end(), scenario_constraints.begin(), scenario_constraints.end());
