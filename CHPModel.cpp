@@ -120,7 +120,7 @@ void CHPModel::buildDAG() {
         // Feasible when Qdot_rel <= Qdot_eps (off) or Qdot_rel >= Qdot_rel_min (on)
         mc::FFVar c_partload = -Qdot_rel_sq + b_part * Qdot_rel + c_part;
 
-        mc::FFVar obj = this->probability * (
+        mc::FFVar obj = 1000*this->probability * (
             this->invest_coeff * pow(Qdot_nom, 0.9)
             + T_OP_coeff * (80.0 * Edot_in + 250.0 * P_buy - 100.0 * P_sell)
         );
@@ -177,7 +177,7 @@ void CHPModel::buildFullModelDAG() {
         mc::FFVar c_heat    = Qdot_dem - Qdot_nom * Qdot_rel;
         mc::FFVar c_partload = -Qdot_rel_sq + b_part * Qdot_rel + c_part;
 
-        objective += this->probability * (
+        objective += 1000*this->probability * (
             this->invest_coeff * pow(Qdot_nom, 0.9)
             + T_OP_coeff * (80.0 * Edot_in + 250.0 * P_buy - 100.0 * P_sell)
         );
