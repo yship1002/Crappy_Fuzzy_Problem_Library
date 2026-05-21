@@ -131,8 +131,8 @@ void CHPModel::buildDAG() {
 
 void CHPModel::buildFullModelDAG() {
     const int Nx = static_cast<int>(this->first_stage_IX.size());  // 1
-    const int Ny = static_cast<int>(this->second_stage_IX.size()); // 5 per scenario
     const int Ns = static_cast<int>(this->scenario_names.size());  // 8
+    const int Ny = static_cast<int>(this->second_stage_IX.size()) / Ns; // 5 per scenario (second_stage_IX is already expanded by convertToCentralizedModel)
 
     const double b_part = 0.5 + 0.001 * 2.3;        // 0.5023
     const double c_part = -0.5 * 0.001 * 2.3;        // -0.00115
