@@ -14,23 +14,41 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
     this->probability = 1.0;
 
     this->first_stage_IX = {
-        mc::Interval(1e-2, 10),
-        mc::Interval(1e-1, 500),
-        mc::Interval(1e-2, 10),
-        mc::Interval(1e-1, 500),
-        mc::Interval(1e-2, 10),
-        mc::Interval(1e-1, 500),
-        mc::Interval(1e-2, 10),
-        mc::Interval(1e-1, 500),
-        mc::Interval(1e-2, 10),
-        mc::Interval(1e-1, 500),
-        mc::Interval(1e-2, 10),
-        mc::Interval(1e-1, 500),
-        mc::Interval(1e-2, 10),
-        mc::Interval(1e-1, 500),
-        mc::Interval(1e-2, 10),
-        mc::Interval(1e-1, 500)
+        mc::Interval(0.22285463857648757, 0.22285463857648757), // molNStream1
+        mc::Interval(123.68491498701013,123.68491498701013), // molWStream1
+        mc::Interval(0.061479954752751274, 0.061479954752751274), // molNStream2
+        mc::Interval(119.50012464909804,119.50012464909804), // molWStream2
+        mc::Interval(0.1613746838237363,0.1613746838237363), // molNStream3
+        mc::Interval(4.184790337912115,4.184790337912115), // molWStream3
+        mc::Interval(14,14), // molNStream4
+        mc::Interval(363.13431969472566,363.13431969472566), // molWStream4
+        mc::Interval(13.994493502551212,13.994493502551212), // molNStream5
+        mc::Interval(362.98906121735627,362.98906121735627), // molWStream5
+        mc::Interval(0.00550649744878918,0.00550649744878918), // molNStream6
+        mc::Interval(0.14525847736943553,0.14525847736943553), // molWStream6
+        mc::Interval(0.15586818637494734,0.15586818637494734), // molNStream7
+        mc::Interval(4.039531860542781,4.039531860542781), // molWStream7
+        mc::Interval(13.838625316176264,13.838625316176264), // molNStream8
+        mc::Interval(358.94952935681357,358.94952935681357) // molWStream8
     };
+    // this->first_stage_IX = {
+    //     mc::Interval(1e-5, 11),
+    //     mc::Interval(1e-5, 500),
+    //     mc::Interval(1e-5, 12),
+    //     mc::Interval(1e-5, 500),
+    //     mc::Interval(1e-5, 13),
+    //     mc::Interval(1e-5, 500),
+    //     mc::Interval(1e-5, 14),
+    //     mc::Interval(1e-5, 500),
+    //     mc::Interval(1e-5, 15),
+    //     mc::Interval(1e-5, 500),
+    //     mc::Interval(1e-5, 16),
+    //     mc::Interval(1e-5, 500),
+    //     mc::Interval(1e-5, 17),
+    //     mc::Interval(1e-5, 500),
+    //     mc::Interval(1e-5, 18),
+    //     mc::Interval(1e-5, 500)
+    // };
 
     this->second_stage_IX = {
         mc::Interval(1e-1, 1e3),
@@ -39,10 +57,10 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
         mc::Interval(0.01, 10),
         mc::Interval(0.001, 1),
         mc::Interval(0.001, 1),
-        mc::Interval(1e-4, 100),
-        mc::Interval(1e-4, 100),
-        mc::Interval(1e-4, 100),
-        mc::Interval(1e-4, 100),
+        mc::Interval(1e-3, 100),
+        mc::Interval(1e-3, 10),
+        mc::Interval(1e-3, 100),
+        mc::Interval(1e-3, 100),
         mc::Interval(0, 5),
         mc::Interval(1e-8, 1),
         mc::Interval(1e-8, 1),
@@ -100,15 +118,15 @@ void EDUnits::buildDAG() {
 
     const double scaleFacFlowByUnit[4] = {
         0.0,
-        192555.0 / (1000.0 * 24.0 * 60.0 * 60.0),
-        192555.0 / (1000.0 * 24.0 * 60.0 * 60.0),
-        192555.0 / (1000.0 * 24.0 * 60.0 * 60.0)
+        5.388e-06,
+        5.388e-06,
+        5.388e-06
     };
     const double scaleFacConcByUnit[4] = {
         0.0,
-        1366.0 / molweightN,
-        1366.0 / molweightN,
-        1366.0 / molweightN
+        3.967e+02,
+        3.967e+02,
+        3.967e+02
     };
 
     for (size_t scenarioIndex = 0; scenarioIndex < this->scenario_names.size(); ++scenarioIndex) {
@@ -168,59 +186,42 @@ void EDUnits::buildDAG() {
         const double scaleFacFlow = scaleFacFlowByUnit[unitIdx];
         const double scaleFacConc = scaleFacConcByUnit[unitIdx];
 
-        mc::FFVar massStream1 = molNStream1 * molweightN + molWStream1 * molweightH20gMol;
-        mc::FFVar flowStream1 = massStream1 / densityH2OGm3;
-        mc::FFVar concStream1 = molNStream1 / flowStream1;
-
-        mc::FFVar massStream4 = molNStream4 * molweightN + molWStream4 * molweightH20gMol;
-        mc::FFVar flowStream4 = massStream4 / densityH2OGm3;
-        mc::FFVar concStream4 = molNStream4 / flowStream4;
-
-        mc::FFVar massStream5 = molNStream5 * molweightN + molWStream5 * molweightH20gMol;
-        mc::FFVar flowStream5In = massStream5 / densityH2OGm3;
-        mc::FFVar concStream5In = molNStream5 / flowStream5In;
-
-        mc::FFVar flowInEd = flowStream1;
-        mc::FFVar concInEd = concStream1;
-        if (unitIdx == 2) {
-            flowInEd = flowStream4;
-            concInEd = concStream4;
-        } else if (unitIdx == 3) {
-            flowInEd = flowStream5In;
-            concInEd = concStream5In;
+        mc::FFVar flowInED, concInED;
+        if (unitIdx == 1) {
+            flowInED = (molNStream1 * molweightN + molWStream1 * molweightH20gMol) / densityH2OGm3;
+            concInED = molNStream1 * densityH2OGm3 / (molNStream1 * molweightN + molWStream1 * molweightH20gMol);
+        } else if (unitIdx == 2) {
+            flowInED = (molNStream4 * molweightN + molWStream4 * molweightH20gMol) / densityH2OGm3;
+            concInED = molNStream4 * densityH2OGm3 / (molNStream4 * molweightN + molWStream4 * molweightH20gMol);
+        } else {
+            flowInED = (molNStream5 * molweightN + molWStream5 * molweightH20gMol) / densityH2OGm3;
+            concInED = molNStream5 * densityH2OGm3 / (molNStream5 * molweightN + molWStream5 * molweightH20gMol);
         }
 
-        mc::FFVar flowInConc = flowSplit * flowInEd / numCells;
-        mc::FFVar flowInDil = (1.0 - flowSplit) * flowInEd / numCells;
-        mc::FFVar concInConc = concInEd;
-        mc::FFVar concInDil = concInEd;
+        mc::FFVar flowInConc = flowSplit * flowInED / numCells;
+        mc::FFVar flowInDil = (1.0 - flowSplit) * flowInED / numCells;
 
-        mc::FFVar uConc = 0.5 * (flowOutConcentrateNd * scaleFacFlow + flowInConc) / (memWidth * thicknessConcentrate);
-        mc::FFVar uDil = 0.5 * (flowOutDiluteNd * scaleFacFlow + flowInDil) / (memWidth * thicknessDilute);
+        mc::FFVar reConc = densityManure * (flowOutConcentrateNd * scaleFacFlow + flowInConc) / (memWidth * viscosityManure);
+        mc::FFVar reDil = densityManure * (flowOutDiluteNd * scaleFacFlow + flowInDil) / (memWidth * viscosityManure);
 
-        mc::FFVar reConc = densityManure * uConc * (2.0 * thicknessConcentrate) / viscosityManure;
-        mc::FFVar reDil = densityManure * uDil * (2.0 * thicknessDilute) / viscosityManure;
+        const double scConc = viscosityManure / (densityManure * saltDiffConc);
+        const double scDil = viscosityManure / (densityManure * saltDiffDil);
 
-        mc::FFVar scConc = viscosityManure / (densityManure * saltDiffConc);
-        mc::FFVar scDil = viscosityManure / (densityManure * saltDiffDil);
+        mc::FFVar shConc = 0.29 * pow(reConc, 0.5) * pow(scConc, 0.33);
+        mc::FFVar shDil = 0.29 * pow(reDil, 0.5) * pow(scDil, 0.33);
 
-        mc::FFVar shConcCem = 0.29 * pow(reConc, 0.5) * pow(scConc, 0.33);
-        mc::FFVar shDilCem = 0.29 * pow(reDil, 0.5) * pow(scDil, 0.33);
-        mc::FFVar shConcAem = 0.29 * pow(reConc, 0.5) * pow(scConc, 0.33);
-        mc::FFVar shDilAem = 0.29 * pow(reDil, 0.5) * pow(scDil, 0.33);
+        mc::FFVar avgConcConc = 0.5 * (concOutConcentrateNd * scaleFacConc + concInED);
+        mc::FFVar avgConcDil = 0.5 * (concOutDiluteNd * scaleFacConc + concInED);
 
-        mc::FFVar avgConcConc = 0.5 * (concOutConcentrateNd * scaleFacConc + concInConc);
-        mc::FFVar avgConcDil = 0.5 * (concOutDiluteNd * scaleFacConc + concInDil);
+        mc::FFVar iLimConcCem = shConc * avgConcConc * faraday * saltDiffConc / (2.0 * thicknessConcentrate * (transCem - transIonConc));
+        mc::FFVar iLimDilCem = shDil * avgConcDil * faraday * saltDiffDil / (2.0 * thicknessDilute * (transCem - transIonConc));
+        mc::FFVar iLimConcAem = shConc * avgConcConc * faraday * saltDiffConc / (2.0 * thicknessConcentrate * (transAem - transIonDil));
+        mc::FFVar iLimDilAem = shDil * avgConcDil * faraday * saltDiffDil / (2.0 * thicknessDilute * (transAem - transIonDil));
 
-        mc::FFVar iLimConcCem = shConcCem * avgConcConc * faraday * saltDiffConc / (2.0 * thicknessConcentrate * (transCem - transIonConc));
-        mc::FFVar iLimDilCem = shDilCem * avgConcDil * faraday * saltDiffDil / (2.0 * thicknessDilute * (transCem - transIonConc));
-        mc::FFVar iLimConcAem = shConcAem * avgConcConc * faraday * saltDiffConc / (2.0 * thicknessConcentrate * (transAem - transIonDil));
-        mc::FFVar iLimDilAem = shDilAem * avgConcDil * faraday * saltDiffDil / (2.0 * thicknessDilute * (transAem - transIonDil));
-
-        mc::FFVar concInConcIntCem = concInConc * (1.0 + current / (memLength * memWidth) / iLimConcCem);
-        mc::FFVar concInDilIntCem = concInDil * (1.0 - current / (memLength * memWidth) / iLimDilCem);
-        mc::FFVar concInConcIntAem = concInConc * (1.0 + current / (memLength * memWidth) / iLimConcAem);
-        mc::FFVar concInDilIntAem = concInDil * (1.0 - current / (memLength * memWidth) / iLimDilAem);
+        mc::FFVar concInConcIntCem = concInED * (1.0 + current / (memLength * memWidth) / iLimConcCem);
+        mc::FFVar concInDilIntCem = concInED * (1.0 - current / (memLength * memWidth) / iLimDilCem);
+        mc::FFVar concInConcIntAem = concInED * (1.0 + current / (memLength * memWidth) / iLimConcAem);
+        mc::FFVar concInDilIntAem = concInED * (1.0 - current / (memLength * memWidth) / iLimDilAem);
 
         mc::FFVar concOutConcIntCem = concOutConcentrateNd * (1.0 + current / (memLength * memWidth) / iLimConcCem);
         mc::FFVar concOutDilIntCem = concOutDiluteNd * (1.0 - current / (memLength * memWidth) / iLimDilCem);
@@ -258,18 +259,14 @@ void EDUnits::buildDAG() {
         addEqualityConstraint(molNStream4 - molNStream3 - molNStream8);
         addEqualityConstraint(molWStream4 - molWStream3 - molWStream8);
 
-        addLessEqualConstraint(molNStream2 - 400.0 * (molweightH20gMol / molweightN / 1000.0) * molWStream2);
-        mc::FFVar purityEd3Expr = molNStream7 - 30000.0 * (molweightH20gMol / molweightN / 1000.0) * molWStream7;
-        addLessEqualConstraint(-purityEd3Expr);
+        addLessEqualConstraint(molNStream2 - 400.0 * (molweightH20gMol / molweightN / 1e6) * molWStream2);
+        addLessEqualConstraint(30000.0 * (molweightH20gMol / molweightN / 1e6) * molWStream7 - molNStream7);
 
         addEqualityConstraint(resConcentrate * conducConcentrate * avgConcConc - thicknessConcentrate);
         addEqualityConstraint(resDilute * conducDilute * avgConcDil - thicknessDilute);
 
         addEqualityConstraint(exp(voltNonOhmicCem * faraday / (permSelCem * rg * temp)) * avgConcDilIntCem - avgConcConcIntCem);
         addEqualityConstraint(exp(voltNonOhmicAem * faraday / (permSelAem * rg * temp)) * avgConcDilIntAem - avgConcConcIntAem);
-
-        mc::FFVar resOhmic = resConcentrate + resDilute + resCem + resAem;
-        mc::FFVar voltNonOhm = voltNonOhmicCem + voltNonOhmicAem;
 
         addEqualityConstraint(flowOutConcentrateNd - (flowInConc / scaleFacFlow) -
             (fluxWaterTotal * memLength * memWidth / scaleFacFlow) -
@@ -280,69 +277,49 @@ void EDUnits::buildDAG() {
             ((molweightNh4Cl * 0.001 / densityH2O) * fluxIonsTotal * memLength * memWidth / scaleFacFlow));
 
         addEqualityConstraint((flowOutConcentrateNd * concOutConcentrateNd) -
-            (flowInConc * concInConc) / (scaleFacFlow * scaleFacConc) -
+            (flowInConc * concInED) / (scaleFacFlow * scaleFacConc) -
             fluxIonsTotal * memLength * memWidth / (scaleFacFlow * scaleFacConc));
 
         addEqualityConstraint((flowOutDiluteNd * concOutDiluteNd) -
-            (flowInDil * concInDil) / (scaleFacFlow * scaleFacConc) +
+            (flowInDil * concInED) / (scaleFacFlow * scaleFacConc) +
             fluxIonsTotal * memLength * memWidth / (scaleFacFlow * scaleFacConc));
 
-        addEqualityConstraint(voltCellPair - voltNonOhm - resOhmic * (current / (memLength * memWidth)));
+        addEqualityConstraint(voltCellPair - (voltNonOhmicCem + voltNonOhmicAem) -
+            (resConcentrate + resDilute + resCem + resAem) * (current / (memLength * memWidth)));
 
         addLessEqualConstraint(current / (memLength * memWidth * iLimDilCem) - 1.0);
         addLessEqualConstraint(current / (memLength * memWidth * iLimDilAem) - 1.0);
 
         addEqualityConstraint(capex - (6800.0 * memLength * memWidth + 2.0 * 100.0 * (numCells - 2.0) * memLength * memWidth));
 
-        mc::FFVar voltBlank = resBlank * current / (memLength * memWidth);
-        mc::FFVar voltTotal = voltBlank + numCells * voltCellPair;
-        addEqualityConstraint(opex1 - (costElec * (24.0 * 1e-3) * voltTotal * current * daysOperation));
+        addEqualityConstraint(opex1 - costElec * (24.0 * 1e-3) *
+            (resBlank * current / (memLength * memWidth) + numCells * voltCellPair) * current * daysOperation);
 
         mc::FFVar flowOutConc = flowOutConcentrateNd * scaleFacFlow;
         mc::FFVar flowOutDil = flowOutDiluteNd * scaleFacFlow;
-        mc::FFVar fConc = 1400.0 / reConc;
-        mc::FFVar fDil = 104.5 / pow(reDil, 0.37);
-        mc::FFVar presDrop1 = densityManure * fConc * memLength * pow(flowOutConc / memWidth, 2.0) / (4.0 * thicknessConcentrate);
-        mc::FFVar presDrop2 = densityManure * fDil * memLength * pow(flowOutDil / memWidth, 2.0) / (4.0 * thicknessDilute);
-        mc::FFVar pumpingCost = costElec * (24.0 * 1e-3) *
-            (presDrop1 * ((flowOutConc + flowInConc) / 2.0) + presDrop2 * ((flowOutDil + flowInDil) / 2.0)) *
-            numCells * daysOperation;
-        addEqualityConstraint(opex2 - pumpingCost);
+        addEqualityConstraint(opex2 - costElec * (24.0 * 1e-3) * numCells * daysOperation * (
+            densityManure * (1400.0 / reConc) * memLength * pow(flowOutConc / memWidth, 2.0) / (4.0 * thicknessConcentrate) * ((flowOutConc + flowInConc) / 2.0) +
+            densityManure * (104.5 / pow(reDil, 0.37)) * memLength * pow(flowOutDil / memWidth, 2.0) / (4.0 * thicknessDilute) * ((flowOutDil + flowInDil) / 2.0)));
 
         if (unitIdx == 1) {
-            mc::FFVar flowStream2 = flowOutDiluteNd * scaleFacFlow * numCells;
-            mc::FFVar concStream2 = concOutDiluteNd * scaleFacConc;
-            addEqualityConstraint(molNStream2 - flowStream2 * concStream2);
-            addEqualityConstraint(molWStream2 - flowStream2 * (densityH2OGm3 - (concStream2 * molweightN) / molweightH20gMol));
-
-            mc::FFVar flowStream3 = flowOutConcentrateNd * scaleFacFlow * numCells;
-            mc::FFVar concStream3 = concOutConcentrateNd * scaleFacConc;
-            addEqualityConstraint(molNStream3 - flowStream3 * concStream3);
-            addEqualityConstraint(molWStream3 - flowStream3 * (densityH2OGm3 - (concStream3 * molweightN) / molweightH20gMol));
+            addEqualityConstraint(molNStream2 - flowOutDiluteNd * (scaleFacFlow * numCells) * concOutDiluteNd * scaleFacConc);
+            addEqualityConstraint(molWStream2 - flowOutDiluteNd * (scaleFacFlow * numCells) * (densityH2OGm3 - concOutDiluteNd * scaleFacConc * molweightN) / molweightH20gMol);
+            addEqualityConstraint(molNStream3 - flowOutConcentrateNd * (scaleFacFlow * numCells) * concOutConcentrateNd * scaleFacConc);
+            addEqualityConstraint(molWStream3 - flowOutConcentrateNd * (scaleFacFlow * numCells) * (densityH2OGm3 - concOutConcentrateNd * scaleFacConc * molweightN) / molweightH20gMol);
         }
 
         if (unitIdx == 2) {
-            mc::FFVar flowStream5 = flowOutConcentrateNd * scaleFacFlow * numCells;
-            mc::FFVar concStream5 = concOutConcentrateNd * scaleFacConc;
-            addEqualityConstraint(molNStream5 - flowStream5 * concStream5);
-            addEqualityConstraint(molWStream5 - flowStream5 * (densityH2OGm3 - (concStream5 * molweightN) / molweightH20gMol));
-
-            mc::FFVar flowStream6 = flowOutDiluteNd * scaleFacFlow * numCells;
-            mc::FFVar concStream6 = concOutDiluteNd * scaleFacConc;
-            addEqualityConstraint(molNStream6 - flowStream6 * concStream6);
-            addEqualityConstraint(molWStream6 - flowStream6 * (densityH2OGm3 - (concStream6 * molweightN) / molweightH20gMol));
+            addEqualityConstraint(molNStream5 - flowOutConcentrateNd * (scaleFacFlow * numCells) * concOutConcentrateNd * scaleFacConc);
+            addEqualityConstraint(molWStream5 - flowOutConcentrateNd * (scaleFacFlow * numCells) * (densityH2OGm3 - concOutConcentrateNd * scaleFacConc * molweightN) / molweightH20gMol);
+            addEqualityConstraint(molNStream6 - flowOutDiluteNd * (scaleFacFlow * numCells) * concOutDiluteNd * scaleFacConc);
+            addEqualityConstraint(molWStream6 - flowOutDiluteNd * (scaleFacFlow * numCells) * (densityH2OGm3 - concOutDiluteNd * scaleFacConc * molweightN) / molweightH20gMol);
         }
 
         if (unitIdx == 3) {
-            mc::FFVar flowStream7 = flowOutConcentrateNd * scaleFacFlow * numCells;
-            mc::FFVar concStream7 = concOutConcentrateNd * scaleFacConc;
-            addEqualityConstraint(molNStream7 - flowStream7 * concStream7);
-            addEqualityConstraint(molWStream7 - flowStream7 * (densityH2OGm3 - (concStream7 * molweightN) / molweightH20gMol));
-
-            mc::FFVar flowStream8 = flowOutDiluteNd * scaleFacFlow * numCells;
-            mc::FFVar concStream8 = concOutDiluteNd * scaleFacConc;
-            addEqualityConstraint(molNStream8 - flowStream8 * concStream8);
-            addEqualityConstraint(molWStream8 - flowStream8 * (densityH2OGm3 - (concStream8 * molweightN) / molweightH20gMol));
+            addEqualityConstraint(molNStream7 - flowOutConcentrateNd * (scaleFacFlow * numCells) * concOutConcentrateNd * scaleFacConc);
+            addEqualityConstraint(molWStream7 - flowOutConcentrateNd * (scaleFacFlow * numCells) * (densityH2OGm3 - concOutConcentrateNd * scaleFacConc * molweightN) / molweightH20gMol);
+            addEqualityConstraint(molNStream8 - flowOutDiluteNd * (scaleFacFlow * numCells) * concOutDiluteNd * scaleFacConc);
+            addEqualityConstraint(molWStream8 - flowOutDiluteNd * (scaleFacFlow * numCells) * (densityH2OGm3 - concOutDiluteNd * scaleFacConc * molweightN) / molweightH20gMol);
         }
 
         mc::FFVar objective = this->probability * (capex + opex1 + opex2 + costTotal * 0.0);
@@ -400,20 +377,21 @@ void EDUnits::buildFullModelDAG() {
 
     const double scaleFacFlowByUnit[4] = {
         0.0,
-        192555.0 / (1000.0 * 24.0 * 60.0 * 60.0),
-        192555.0 / (1000.0 * 24.0 * 60.0 * 60.0),
-        192555.0 / (1000.0 * 24.0 * 60.0 * 60.0)
+        5.388e-06,
+        5.388e-06,
+        5.388e-06
     };
     const double scaleFacConcByUnit[4] = {
         0.0,
-        1366.0 / molweightN,
-        1366.0 / molweightN,
-        1366.0 / molweightN
+        3.967e+02,
+        3.967e+02,
+        3.967e+02
     };
 
     const int firstStageCount = static_cast<int>(this->first_stage_IX.size());
-    const int secondStageCount = static_cast<int>(this->second_stage_IX.size());
-    const int totalSecondStageCount = secondStageCount * static_cast<int>(this->scenario_names.size());
+    // second_stage_IX is already the full combined size after convertToCentralizedModel()
+    const int totalSecondStageCount = static_cast<int>(this->second_stage_IX.size());
+    const int secondStageCount = totalSecondStageCount / static_cast<int>(this->scenario_names.size());
 
     this->X[ScenarioNames::SCENARIO1].resize(firstStageCount + totalSecondStageCount);
     for (int i = 0; i < firstStageCount + totalSecondStageCount; ++i) {
@@ -455,9 +433,8 @@ void EDUnits::buildFullModelDAG() {
     addEqualityConstraint(molNStream4 - molNStream3 - molNStream8);
     addEqualityConstraint(molWStream4 - molWStream3 - molWStream8);
 
-    addLessEqualConstraint(molNStream2 - 400.0 * (molweightH20gMol / molweightN / 1000.0) * molWStream2);
-    mc::FFVar purityEd3Expr = molNStream7 - 30000.0 * (molweightH20gMol / molweightN / 1000.0) * molWStream7;
-    addLessEqualConstraint(-purityEd3Expr);
+    addLessEqualConstraint(molNStream2 - 400.0 * (molweightH20gMol / molweightN / 1e6) * molWStream2);
+    addLessEqualConstraint(30000.0 * (molweightH20gMol / molweightN / 1e6) * molWStream7 - molNStream7);
 
     mc::FFVar objective = 0.0;
 
@@ -488,59 +465,42 @@ void EDUnits::buildFullModelDAG() {
         const double scaleFacFlow = scaleFacFlowByUnit[unitIdx];
         const double scaleFacConc = scaleFacConcByUnit[unitIdx];
 
-        mc::FFVar massStream1 = molNStream1 * molweightN + molWStream1 * molweightH20gMol;
-        mc::FFVar flowStream1 = massStream1 / densityH2OGm3;
-        mc::FFVar concStream1 = molNStream1 / flowStream1;
-
-        mc::FFVar massStream4 = molNStream4 * molweightN + molWStream4 * molweightH20gMol;
-        mc::FFVar flowStream4 = massStream4 / densityH2OGm3;
-        mc::FFVar concStream4 = molNStream4 / flowStream4;
-
-        mc::FFVar massStream5 = molNStream5 * molweightN + molWStream5 * molweightH20gMol;
-        mc::FFVar flowStream5In = massStream5 / densityH2OGm3;
-        mc::FFVar concStream5In = molNStream5 / flowStream5In;
-
-        mc::FFVar flowInEd = flowStream1;
-        mc::FFVar concInEd = concStream1;
-        if (unitIdx == 2) {
-            flowInEd = flowStream4;
-            concInEd = concStream4;
-        } else if (unitIdx == 3) {
-            flowInEd = flowStream5In;
-            concInEd = concStream5In;
+        mc::FFVar flowInED, concInED;
+        if (unitIdx == 1) {
+            flowInED = (molNStream1 * molweightN + molWStream1 * molweightH20gMol) / densityH2OGm3;
+            concInED = molNStream1 * densityH2OGm3 / (molNStream1 * molweightN + molWStream1 * molweightH20gMol);
+        } else if (unitIdx == 2) {
+            flowInED = (molNStream4 * molweightN + molWStream4 * molweightH20gMol) / densityH2OGm3;
+            concInED = molNStream4 * densityH2OGm3 / (molNStream4 * molweightN + molWStream4 * molweightH20gMol);
+        } else {
+            flowInED = (molNStream5 * molweightN + molWStream5 * molweightH20gMol) / densityH2OGm3;
+            concInED = molNStream5 * densityH2OGm3 / (molNStream5 * molweightN + molWStream5 * molweightH20gMol);
         }
 
-        mc::FFVar flowInConc = flowSplit * flowInEd / numCells;
-        mc::FFVar flowInDil = (1.0 - flowSplit) * flowInEd / numCells;
-        mc::FFVar concInConc = concInEd;
-        mc::FFVar concInDil = concInEd;
+        mc::FFVar flowInConc = flowSplit * flowInED / numCells;
+        mc::FFVar flowInDil = (1.0 - flowSplit) * flowInED / numCells;
 
-        mc::FFVar uConc = 0.5 * (flowOutConcentrateNd * scaleFacFlow + flowInConc) / (memWidth * thicknessConcentrate);
-        mc::FFVar uDil = 0.5 * (flowOutDiluteNd * scaleFacFlow + flowInDil) / (memWidth * thicknessDilute);
+        mc::FFVar reConc = densityManure * (flowOutConcentrateNd * scaleFacFlow + flowInConc) / (memWidth * viscosityManure);
+        mc::FFVar reDil = densityManure * (flowOutDiluteNd * scaleFacFlow + flowInDil) / (memWidth * viscosityManure);
 
-        mc::FFVar reConc = densityManure * uConc * (2.0 * thicknessConcentrate) / viscosityManure;
-        mc::FFVar reDil = densityManure * uDil * (2.0 * thicknessDilute) / viscosityManure;
+        const double scConc = viscosityManure / (densityManure * saltDiffConc);
+        const double scDil = viscosityManure / (densityManure * saltDiffDil);
 
-        mc::FFVar scConc = viscosityManure / (densityManure * saltDiffConc);
-        mc::FFVar scDil = viscosityManure / (densityManure * saltDiffDil);
+        mc::FFVar shConc = 0.29 * pow(reConc, 0.5) * pow(scConc, 0.33);
+        mc::FFVar shDil = 0.29 * pow(reDil, 0.5) * pow(scDil, 0.33);
 
-        mc::FFVar shConcCem = 0.29 * pow(reConc, 0.5) * pow(scConc, 0.33);
-        mc::FFVar shDilCem = 0.29 * pow(reDil, 0.5) * pow(scDil, 0.33);
-        mc::FFVar shConcAem = 0.29 * pow(reConc, 0.5) * pow(scConc, 0.33);
-        mc::FFVar shDilAem = 0.29 * pow(reDil, 0.5) * pow(scDil, 0.33);
+        mc::FFVar avgConcConc = 0.5 * (concOutConcentrateNd * scaleFacConc + concInED);
+        mc::FFVar avgConcDil = 0.5 * (concOutDiluteNd * scaleFacConc + concInED);
 
-        mc::FFVar avgConcConc = 0.5 * (concOutConcentrateNd * scaleFacConc + concInConc);
-        mc::FFVar avgConcDil = 0.5 * (concOutDiluteNd * scaleFacConc + concInDil);
+        mc::FFVar iLimConcCem = shConc * avgConcConc * faraday * saltDiffConc / (2.0 * thicknessConcentrate * (transCem - transIonConc));
+        mc::FFVar iLimDilCem = shDil * avgConcDil * faraday * saltDiffDil / (2.0 * thicknessDilute * (transCem - transIonConc));
+        mc::FFVar iLimConcAem = shConc * avgConcConc * faraday * saltDiffConc / (2.0 * thicknessConcentrate * (transAem - transIonDil));
+        mc::FFVar iLimDilAem = shDil * avgConcDil * faraday * saltDiffDil / (2.0 * thicknessDilute * (transAem - transIonDil));
 
-        mc::FFVar iLimConcCem = shConcCem * avgConcConc * faraday * saltDiffConc / (2.0 * thicknessConcentrate * (transCem - transIonConc));
-        mc::FFVar iLimDilCem = shDilCem * avgConcDil * faraday * saltDiffDil / (2.0 * thicknessDilute * (transCem - transIonConc));
-        mc::FFVar iLimConcAem = shConcAem * avgConcConc * faraday * saltDiffConc / (2.0 * thicknessConcentrate * (transAem - transIonDil));
-        mc::FFVar iLimDilAem = shDilAem * avgConcDil * faraday * saltDiffDil / (2.0 * thicknessDilute * (transAem - transIonDil));
-
-        mc::FFVar concInConcIntCem = concInConc * (1.0 + current / (memLength * memWidth) / iLimConcCem);
-        mc::FFVar concInDilIntCem = concInDil * (1.0 - current / (memLength * memWidth) / iLimDilCem);
-        mc::FFVar concInConcIntAem = concInConc * (1.0 + current / (memLength * memWidth) / iLimConcAem);
-        mc::FFVar concInDilIntAem = concInDil * (1.0 - current / (memLength * memWidth) / iLimDilAem);
+        mc::FFVar concInConcIntCem = concInED * (1.0 + current / (memLength * memWidth) / iLimConcCem);
+        mc::FFVar concInDilIntCem = concInED * (1.0 - current / (memLength * memWidth) / iLimDilCem);
+        mc::FFVar concInConcIntAem = concInED * (1.0 + current / (memLength * memWidth) / iLimConcAem);
+        mc::FFVar concInDilIntAem = concInED * (1.0 - current / (memLength * memWidth) / iLimDilAem);
 
         mc::FFVar concOutConcIntCem = concOutConcentrateNd * (1.0 + current / (memLength * memWidth) / iLimConcCem);
         mc::FFVar concOutDilIntCem = concOutDiluteNd * (1.0 - current / (memLength * memWidth) / iLimDilCem);
@@ -568,9 +528,6 @@ void EDUnits::buildFullModelDAG() {
         addEqualityConstraint(exp(voltNonOhmicCem * faraday / (permSelCem * rg * temp)) * avgConcDilIntCem - avgConcConcIntCem);
         addEqualityConstraint(exp(voltNonOhmicAem * faraday / (permSelAem * rg * temp)) * avgConcDilIntAem - avgConcConcIntAem);
 
-        mc::FFVar resOhmic = resConcentrate + resDilute + resCem + resAem;
-        mc::FFVar voltNonOhm = voltNonOhmicCem + voltNonOhmicAem;
-
         addEqualityConstraint(flowOutConcentrateNd - (flowInConc / scaleFacFlow) -
             (fluxWaterTotal * memLength * memWidth / scaleFacFlow) -
             ((molweightNh4Cl * 0.001 / densityH2O) * fluxIonsTotal * memLength * memWidth / scaleFacFlow));
@@ -580,69 +537,49 @@ void EDUnits::buildFullModelDAG() {
             ((molweightNh4Cl * 0.001 / densityH2O) * fluxIonsTotal * memLength * memWidth / scaleFacFlow));
 
         addEqualityConstraint((flowOutConcentrateNd * concOutConcentrateNd) -
-            (flowInConc * concInConc) / (scaleFacFlow * scaleFacConc) -
+            (flowInConc * concInED) / (scaleFacFlow * scaleFacConc) -
             fluxIonsTotal * memLength * memWidth / (scaleFacFlow * scaleFacConc));
 
         addEqualityConstraint((flowOutDiluteNd * concOutDiluteNd) -
-            (flowInDil * concInDil) / (scaleFacFlow * scaleFacConc) +
+            (flowInDil * concInED) / (scaleFacFlow * scaleFacConc) +
             fluxIonsTotal * memLength * memWidth / (scaleFacFlow * scaleFacConc));
 
-        addEqualityConstraint(voltCellPair - voltNonOhm - resOhmic * (current / (memLength * memWidth)));
+        addEqualityConstraint(voltCellPair - (voltNonOhmicCem + voltNonOhmicAem) -
+            (resConcentrate + resDilute + resCem + resAem) * (current / (memLength * memWidth)));
 
         addLessEqualConstraint(current / (memLength * memWidth * iLimDilCem) - 1.0);
         addLessEqualConstraint(current / (memLength * memWidth * iLimDilAem) - 1.0);
 
         addEqualityConstraint(capex - (6800.0 * memLength * memWidth + 2.0 * 100.0 * (numCells - 2.0) * memLength * memWidth));
 
-        mc::FFVar voltBlank = resBlank * current / (memLength * memWidth);
-        mc::FFVar voltTotal = voltBlank + numCells * voltCellPair;
-        addEqualityConstraint(opex1 - (costElec * (24.0 * 1e-3) * voltTotal * current * daysOperation));
+        addEqualityConstraint(opex1 - costElec * (24.0 * 1e-3) *
+            (resBlank * current / (memLength * memWidth) + numCells * voltCellPair) * current * daysOperation);
 
         mc::FFVar flowOutConc = flowOutConcentrateNd * scaleFacFlow;
         mc::FFVar flowOutDil = flowOutDiluteNd * scaleFacFlow;
-        mc::FFVar fConc = 1400.0 / reConc;
-        mc::FFVar fDil = 104.5 / pow(reDil, 0.37);
-        mc::FFVar presDrop1 = densityManure * fConc * memLength * pow(flowOutConc / memWidth, 2.0) / (4.0 * thicknessConcentrate);
-        mc::FFVar presDrop2 = densityManure * fDil * memLength * pow(flowOutDil / memWidth, 2.0) / (4.0 * thicknessDilute);
-        mc::FFVar pumpingCost = costElec * (24.0 * 1e-3) *
-            (presDrop1 * ((flowOutConc + flowInConc) / 2.0) + presDrop2 * ((flowOutDil + flowInDil) / 2.0)) *
-            numCells * daysOperation;
-        addEqualityConstraint(opex2 - pumpingCost);
+        addEqualityConstraint(opex2 - costElec * (24.0 * 1e-3) * numCells * daysOperation * (
+            densityManure * (1400.0 / reConc) * memLength * pow(flowOutConc / memWidth, 2.0) / (4.0 * thicknessConcentrate) * ((flowOutConc + flowInConc) / 2.0) +
+            densityManure * (104.5 / pow(reDil, 0.37)) * memLength * pow(flowOutDil / memWidth, 2.0) / (4.0 * thicknessDilute) * ((flowOutDil + flowInDil) / 2.0)));
 
         if (unitIdx == 1) {
-            mc::FFVar flowStream2 = flowOutDiluteNd * scaleFacFlow * numCells;
-            mc::FFVar concStream2 = concOutDiluteNd * scaleFacConc;
-            addEqualityConstraint(molNStream2 - flowStream2 * concStream2);
-            addEqualityConstraint(molWStream2 - flowStream2 * (densityH2OGm3 - (concStream2 * molweightN) / molweightH20gMol));
-
-            mc::FFVar flowStream3 = flowOutConcentrateNd * scaleFacFlow * numCells;
-            mc::FFVar concStream3 = concOutConcentrateNd * scaleFacConc;
-            addEqualityConstraint(molNStream3 - flowStream3 * concStream3);
-            addEqualityConstraint(molWStream3 - flowStream3 * (densityH2OGm3 - (concStream3 * molweightN) / molweightH20gMol));
+            addEqualityConstraint(molNStream2 - flowOutDiluteNd * (scaleFacFlow * numCells) * concOutDiluteNd * scaleFacConc);
+            addEqualityConstraint(molWStream2 - flowOutDiluteNd * (scaleFacFlow * numCells) * (densityH2OGm3 - concOutDiluteNd * scaleFacConc * molweightN) / molweightH20gMol);
+            addEqualityConstraint(molNStream3 - flowOutConcentrateNd * (scaleFacFlow * numCells) * concOutConcentrateNd * scaleFacConc);
+            addEqualityConstraint(molWStream3 - flowOutConcentrateNd * (scaleFacFlow * numCells) * (densityH2OGm3 - concOutConcentrateNd * scaleFacConc * molweightN) / molweightH20gMol);
         }
 
         if (unitIdx == 2) {
-            mc::FFVar flowStream5 = flowOutConcentrateNd * scaleFacFlow * numCells;
-            mc::FFVar concStream5 = concOutConcentrateNd * scaleFacConc;
-            addEqualityConstraint(molNStream5 - flowStream5 * concStream5);
-            addEqualityConstraint(molWStream5 - flowStream5 * (densityH2OGm3 - (concStream5 * molweightN) / molweightH20gMol));
-
-            mc::FFVar flowStream6 = flowOutDiluteNd * scaleFacFlow * numCells;
-            mc::FFVar concStream6 = concOutDiluteNd * scaleFacConc;
-            addEqualityConstraint(molNStream6 - flowStream6 * concStream6);
-            addEqualityConstraint(molWStream6 - flowStream6 * (densityH2OGm3 - (concStream6 * molweightN) / molweightH20gMol));
+            addEqualityConstraint(molNStream5 - flowOutConcentrateNd * (scaleFacFlow * numCells) * concOutConcentrateNd * scaleFacConc);
+            addEqualityConstraint(molWStream5 - flowOutConcentrateNd * (scaleFacFlow * numCells) * (densityH2OGm3 - concOutConcentrateNd * scaleFacConc * molweightN) / molweightH20gMol);
+            addEqualityConstraint(molNStream6 - flowOutDiluteNd * (scaleFacFlow * numCells) * concOutDiluteNd * scaleFacConc);
+            addEqualityConstraint(molWStream6 - flowOutDiluteNd * (scaleFacFlow * numCells) * (densityH2OGm3 - concOutDiluteNd * scaleFacConc * molweightN) / molweightH20gMol);
         }
 
         if (unitIdx == 3) {
-            mc::FFVar flowStream7 = flowOutConcentrateNd * scaleFacFlow * numCells;
-            mc::FFVar concStream7 = concOutConcentrateNd * scaleFacConc;
-            addEqualityConstraint(molNStream7 - flowStream7 * concStream7);
-            addEqualityConstraint(molWStream7 - flowStream7 * (densityH2OGm3 - (concStream7 * molweightN) / molweightH20gMol));
-
-            mc::FFVar flowStream8 = flowOutDiluteNd * scaleFacFlow * numCells;
-            mc::FFVar concStream8 = concOutDiluteNd * scaleFacConc;
-            addEqualityConstraint(molNStream8 - flowStream8 * concStream8);
-            addEqualityConstraint(molWStream8 - flowStream8 * (densityH2OGm3 - (concStream8 * molweightN) / molweightH20gMol));
+            addEqualityConstraint(molNStream7 - flowOutConcentrateNd * (scaleFacFlow * numCells) * concOutConcentrateNd * scaleFacConc);
+            addEqualityConstraint(molWStream7 - flowOutConcentrateNd * (scaleFacFlow * numCells) * (densityH2OGm3 - concOutConcentrateNd * scaleFacConc * molweightN) / molweightH20gMol);
+            addEqualityConstraint(molNStream8 - flowOutDiluteNd * (scaleFacFlow * numCells) * concOutDiluteNd * scaleFacConc);
+            addEqualityConstraint(molWStream8 - flowOutDiluteNd * (scaleFacFlow * numCells) * (densityH2OGm3 - concOutDiluteNd * scaleFacConc * molweightN) / molweightH20gMol);
         }
 
         objective += this->probability * (capex + opex1 + opex2 + costTotal * 0.0);
