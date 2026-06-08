@@ -117,7 +117,7 @@ void EDUnits::buildDAG() {
     const double waterPermCem = 7.79e-11 / 3600.0;
     const double waterPermAem = 6.29e-11 / 3600.0;
     const double vantHoffNumber = 2.0;
-    const double molweightH2O = 0.018;
+    const double molweightH20 = 0.018;
     const double molweightH20gMol = 18.01528;
     const double densityH2O = 1000.0;
     const double densityH2OGm3 = 1000.0 * 1000.0;
@@ -261,7 +261,7 @@ void EDUnits::buildDAG() {
 
         mc::FFVar osmWaterFluxAem = waterPermAem * vantHoffNumber * rg * temp * (osmoticCoeff * avgConcConcIntAem - osmoticCoeff * avgConcDilIntAem);
         mc::FFVar osmWaterFluxCem = waterPermCem * vantHoffNumber * rg * temp * (osmoticCoeff * avgConcConcIntCem - osmoticCoeff * avgConcDilIntCem);
-        mc::FFVar eosmWaterFlux = waterTransNumber * fluxIonsTotal * molweightH2O / densityH2O;
+        mc::FFVar eosmWaterFlux = waterTransNumber * fluxIonsTotal * molweightH20 / densityH2O;
         mc::FFVar fluxWaterTotal = osmWaterFluxAem + osmWaterFluxCem + eosmWaterFlux;
 
         std::vector<mc::FFVar> constraints;
@@ -283,14 +283,14 @@ void EDUnits::buildDAG() {
         addLessEqualConstraint(molNStream2 - 400.0 * (molweightH20gMol / molweightN / 1e6) * molWStream2);
         addLessEqualConstraint(30000.0 * (molweightH20gMol / molweightN / 1e6) * molWStream7 - molNStream7);
 
-        addLessEqualConstraint(molNStream1 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream1 * molweightH2OgMol);
-        addLessEqualConstraint(molNStream2 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream2 * molweightH2OgMol);
-        addLessEqualConstraint(molNStream3 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream3 * molweightH2OgMol);
-        addLessEqualConstraint(molNStream4 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream4 * molweightH2OgMol);
-        addLessEqualConstraint(molNStream5 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream5 * molweightH2OgMol);
-        addLessEqualConstraint(molNStream6 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream6 * molweightH2OgMol);
-        addLessEqualConstraint(molNStream7 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream7 * molweightH2OgMol);
-        addLessEqualConstraint(molNStream8 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream8 * molweightH2OgMol);
+        addLessEqualConstraint(molNStream1 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream1 * molweightH20gMol);
+        addLessEqualConstraint(molNStream2 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream2 * molweightH20gMol);
+        addLessEqualConstraint(molNStream3 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream3 * molweightH20gMol);
+        addLessEqualConstraint(molNStream4 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream4 * molweightH20gMol);
+        addLessEqualConstraint(molNStream5 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream5 * molweightH20gMol);
+        addLessEqualConstraint(molNStream6 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream6 * molweightH20gMol);
+        addLessEqualConstraint(molNStream7 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream7 * molweightH20gMol);
+        addLessEqualConstraint(molNStream8 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream8 * molweightH20gMol);
 
         addEqualityConstraint(resConcentrate * conducConcentrate * avgConcConc - thicknessConcentrate);
         addEqualityConstraint(resDilute * conducDilute * avgConcDil - thicknessDilute);
@@ -385,7 +385,7 @@ void EDUnits::buildFullModelDAG() {
     const double waterPermCem = 7.79e-11 / 3600.0;
     const double waterPermAem = 6.29e-11 / 3600.0;
     const double vantHoffNumber = 2.0;
-    const double molweightH2O = 0.018;
+    const double molweightH20 = 0.018;
     const double molweightH20gMol = 18.01528;
     const double densityH2O = 1000.0;
     const double densityH2OGm3 = 1000.0 * 1000.0;
@@ -466,14 +466,14 @@ void EDUnits::buildFullModelDAG() {
     addLessEqualConstraint(molNStream2 - 400.0 * (molweightH20gMol / molweightN / 1e6) * molWStream2);
     addLessEqualConstraint(30000.0 * (molweightH20gMol / molweightN / 1e6) * molWStream7 - molNStream7);
 
-    addLessEqualConstraint(molNStream1 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream1 * molweightH2OgMol);
-    addLessEqualConstraint(molNStream2 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream2 * molweightH2OgMol);
-    addLessEqualConstraint(molNStream3 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream3 * molweightH2OgMol);
-    addLessEqualConstraint(molNStream4 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream4 * molweightH2OgMol);
-    addLessEqualConstraint(molNStream5 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream5 * molweightH2OgMol);
-    addLessEqualConstraint(molNStream6 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream6 * molweightH2OgMol);
-    addLessEqualConstraint(molNStream7 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream7 * molweightH2OgMol);
-    addLessEqualConstraint(molNStream8 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream8 * molweightH2OgMol);
+    addLessEqualConstraint(molNStream1 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream1 * molweightH20gMol);
+    addLessEqualConstraint(molNStream2 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream2 * molweightH20gMol);
+    addLessEqualConstraint(molNStream3 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream3 * molweightH20gMol);
+    addLessEqualConstraint(molNStream4 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream4 * molweightH20gMol);
+    addLessEqualConstraint(molNStream5 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream5 * molweightH20gMol);
+    addLessEqualConstraint(molNStream6 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream6 * molweightH20gMol);
+    addLessEqualConstraint(molNStream7 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream7 * molweightH20gMol);
+    addLessEqualConstraint(molNStream8 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream8 * molweightH20gMol);
 
     mc::FFVar objective = 0.0;
 
@@ -558,7 +558,7 @@ void EDUnits::buildFullModelDAG() {
 
         mc::FFVar osmWaterFluxAem = waterPermAem * vantHoffNumber * rg * temp * (osmoticCoeff * avgConcConcIntAem - osmoticCoeff * avgConcDilIntAem);
         mc::FFVar osmWaterFluxCem = waterPermCem * vantHoffNumber * rg * temp * (osmoticCoeff * avgConcConcIntCem - osmoticCoeff * avgConcDilIntCem);
-        mc::FFVar eosmWaterFlux = waterTransNumber * fluxIonsTotal * molweightH2O / densityH2O;
+        mc::FFVar eosmWaterFlux = waterTransNumber * fluxIonsTotal * molweightH20 / densityH2O;
         mc::FFVar fluxWaterTotal = osmWaterFluxAem + osmWaterFluxCem + eosmWaterFlux;
 
         addEqualityConstraint(resConcentrate * conducConcentrate * avgConcConc - thicknessConcentrate);
