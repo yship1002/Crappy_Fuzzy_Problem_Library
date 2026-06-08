@@ -52,16 +52,16 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
 
     this->second_stage_IX = {
         mc::Interval(1, 200),           // I
-        mc::Interval(0, 0.5),           // flowSplit
-        mc::Interval(0.1, 10),          // memLength
-        mc::Interval(0.005, 1),         // memWidth
-        mc::Interval(0.0003, 0.01),     // thicknessConcentrate
-        mc::Interval(0.0003, 0.01),     // thicknessDilute
-        mc::Interval(1e-3, 50),         // flowOutConcentrateND
+        mc::Interval(0, 1),           // flowSplit
+        mc::Interval(0.01, 10),          // memLength
+        mc::Interval(0.01, 10),         // memWidth
+        mc::Interval(0.001, 0.01),     // thicknessConcentrate
+        mc::Interval(0.001, 0.01),     // thicknessDilute
+        mc::Interval(1e-3, 100),         // flowOutConcentrateND
         mc::Interval(1e-3, 10),         // flowOutDiluteND
-        mc::Interval(0.1, 50),          // concOutConcentrateND
-        mc::Interval(1e-3, 5),          // concOutDiluteND
-        mc::Interval(0.01, 3),          // voltCellPair
+        mc::Interval(1e-3, 100),          // concOutConcentrateND
+        mc::Interval(1e-3, 100),          // concOutDiluteND
+        mc::Interval(0, 5),          // voltCellPair
         mc::Interval(1e-6, 1e-2),       // resConcentrate
         mc::Interval(1e-6, 1e-2),       // resDilute
         mc::Interval(1e-4, 0.25),       // voltNonOhmicCEM
@@ -283,6 +283,15 @@ void EDUnits::buildDAG() {
         addLessEqualConstraint(molNStream2 - 400.0 * (molweightH20gMol / molweightN / 1e6) * molWStream2);
         addLessEqualConstraint(30000.0 * (molweightH20gMol / molweightN / 1e6) * molWStream7 - molNStream7);
 
+        addLessEqualConstraint(molNStream1 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream1 * molweightH2OgMol);
+        addLessEqualConstraint(molNStream2 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream2 * molweightH2OgMol);
+        addLessEqualConstraint(molNStream3 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream3 * molweightH2OgMol);
+        addLessEqualConstraint(molNStream4 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream4 * molweightH2OgMol);
+        addLessEqualConstraint(molNStream5 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream5 * molweightH2OgMol);
+        addLessEqualConstraint(molNStream6 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream6 * molweightH2OgMol);
+        addLessEqualConstraint(molNStream7 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream7 * molweightH2OgMol);
+        addLessEqualConstraint(molNStream8 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream8 * molweightH2OgMol);
+
         addEqualityConstraint(resConcentrate * conducConcentrate * avgConcConc - thicknessConcentrate);
         addEqualityConstraint(resDilute * conducDilute * avgConcDil - thicknessDilute);
 
@@ -456,6 +465,15 @@ void EDUnits::buildFullModelDAG() {
 
     addLessEqualConstraint(molNStream2 - 400.0 * (molweightH20gMol / molweightN / 1e6) * molWStream2);
     addLessEqualConstraint(30000.0 * (molweightH20gMol / molweightN / 1e6) * molWStream7 - molNStream7);
+
+    addLessEqualConstraint(molNStream1 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream1 * molweightH2OgMol);
+    addLessEqualConstraint(molNStream2 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream2 * molweightH2OgMol);
+    addLessEqualConstraint(molNStream3 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream3 * molweightH2OgMol);
+    addLessEqualConstraint(molNStream4 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream4 * molweightH2OgMol);
+    addLessEqualConstraint(molNStream5 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream5 * molweightH2OgMol);
+    addLessEqualConstraint(molNStream6 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream6 * molweightH2OgMol);
+    addLessEqualConstraint(molNStream7 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream7 * molweightH2OgMol);
+    addLessEqualConstraint(molNStream8 * (densityH2OGm3 - 40000*molweightN) - 40000 * molWStream8 * molweightH2OgMol);
 
     mc::FFVar objective = 0.0;
 
