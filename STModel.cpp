@@ -9,6 +9,22 @@ void STModel::clearDAG() {
         this->F[scenario_name].clear();
     }
 }
+double STModel::getconditionnumber(const double* coeffs,int length){
+    double max = std::abs(coeffs[0]);
+    double min = std::abs(coeffs[0]);
+    for (int i = 0; i < length; ++i) {
+        if (std::abs(coeffs[i]) > max) {
+            max = std::abs(coeffs[i]);
+        }
+        if (std::abs(coeffs[i]) < min && std::abs(coeffs[i]) > 1e-10) { // avoid zero
+            min = std::abs(coeffs[i]);
+        }
+    }
+    if (min < 1e-10) {
+        return std::numeric_limits<double>::infinity(); // condition number is infinite if min is zero
+    }
+    return max / min;
+}
 void STModel::convertToCentralizedModel() {
     std::vector<mc::Interval> new_second_stage_IX;
     for (auto & scenario_name : this->scenario_names){
@@ -195,21 +211,35 @@ void STModel::generateLP(IloEnv* cplex_env,IloModel* cplexmodel,
 
     this->DAG[this->scenario_name].eval(this->F[this->scenario_name].size(), this->F[this->scenario_name].data(), PF, nvars, this->X[this->scenario_name].data(), PX);
     
-
-    Env.options.SANDWICH_RTOL=1e-10;
-    Env.options.SANDWICH_MAXCUT=200;
-
-
-    Env.generate_cuts(this->F[this->scenario_name].size(), PF);
-
-    // Extract LP data from Env Don't touch below this line
-    auto c = Env.Cuts();
     int after_nvars = Env.Vars().size();
     std::vector<mc::Interval> var_bound(after_nvars);
-    for (auto v : Env.Vars()) { // Note: Env.Vars() ordering is not v1,v2, ... rather based on z1,z2 so we need to get indices
-        int v_idx=v.second->id().second;
-        var_bound[v_idx]=mc::Interval(v.second->range().l(),v.second->range().u());
+    for (auto v : Env.Vars()) {
+        int v_idx = v.second->id().second;
+        // v.second->var() is the FFVar — ask the DAG for its current interval
+
+        var_bound[v_idx] = mc::Interval(v.second->range().l(), v.second->range().u());
+
     }
+
+
+    // Env.options.SANDWICH_RTOL=1e-10;
+    // Env.options.SANDWICH_MAXCUT=200;
+
+                           
+
+    Env.generate_cuts(this->F[this->scenario_name].size(), PF);
+    
+    std::cout<<Env;
+    std::cout<<this->DAG[this->scenario_name];  
+    
+    // Extract LP data from Env Don't touch below this line
+    auto c = Env.Cuts();
+    //int after_nvars = Env.Vars().size();
+    // std::vector<mc::Interval> var_bound(after_nvars);
+    // for (auto v : Env.Vars()) { // Note: Env.Vars() ordering is not v1,v2, ... rather based on z1,z2 so we need to get indices
+    //     int v_idx=v.second->id().second;
+    //     var_bound[v_idx]=mc::Interval(v.second->range().l(),v.second->range().u());
+    // }
     // Add variables to cplex in order of their IDs to match indexing
     for (int i = 0; i < after_nvars; ++i) {
         cplex_x->add(IloNumVar((*cplex_env), var_bound[i].l(), var_bound[i].u()));
@@ -218,9 +248,13 @@ void STModel::generateLP(IloEnv* cplex_env,IloModel* cplexmodel,
 
     // Loop over cuts to build Ax<=b
     int row_idx=0;
-    for (const auto& pc : c) {
+    for ( const auto& pc : c) {
         const double* coeffs = pc->coef();    // get pointer to coefficients
         int n = pc->nvar();  // number of variables in this constraint
+        // if (this->getconditionnumber(coeffs, n) > 1e15) {
+        //     std::cout << "Skipping cut with condition number: " << this->getconditionnumber(coeffs, n) << std::endl;
+        //     continue; // skip this cut if it's too ill-conditioned
+        // }
         auto v = pc->var();              // get variable names that appear in this constraint
         IloExpr expr(*cplex_env);
         for (int i = 0; i < n; ++i){

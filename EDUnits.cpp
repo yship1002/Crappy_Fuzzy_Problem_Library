@@ -51,7 +51,7 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
     };
 
     this->second_stage_IX = {
-        mc::Interval(1e-1, 1e3),
+        mc::Interval(1e-1, 1e3), 
         mc::Interval(0, 1),
         mc::Interval(0.01, 100),
         mc::Interval(0.01, 10),
@@ -71,6 +71,27 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
         mc::Interval(0, 1e6),
         mc::Interval(0, 1e6)
     };
+    // this->second_stage_IX ={
+    //     mc::Interval(0.0999999999000337,    0.0999999999000337),   // I
+    //     mc::Interval(0.9995735093972126,    0.9995735093972126),   // flowSplit
+    //     mc::Interval(0.036242856343132054,  0.036242856343132054), // memLength
+    //     mc::Interval(0.009999999900088968,  0.009999999900088968), // memWidth
+    //     mc::Interval(0.000999999900010844,  0.000999999900010844), // thicknessConcentrate
+    //     mc::Interval(0.0009999999000038177, 0.0009999999000038177),// thicknessDilute
+    //     mc::Interval(2.5001359490822983,    2.5001359490822983),   // flowOutConcentrateND
+    //     mc::Interval(0.001,                 0.001),                // flowOutDiluteND
+    //     mc::Interval(5.237617366884594,     5.237617366884594),    // concOutConcentrateND
+    //     mc::Interval(5.152472119923644,     5.152472119923644),    // concOutDiluteND
+    //     mc::Interval(0.15214083523685012,   0.15214083523685012),  // voltCellPair
+    //     mc::Interval(3.217168486072007e-05, 3.217168486072007e-05),// resConcentrate
+    //     mc::Interval(3.2435231169229935e-05,3.2435231169229935e-05),// resDilute
+    //     mc::Interval(0.008015556841086438,  0.008015556841086438), // voltNonOhmicCEM
+    //     mc::Interval(0.007655096301298272,  0.007655096301298272), // voltNonOhmicAEM
+    //     mc::Interval(38.56239876381159,     38.56239876381159),    // capex
+    //     mc::Interval(38.00625183346244,     38.00625183346244),    // opex1
+    //     mc::Interval(0.00028748342492133694,0.00028748342492133694),// opex2
+    //     mc::Interval(0,                     0)                    // costTotal (unknown)
+    // };
 }
 
 void EDUnits::buildDAG() {

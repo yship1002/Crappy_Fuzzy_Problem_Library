@@ -104,7 +104,7 @@ class STModel:public Ipopt::TNLP{
         virtual void buildFullModelDAG() = 0;
         void clearDAG();
         void convertToCentralizedModel();
-
+        double getconditionnumber(const double* coeffs ,int length);
         void generateMINLP(GRBModel* grbmodel);
         void generateLP(IloEnv* cplex_env,IloModel* cplexmodel,
                               IloRangeArray* cplex_constraints,
