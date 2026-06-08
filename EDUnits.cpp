@@ -51,26 +51,26 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
     };
 
     this->second_stage_IX = {
-        mc::Interval(1e-1, 1e3), 
-        mc::Interval(0, 1),
-        mc::Interval(0.01, 100),
-        mc::Interval(0.01, 10),
-        mc::Interval(0.001, 1),
-        mc::Interval(0.001, 1),
-        mc::Interval(1e-3, 100),
-        mc::Interval(1e-3, 10),
-        mc::Interval(1e-3, 100),
-        mc::Interval(1e-3, 100),
-        mc::Interval(0, 5),
-        mc::Interval(1e-8, 1),
-        mc::Interval(1e-8, 1),
-        mc::Interval(1e-7, 1),
-        mc::Interval(1e-7, 1),
-        mc::Interval(0, 1e6),
-        mc::Interval(0, 1e6),
-        mc::Interval(0, 1e6),
-        mc::Interval(0, 1e6)
-    };
+        mc::Interval(1, 200),           // I
+        mc::Interval(0, 0.5),           // flowSplit
+        mc::Interval(0.1, 10),          // memLength
+        mc::Interval(0.005, 1),         // memWidth
+        mc::Interval(0.0003, 0.01),     // thicknessConcentrate
+        mc::Interval(0.0003, 0.01),     // thicknessDilute
+        mc::Interval(1e-3, 50),         // flowOutConcentrateND
+        mc::Interval(1e-3, 10),         // flowOutDiluteND
+        mc::Interval(0.1, 50),          // concOutConcentrateND
+        mc::Interval(1e-3, 5),          // concOutDiluteND
+        mc::Interval(0.01, 3),          // voltCellPair
+        mc::Interval(1e-6, 1e-2),       // resConcentrate
+        mc::Interval(1e-6, 1e-2),       // resDilute
+        mc::Interval(1e-4, 0.25),       // voltNonOhmicCEM
+        mc::Interval(1e-4, 0.25),       // voltNonOhmicAEM
+        mc::Interval(0, 1e6),           // capex
+        mc::Interval(0, 1e6),           // opex1
+        mc::Interval(0, 1e6),           // opex2
+        mc::Interval(0, 1e6)            // costTotal
+    };  
     // this->second_stage_IX ={
     //     mc::Interval(0.0999999999000337,    0.0999999999000337),   // I
     //     mc::Interval(0.9995735093972126,    0.9995735093972126),   // flowSplit
