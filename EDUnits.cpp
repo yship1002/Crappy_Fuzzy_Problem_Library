@@ -69,7 +69,9 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
         mc::Interval(0, 1e6),           // capex
         mc::Interval(0, 1e6),           // opex1
         mc::Interval(0, 1e6),           // opex2
-        mc::Interval(0, 1e6)            // costTotal
+        mc::Interval(0, 1e6)  ,          // costTotal
+        mc::Interval(1e-5, 1e6),        // auxConcDilCem  (index 19)
+        mc::Interval(1e-5, 1e6)         // auxConcDilAem  (index 20)
     };  
     // this->second_stage_IX ={
     //     mc::Interval(0.0999999999000337,    0.0999999999000337),   // I
@@ -202,6 +204,8 @@ void EDUnits::buildDAG() {
         mc::FFVar& opex1 = vars[secondStageStart + 16];
         mc::FFVar& opex2 = vars[secondStageStart + 17];
         mc::FFVar& costTotal = vars[secondStageStart + 18];
+        mc::FFVar& auxConcDilCem    = vars[secondStageStart + 19];  // ADD
+        mc::FFVar& auxConcDilAem    = vars[secondStageStart + 20];  // ADD
 
         const int unitIdx = static_cast<int>(scenarioIndex) + 1;
         const double scaleFacFlow = scaleFacFlowByUnit[unitIdx];
@@ -295,8 +299,19 @@ void EDUnits::buildDAG() {
         addEqualityConstraint(resConcentrate * conducConcentrate * avgConcConc - thicknessConcentrate);
         addEqualityConstraint(resDilute * conducDilute * avgConcDil - thicknessDilute);
 
-        addEqualityConstraint(exp(voltNonOhmicCem * faraday / (permSelCem * rg * temp)) * avgConcDilIntCem - avgConcConcIntCem);
-        addEqualityConstraint(exp(voltNonOhmicAem * faraday / (permSelAem * rg * temp)) * avgConcDilIntAem - avgConcConcIntAem);
+
+        addEqualityConstraint(auxConcDilCem - avgConcDilIntCem);
+        addEqualityConstraint(auxConcDilAem - avgConcDilIntAem);
+        addEqualityConstraint(
+            voltNonOhmicCem - (permSelCem * rg * temp / faraday) * (log(avgConcConcIntCem) - log(auxConcDilCem))
+        );
+        addEqualityConstraint(
+            voltNonOhmicAem - (permSelAem * rg * temp / faraday) * (log(avgConcConcIntAem) - log(auxConcDilAem))
+        );
+
+        //addEqualityConstraint(exp(voltNonOhmicCem * faraday / (permSelCem * rg * temp)) * avgConcDilIntCem - avgConcConcIntCem);
+        //addEqualityConstraint(exp(voltNonOhmicAem * faraday / (permSelAem * rg * temp)) * avgConcDilIntAem - avgConcConcIntAem);
+
 
         addEqualityConstraint(flowOutConcentrateNd - (flowInConc / scaleFacFlow) -
             (fluxWaterTotal * memLength * memWidth / scaleFacFlow) -
@@ -355,7 +370,7 @@ void EDUnits::buildDAG() {
         mc::FFVar objective = this->probability * (capex + opex1 + opex2 + costTotal * 0.0);
 
         std::vector<mc::FFVar> functions;
-        functions.reserve(1 + constraints.size());
+
         functions.push_back(objective);
         functions.insert(functions.end(), constraints.begin(), constraints.end());
         this->F[scenarioName] = functions;
@@ -448,7 +463,7 @@ void EDUnits::buildFullModelDAG() {
     mc::FFVar& molWStream8 = vars[15];
 
     std::vector<mc::FFVar> constraints;
-    constraints.reserve(256);
+
 
     auto addEqualityConstraint = [&](const mc::FFVar& expr) {
         constraints.push_back(expr);
@@ -500,6 +515,8 @@ void EDUnits::buildFullModelDAG() {
         mc::FFVar& opex1 = vars[secondStageStart + 16];
         mc::FFVar& opex2 = vars[secondStageStart + 17];
         mc::FFVar& costTotal = vars[secondStageStart + 18];
+        mc::FFVar& auxConcDilCem    = vars[secondStageStart + 19];  // ADD
+        mc::FFVar& auxConcDilAem    = vars[secondStageStart + 20];  // ADD
 
         const double scaleFacFlow = scaleFacFlowByUnit[unitIdx];
         const double scaleFacConc = scaleFacConcByUnit[unitIdx];
@@ -564,8 +581,21 @@ void EDUnits::buildFullModelDAG() {
         addEqualityConstraint(resConcentrate * conducConcentrate * avgConcConc - thicknessConcentrate);
         addEqualityConstraint(resDilute * conducDilute * avgConcDil - thicknessDilute);
 
-        addEqualityConstraint(exp(voltNonOhmicCem * faraday / (permSelCem * rg * temp)) * avgConcDilIntCem - avgConcConcIntCem);
-        addEqualityConstraint(exp(voltNonOhmicAem * faraday / (permSelAem * rg * temp)) * avgConcDilIntAem - avgConcConcIntAem);
+
+        addEqualityConstraint(auxConcDilCem - avgConcDilIntCem);
+        addEqualityConstraint(auxConcDilAem - avgConcDilIntAem);
+        addEqualityConstraint(
+            voltNonOhmicCem - (permSelCem * rg * temp / faraday) * (log(avgConcConcIntCem) - log(auxConcDilCem))
+        );
+        addEqualityConstraint(
+            voltNonOhmicAem - (permSelAem * rg * temp / faraday) * (log(avgConcConcIntAem) - log(auxConcDilAem))
+        );
+
+
+        //addEqualityConstraint(exp(voltNonOhmicCem * faraday / (permSelCem * rg * temp)) * avgConcDilIntCem - avgConcConcIntCem);
+        //addEqualityConstraint(exp(voltNonOhmicAem * faraday / (permSelAem * rg * temp)) * avgConcDilIntAem - avgConcConcIntAem);
+
+
 
         addEqualityConstraint(flowOutConcentrateNd - (flowInConc / scaleFacFlow) -
             (fluxWaterTotal * memLength * memWidth / scaleFacFlow) -
@@ -625,7 +655,7 @@ void EDUnits::buildFullModelDAG() {
     }
 
     std::vector<mc::FFVar> functions;
-    functions.reserve(1 + constraints.size());
+
     functions.push_back(objective);
     functions.insert(functions.end(), constraints.begin(), constraints.end());
     this->F[ScenarioNames::SCENARIO1] = functions;
