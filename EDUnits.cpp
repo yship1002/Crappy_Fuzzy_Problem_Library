@@ -269,7 +269,7 @@ void EDUnits::buildDAG() {
         mc::FFVar fluxWaterTotal = osmWaterFluxAem + osmWaterFluxCem + eosmWaterFlux;
 
         std::vector<mc::FFVar> constraints;
-        constraints.reserve(64);
+
 
         auto addEqualityConstraint = [&](const mc::FFVar& expr) {
             constraints.push_back(expr);
