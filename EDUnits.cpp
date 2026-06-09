@@ -70,8 +70,8 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
         mc::Interval(0, 1e6),           // opex1
         mc::Interval(0, 1e6),           // opex2
         mc::Interval(0, 1e6)  ,          // costTotal
-        mc::Interval(1e-5, 1e6),        // auxConcDilCem  (index 19)
-        mc::Interval(1e-5, 1e6)         // auxConcDilAem  (index 20)
+        mc::Interval(0, 0.99),          // 19: ratioCurrentILimCem
+        mc::Interval(0, 0.99)           // 20: ratioCurrentILimAem
     };  
     // this->second_stage_IX ={
     //     mc::Interval(0.0999999999000337,    0.0999999999000337),   // I
@@ -204,8 +204,8 @@ void EDUnits::buildDAG() {
         mc::FFVar& opex1 = vars[secondStageStart + 16];
         mc::FFVar& opex2 = vars[secondStageStart + 17];
         mc::FFVar& costTotal = vars[secondStageStart + 18];
-        mc::FFVar& auxConcDilCem    = vars[secondStageStart + 19];  // ADD
-        mc::FFVar& auxConcDilAem    = vars[secondStageStart + 20];  // ADD
+        mc::FFVar& ratioCurrentILimCem   = vars[secondStageStart + 19];  // replaces auxConcDilCem
+        mc::FFVar& ratioCurrentILimAem   = vars[secondStageStart + 20];  // replaces auxConcDilAem
 
         const int unitIdx = static_cast<int>(scenarioIndex) + 1;
         const double scaleFacFlow = scaleFacFlowByUnit[unitIdx];
@@ -269,7 +269,7 @@ void EDUnits::buildDAG() {
         mc::FFVar fluxWaterTotal = osmWaterFluxAem + osmWaterFluxCem + eosmWaterFlux;
 
         std::vector<mc::FFVar> constraints;
-
+        constraints.reserve(64);
 
         auto addEqualityConstraint = [&](const mc::FFVar& expr) {
             constraints.push_back(expr);
@@ -300,13 +300,31 @@ void EDUnits::buildDAG() {
         addEqualityConstraint(resDilute * conducDilute * avgConcDil - thicknessDilute);
 
 
-        addEqualityConstraint(auxConcDilCem - avgConcDilIntCem);
-        addEqualityConstraint(auxConcDilAem - avgConcDilIntAem);
+        // Define ratio variables via equality constraints
+        addEqualityConstraint(ratioCurrentILimCem - current / (memLength * memWidth * iLimDilCem));
+        addEqualityConstraint(ratioCurrentILimAem - current / (memLength * memWidth * iLimDilAem));
+
+        // Log-form Nernst constraints using safe building blocks:
+        // avgConcConc, avgConcDil > 0 always (built from positive-bounded variables)
+        // log(1 + r_conc): safe since r_conc > 0 always
+        // log(1 - ratio): safe since ratio ∈ [0, 0.99]
         addEqualityConstraint(
-            voltNonOhmicCem - (permSelCem * rg * temp / faraday) * (log(avgConcConcIntCem) - log(auxConcDilCem))
+            voltNonOhmicCem
+            - (permSelCem * rg * temp / faraday) * (
+                log(current / (memLength * memWidth * iLimConcCem) + 1.0)
+            + log(avgConcConc)
+            - log(1.0 - ratioCurrentILimCem)
+            - log(avgConcDil)
+            )
         );
         addEqualityConstraint(
-            voltNonOhmicAem - (permSelAem * rg * temp / faraday) * (log(avgConcConcIntAem) - log(auxConcDilAem))
+            voltNonOhmicAem
+            - (permSelAem * rg * temp / faraday) * (
+                log(current / (memLength * memWidth * iLimConcAem) + 1.0)
+            + log(avgConcConc)
+            - log(1.0 - ratioCurrentILimAem)
+            - log(avgConcDil)
+            )
         );
 
         //addEqualityConstraint(exp(voltNonOhmicCem * faraday / (permSelCem * rg * temp)) * avgConcDilIntCem - avgConcConcIntCem);
@@ -515,8 +533,8 @@ void EDUnits::buildFullModelDAG() {
         mc::FFVar& opex1 = vars[secondStageStart + 16];
         mc::FFVar& opex2 = vars[secondStageStart + 17];
         mc::FFVar& costTotal = vars[secondStageStart + 18];
-        mc::FFVar& auxConcDilCem    = vars[secondStageStart + 19];  // ADD
-        mc::FFVar& auxConcDilAem    = vars[secondStageStart + 20];  // ADD
+        mc::FFVar& ratioCurrentILimCem   = vars[secondStageStart + 19];  // replaces auxConcDilCem
+        mc::FFVar& ratioCurrentILimAem   = vars[secondStageStart + 20];  // replaces auxConcDilAem
 
         const double scaleFacFlow = scaleFacFlowByUnit[unitIdx];
         const double scaleFacConc = scaleFacConcByUnit[unitIdx];
@@ -582,13 +600,31 @@ void EDUnits::buildFullModelDAG() {
         addEqualityConstraint(resDilute * conducDilute * avgConcDil - thicknessDilute);
 
 
-        addEqualityConstraint(auxConcDilCem - avgConcDilIntCem);
-        addEqualityConstraint(auxConcDilAem - avgConcDilIntAem);
+        // Define ratio variables via equality constraints
+        addEqualityConstraint(ratioCurrentILimCem - current / (memLength * memWidth * iLimDilCem));
+        addEqualityConstraint(ratioCurrentILimAem - current / (memLength * memWidth * iLimDilAem));
+
+        // Log-form Nernst constraints using safe building blocks:
+        // avgConcConc, avgConcDil > 0 always (built from positive-bounded variables)
+        // log(1 + r_conc): safe since r_conc > 0 always
+        // log(1 - ratio): safe since ratio ∈ [0, 0.99]
         addEqualityConstraint(
-            voltNonOhmicCem - (permSelCem * rg * temp / faraday) * (log(avgConcConcIntCem) - log(auxConcDilCem))
+            voltNonOhmicCem
+            - (permSelCem * rg * temp / faraday) * (
+                log(current / (memLength * memWidth * iLimConcCem) + 1.0)
+            + log(avgConcConc)
+            - log(1.0 - ratioCurrentILimCem)
+            - log(avgConcDil)
+            )
         );
         addEqualityConstraint(
-            voltNonOhmicAem - (permSelAem * rg * temp / faraday) * (log(avgConcConcIntAem) - log(auxConcDilAem))
+            voltNonOhmicAem
+            - (permSelAem * rg * temp / faraday) * (
+                log(current / (memLength * memWidth * iLimConcAem) + 1.0)
+            + log(avgConcConc)
+            - log(1.0 - ratioCurrentILimAem)
+            - log(avgConcDil)
+            )
         );
 
 
