@@ -14,40 +14,40 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
     this->probability = 1.0;
 
     // this->first_stage_IX = {
-    //     mc::Interval(0.22285463857648757, 0.22285463857648757), // molNStream1
-    //     mc::Interval(123.68491498701013,123.68491498701013), // molWStream1
-    //     mc::Interval(0.061479954752751274, 0.061479954752751274), // molNStream2
-    //     mc::Interval(119.50012464909804,119.50012464909804), // molWStream2
-    //     mc::Interval(0.1613746838237363,0.1613746838237363), // molNStream3
-    //     mc::Interval(4.184790337912115,4.184790337912115), // molWStream3
-    //     mc::Interval(14,14), // molNStream4
-    //     mc::Interval(363.13431969472566,363.13431969472566), // molWStream4
-    //     mc::Interval(13.994493502551212,13.994493502551212), // molNStream5
-    //     mc::Interval(362.98906121735627,362.98906121735627), // molWStream5
-    //     mc::Interval(0.00550649744878918,0.00550649744878918), // molNStream6
-    //     mc::Interval(0.14525847736943553,0.14525847736943553), // molWStream6
-    //     mc::Interval(0.15586818637494734,0.15586818637494734), // molNStream7
-    //     mc::Interval(4.039531860542781,4.039531860542781), // molWStream7
-    //     mc::Interval(13.838625316176264,13.838625316176264), // molNStream8
-    //     mc::Interval(358.94952935681357,358.94952935681357) // molWStream8
+    //     mc::Interval(1e-5, 11), // molNStream1
+    //     mc::Interval(1e-5, 500), // molWStream1
+    //     mc::Interval(1e-5, 12), // molNStream2
+    //     mc::Interval(1e-5, 500), // molWStream2
+    //     mc::Interval(1e-5, 13), // molNStream3
+    //     mc::Interval(1e-5, 500), // molWStream3
+    //     mc::Interval(1e-5, 14), // molNStream4
+    //     mc::Interval(1e-5, 500), // molWStream4
+    //     mc::Interval(1e-5, 15), // molNStream5
+    //     mc::Interval(1e-5, 500), // molWStream5
+    //     mc::Interval(1e-5, 16), // molNStream6
+    //     mc::Interval(1e-5, 500), // molWStream6
+    //     mc::Interval(1e-5, 17), // molNStream7
+    //     mc::Interval(1e-5, 500), // molWStream7
+    //     mc::Interval(1e-5, 18), // molNStream8
+    //     mc::Interval(1e-5, 500) // molWStream8
     // };
     this->first_stage_IX = {
-        mc::Interval(1e-5, 11),
-        mc::Interval(1e-5, 500),
-        mc::Interval(1e-5, 12),
-        mc::Interval(1e-5, 500),
-        mc::Interval(1e-5, 13),
-        mc::Interval(1e-5, 500),
-        mc::Interval(1e-5, 14),
-        mc::Interval(1e-5, 500),
-        mc::Interval(1e-5, 15),
-        mc::Interval(1e-5, 500),
-        mc::Interval(1e-5, 16),
-        mc::Interval(1e-5, 500),
-        mc::Interval(1e-5, 17),
-        mc::Interval(1e-5, 500),
-        mc::Interval(1e-5, 18),
-        mc::Interval(1e-5, 500)
+        mc::Interval(0.222018, 0.222018), // molNStream1
+        mc::Interval(123.686, 123.686),   // molWStream1
+        mc::Interval(0.06148, 0.06148),   // molNStream2
+        mc::Interval(119.5, 119.5),       // molWStream2
+        mc::Interval(0.160538, 0.160538), // molNStream3
+        mc::Interval(4.18544, 4.18544),   // molWStream3
+        mc::Interval(14, 14),             // molNStream4
+        mc::Interval(365.954, 365.954),   // molWStream4
+        mc::Interval(13.9953, 13.9953),   // molNStream5
+        mc::Interval(365.808, 365.808),   // molWStream5
+        mc::Interval(0.00466994, 0.00466994), // molNStream6
+        mc::Interval(0.145909, 0.145909), // molWStream6
+        mc::Interval(0.155868, 0.155868), // molNStream7
+        mc::Interval(4.03953, 4.03953),   // molWStream7
+        mc::Interval(13.8395, 13.8395),   // molNStream8
+        mc::Interval(361.769, 361.769)    // molWStream8
     };
 
     this->second_stage_IX = {
@@ -64,12 +64,14 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
         mc::Interval(0, 5),          // voltCellPair
         mc::Interval(1e-6, 1e-2),       // resConcentrate
         mc::Interval(1e-6, 1e-2),       // resDilute
-        mc::Interval(1e-4, 0.25),       // voltNonOhmicCEM
+        mc::Interval(1e-4,0.25),       // voltNonOhmicCEM
         mc::Interval(1e-4, 0.25),       // voltNonOhmicAEM
         mc::Interval(0, 1e6),           // capex
         mc::Interval(0, 1e6),           // opex1
         mc::Interval(0, 1e6),           // opex2
-        mc::Interval(0, 1e6)            // costTotal
+        mc::Interval(0, 1e6),            // costTotal
+        mc::Interval(1e-4, 1),  // alphaDilCem = 1 - J/iLimDilCem
+        mc::Interval(1e-4, 1)  // alphaDilAem = 1 - J/iLimDilAem
 
     };  
     // this->second_stage_IX ={
@@ -298,8 +300,17 @@ void EDUnits::buildDAG() {
         addEqualityConstraint(resDilute * conducDilute * avgConcDil - thicknessDilute);
 
 
-        addEqualityConstraint(exp(voltNonOhmicCem * faraday / (permSelCem * rg * temp)) * avgConcDilIntCem - avgConcConcIntCem);
-        addEqualityConstraint(exp(voltNonOhmicAem * faraday / (permSelAem * rg * temp)) * avgConcDilIntAem - avgConcConcIntAem);
+        //addEqualityConstraint(exp(voltNonOhmicCem * faraday / (permSelCem * rg * temp)) * avgConcDilIntCem - avgConcConcIntCem);
+        //addEqualityConstraint(exp(voltNonOhmicAem * faraday / (permSelAem * rg * temp)) * avgConcDilIntAem - avgConcConcIntAem);
+        addEqualityConstraint(
+            voltNonOhmicCem * (faraday / (permSelCem * rg * temp)) 
+            - log(avgConcConcIntCem / avgConcDilIntCem)
+        );
+
+        addEqualityConstraint(
+            voltNonOhmicAem * (faraday / (permSelAem * rg * temp)) 
+            - log(avgConcConcIntAem / avgConcDilIntAem)
+        );
 
 
         addEqualityConstraint(flowOutConcentrateNd - (flowInConc / scaleFacFlow) -
@@ -451,6 +462,7 @@ void EDUnits::buildFullModelDAG() {
     mc::FFVar& molNStream8 = vars[14];
     mc::FFVar& molWStream8 = vars[15];
 
+
     std::vector<mc::FFVar> constraints;
 
 
@@ -504,6 +516,8 @@ void EDUnits::buildFullModelDAG() {
         mc::FFVar& opex1 = vars[secondStageStart + 16];
         mc::FFVar& opex2 = vars[secondStageStart + 17];
         mc::FFVar& costTotal = vars[secondStageStart + 18];
+        mc::FFVar& alphaDilCem = vars[secondStageStart + 19];
+        mc::FFVar& alphaDilAem = vars[secondStageStart + 20];
  
 
         const double scaleFacFlow = scaleFacFlowByUnit[unitIdx];
@@ -542,14 +556,24 @@ void EDUnits::buildFullModelDAG() {
         mc::FFVar iLimDilAem = shDil * avgConcDil * faraday * saltDiffDil / (2.0 * thicknessDilute * (transAem - transIonDil));
 
         mc::FFVar concInConcIntCem = concInED * (1.0 + current / (memLength * memWidth) / iLimConcCem);
-        mc::FFVar concInDilIntCem = concInED * (1.0 - current / (memLength * memWidth) / iLimDilCem);
         mc::FFVar concInConcIntAem = concInED * (1.0 + current / (memLength * memWidth) / iLimConcAem);
-        mc::FFVar concInDilIntAem = concInED * (1.0 - current / (memLength * memWidth) / iLimDilAem);
-
         mc::FFVar concOutConcIntCem = concOutConcentrateNd * (1.0 + current / (memLength * memWidth) / iLimConcCem);
-        mc::FFVar concOutDilIntCem = concOutDiluteNd * (1.0 - current / (memLength * memWidth) / iLimDilCem);
         mc::FFVar concOutConcIntAem = concOutConcentrateNd * (1.0 + current / (memLength * memWidth) / iLimConcAem);
-        mc::FFVar concOutDilIntAem = concOutDiluteNd * (1.0 - current / (memLength * memWidth) / iLimDilAem);
+        
+
+
+        // These divisions are safe: iLimDilCem/Aem intervals never cross zero
+        addEqualityConstraint(alphaDilCem - (1.0 - current / (memLength * memWidth * iLimDilCem)));
+        addEqualityConstraint(alphaDilAem - (1.0 - current / (memLength * memWidth * iLimDilAem)));
+        mc::FFVar concInDilIntCem  = concInED        * alphaDilCem;
+        mc::FFVar concOutDilIntCem = concOutDiluteNd * alphaDilCem;
+        mc::FFVar concInDilIntAem  = concInED        * alphaDilAem;
+        mc::FFVar concOutDilIntAem = concOutDiluteNd * alphaDilAem;
+
+        // mc::FFVar concOutDilIntCem = concOutDiluteNd * (1.0 - current / (memLength * memWidth) / iLimDilCem);
+        // mc::FFVar concInDilIntCem = concInED * (1.0 - current / (memLength * memWidth) / iLimDilCem);
+        // mc::FFVar concInDilIntAem = concInED * (1.0 - current / (memLength * memWidth) / iLimDilAem);
+        // mc::FFVar concOutDilIntAem = concOutDiluteNd * (1.0 - current / (memLength * memWidth) / iLimDilAem);
 
         mc::FFVar avgConcConcIntCem = 0.5 * (concOutConcIntCem * scaleFacConc + concInConcIntCem);
         mc::FFVar avgConcDilIntCem = 0.5 * (concOutDilIntCem * scaleFacConc + concInDilIntCem);
@@ -570,10 +594,18 @@ void EDUnits::buildFullModelDAG() {
         addEqualityConstraint(resDilute * conducDilute * avgConcDil - thicknessDilute);
 
 
-        addEqualityConstraint(exp(voltNonOhmicCem * faraday / (permSelCem * rg * temp)) * avgConcDilIntCem - avgConcConcIntCem);
-        addEqualityConstraint(exp(voltNonOhmicAem * faraday / (permSelAem * rg * temp)) * avgConcDilIntAem - avgConcConcIntAem);
+        //addEqualityConstraint(exp(voltNonOhmicCem * faraday / (permSelCem * rg * temp)) * avgConcDilIntCem - avgConcConcIntCem);
+        //addEqualityConstraint(exp(voltNonOhmicAem * faraday / (permSelAem * rg * temp)) * avgConcDilIntAem - avgConcConcIntAem);
+        addEqualityConstraint(
+            voltNonOhmicCem * (faraday / (permSelCem * rg * temp)) 
+            - log(avgConcConcIntCem / avgConcDilIntCem)
+        );
 
-
+        addEqualityConstraint(
+            voltNonOhmicAem * (faraday / (permSelAem * rg * temp)) 
+            - log(avgConcConcIntAem / avgConcDilIntAem)
+        );
+        
 
         addEqualityConstraint(flowOutConcentrateNd - (flowInConc / scaleFacFlow) -
             (fluxWaterTotal * memLength * memWidth / scaleFacFlow) -

@@ -223,7 +223,7 @@ void STModel::generateLP(IloEnv* cplex_env,IloModel* cplexmodel,
 
 
     // Env.options.SANDWICH_RTOL=1e-10;
-    // Env.options.SANDWICH_MAXCUT=200;
+    //Env.options.SANDWICH_MAXCUT=1;
 
                            
 
