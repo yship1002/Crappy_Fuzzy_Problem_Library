@@ -205,6 +205,8 @@ void EDUnits::buildDAG() {
         mc::FFVar& opex1 = vars[secondStageStart + 16];
         mc::FFVar& opex2 = vars[secondStageStart + 17];
         mc::FFVar& costTotal = vars[secondStageStart + 18];
+        mc::FFVar& alphaDilCem = vars[secondStageStart + 19];
+        mc::FFVar& alphaDilAem = vars[secondStageStart + 20];
 
 
         const int unitIdx = static_cast<int>(scenarioIndex) + 1;
@@ -244,14 +246,27 @@ void EDUnits::buildDAG() {
         mc::FFVar iLimDilAem = shDil * avgConcDil * faraday * saltDiffDil / (2.0 * thicknessDilute * (transAem - transIonDil));
 
         mc::FFVar concInConcIntCem = concInED * (1.0 + current / (memLength * memWidth) / iLimConcCem);
-        mc::FFVar concInDilIntCem = concInED * (1.0 - current / (memLength * memWidth) / iLimDilCem);
         mc::FFVar concInConcIntAem = concInED * (1.0 + current / (memLength * memWidth) / iLimConcAem);
-        mc::FFVar concInDilIntAem = concInED * (1.0 - current / (memLength * memWidth) / iLimDilAem);
-
         mc::FFVar concOutConcIntCem = concOutConcentrateNd * (1.0 + current / (memLength * memWidth) / iLimConcCem);
-        mc::FFVar concOutDilIntCem = concOutDiluteNd * (1.0 - current / (memLength * memWidth) / iLimDilCem);
         mc::FFVar concOutConcIntAem = concOutConcentrateNd * (1.0 + current / (memLength * memWidth) / iLimConcAem);
-        mc::FFVar concOutDilIntAem = concOutDiluteNd * (1.0 - current / (memLength * memWidth) / iLimDilAem);
+
+        std::vector<mc::FFVar> constraints;
+        auto addEqualityConstraint = [&](const mc::FFVar& expr) {
+            constraints.push_back(expr);
+            constraints.push_back(-expr);
+        };
+        auto addLessEqualConstraint = [&](const mc::FFVar& expr) {
+            constraints.push_back(expr);
+        };
+        // These divisions are safe: iLimDilCem/Aem intervals never cross zero
+        addEqualityConstraint(alphaDilCem - (1.0 - current / (memLength * memWidth * iLimDilCem)));
+        addEqualityConstraint(alphaDilAem - (1.0 - current / (memLength * memWidth * iLimDilAem)));
+
+        mc::FFVar concOutDilIntAem = concOutDiluteNd * alphaDilAem;
+        mc::FFVar concInDilIntAem = concInED * alphaDilAem;
+        mc::FFVar concInDilIntCem = concInED * alphaDilCem;
+        mc::FFVar concOutDilIntCem = concOutDiluteNd * alphaDilCem;
+
 
         mc::FFVar avgConcConcIntCem = 0.5 * (concOutConcIntCem * scaleFacConc + concInConcIntCem);
         mc::FFVar avgConcDilIntCem = 0.5 * (concOutDilIntCem * scaleFacConc + concInDilIntCem);
@@ -268,16 +283,7 @@ void EDUnits::buildDAG() {
         mc::FFVar eosmWaterFlux = waterTransNumber * fluxIonsTotal * molweightH20 / densityH2O;
         mc::FFVar fluxWaterTotal = osmWaterFluxAem + osmWaterFluxCem + eosmWaterFlux;
 
-        std::vector<mc::FFVar> constraints;
 
-
-        auto addEqualityConstraint = [&](const mc::FFVar& expr) {
-            constraints.push_back(expr);
-            constraints.push_back(-expr);
-        };
-        auto addLessEqualConstraint = [&](const mc::FFVar& expr) {
-            constraints.push_back(expr);
-        };
 
         addEqualityConstraint(molNStream1 - molNFeed - molNStream6);
         addEqualityConstraint(molWStream1 - molWFeed - molWStream6);
