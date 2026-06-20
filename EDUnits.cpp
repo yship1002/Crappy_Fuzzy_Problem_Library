@@ -1,8 +1,9 @@
 #include "EDUnits.h"
-
 #include <vector>
 #include <cmath>
 
+
+// NEEDED: no division, simplier formation, axu var
 EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
     this->branching_strategy = branchingStrategy;
     this->scenario_names = {
@@ -70,8 +71,7 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
         mc::Interval(0, 1e6),           // opex1
         mc::Interval(0, 1e6),           // opex2
         mc::Interval(0, 1e6),            // costTotal
-        mc::Interval(1e-4, 1),  // alphaDilCem = 1 - J/iLimDilCem
-        mc::Interval(1e-4, 1)  // alphaDilAem = 1 - J/iLimDilAem
+
 
     };  
     // this->second_stage_IX ={
@@ -205,8 +205,7 @@ void EDUnits::buildDAG() {
         mc::FFVar& opex1 = vars[secondStageStart + 16];
         mc::FFVar& opex2 = vars[secondStageStart + 17];
         mc::FFVar& costTotal = vars[secondStageStart + 18];
-        mc::FFVar& alphaDilCem = vars[secondStageStart + 19];
-        mc::FFVar& alphaDilAem = vars[secondStageStart + 20];
+
 
 
         const int unitIdx = static_cast<int>(scenarioIndex) + 1;
@@ -258,14 +257,12 @@ void EDUnits::buildDAG() {
         auto addLessEqualConstraint = [&](const mc::FFVar& expr) {
             constraints.push_back(expr);
         };
-        // These divisions are safe: iLimDilCem/Aem intervals never cross zero
-        addEqualityConstraint(alphaDilCem - (1.0 - current / (memLength * memWidth * iLimDilCem)));
-        addEqualityConstraint(alphaDilAem - (1.0 - current / (memLength * memWidth * iLimDilAem)));
 
-        mc::FFVar concOutDilIntAem = concOutDiluteNd * alphaDilAem;
-        mc::FFVar concInDilIntAem = concInED * alphaDilAem;
-        mc::FFVar concInDilIntCem = concInED * alphaDilCem;
-        mc::FFVar concOutDilIntCem = concOutDiluteNd * alphaDilCem;
+
+        mc::FFVar concOutDilIntAem = concOutDiluteNd * (1.0 - current / (memLength * memWidth * iLimDilAem));
+        mc::FFVar concInDilIntAem = concInED * (1.0 - current / (memLength * memWidth * iLimDilAem));
+        mc::FFVar concInDilIntCem = concInED * (1.0 - current / (memLength * memWidth * iLimDilCem));
+        mc::FFVar concOutDilIntCem = concOutDiluteNd * (1.0 - current / (memLength * memWidth * iLimDilCem));
 
 
         mc::FFVar avgConcConcIntCem = 0.5 * (concOutConcIntCem * scaleFacConc + concInConcIntCem);
@@ -306,17 +303,18 @@ void EDUnits::buildDAG() {
         addEqualityConstraint(resDilute * conducDilute * avgConcDil - thicknessDilute);
 
 
-        addEqualityConstraint(exp(voltNonOhmicCem * faraday / (permSelCem * rg * temp)) * avgConcDilIntCem - avgConcConcIntCem);
-        addEqualityConstraint(exp(voltNonOhmicAem * faraday / (permSelAem * rg * temp)) * avgConcDilIntAem - avgConcConcIntAem);
-        // addEqualityConstraint(
-        //     voltNonOhmicCem * (faraday / (permSelCem * rg * temp)) 
-        //     - log(avgConcConcIntCem / avgConcDilIntCem)
-        // );
+        //addEqualityConstraint(exp(voltNonOhmicCem * faraday / (permSelCem * rg * temp)) * avgConcDilIntCem - avgConcConcIntCem);
+        //addEqualityConstraint(exp(voltNonOhmicAem * faraday / (permSelAem * rg * temp)) * avgConcDilIntAem - avgConcConcIntAem);
 
-        // addEqualityConstraint(
-        //     voltNonOhmicAem * (faraday / (permSelAem * rg * temp)) 
-        //     - log(avgConcConcIntAem / avgConcDilIntAem)
-        // );
+        addEqualityConstraint(
+            voltNonOhmicCem * (faraday / (permSelCem * rg * temp)) 
+            - log(avgConcConcIntCem / avgConcDilIntCem)
+        );
+
+        addEqualityConstraint(
+            voltNonOhmicAem * (faraday / (permSelAem * rg * temp)) 
+            - log(avgConcConcIntAem / avgConcDilIntAem)
+        );
 
 
         addEqualityConstraint(flowOutConcentrateNd - (flowInConc / scaleFacFlow) -
@@ -326,6 +324,7 @@ void EDUnits::buildDAG() {
         addEqualityConstraint(flowOutDiluteNd - (flowInDil / scaleFacFlow) +
             (fluxWaterTotal * memLength * memWidth / scaleFacFlow) +
             ((molweightNh4Cl * 0.001 / densityH2O) * fluxIonsTotal * memLength * memWidth / scaleFacFlow));
+        
 
         addEqualityConstraint((flowOutConcentrateNd * concOutConcentrateNd) -
             (flowInConc * concInED) / (scaleFacFlow * scaleFacConc) -
@@ -335,6 +334,17 @@ void EDUnits::buildDAG() {
             (flowInDil * concInED) / (scaleFacFlow * scaleFacConc) +
             fluxIonsTotal * memLength * memWidth / (scaleFacFlow * scaleFacConc));
 
+
+
+        // REDUNDANT CONSTRAINT: flow balance is already enforced by molNStream and molWStream constraints, but this may help the solver
+        addEqualityConstraint(flowOutConcentrateNd - (flowInConc / scaleFacFlow)+flowOutDiluteNd - (flowInDil / scaleFacFlow));
+        //Redundant constraint: ion flux is already enforced by flowOutConc/Dil*concOutConc/Dil constraints, but may help solver
+        addEqualityConstraint((flowOutConcentrateNd * concOutConcentrateNd) -
+            (flowInConc * concInED) / (scaleFacFlow * scaleFacConc)+(flowOutDiluteNd * concOutDiluteNd) -
+            (flowInDil * concInED) / (scaleFacFlow * scaleFacConc));
+
+
+            
         addEqualityConstraint(voltCellPair - (voltNonOhmicCem + voltNonOhmicAem) -
             (resConcentrate + resDilute + resCem + resAem) * (current / (memLength * memWidth)));
 
@@ -522,8 +532,7 @@ void EDUnits::buildFullModelDAG() {
         mc::FFVar& opex1 = vars[secondStageStart + 16];
         mc::FFVar& opex2 = vars[secondStageStart + 17];
         mc::FFVar& costTotal = vars[secondStageStart + 18];
-        mc::FFVar& alphaDilCem = vars[secondStageStart + 19];
-        mc::FFVar& alphaDilAem = vars[secondStageStart + 20];
+
  
 
         const double scaleFacFlow = scaleFacFlowByUnit[unitIdx];
@@ -568,13 +577,11 @@ void EDUnits::buildFullModelDAG() {
         
 
 
-        // These divisions are safe: iLimDilCem/Aem intervals never cross zero
-        addEqualityConstraint(alphaDilCem - (1.0 - current / (memLength * memWidth * iLimDilCem)));
-        addEqualityConstraint(alphaDilAem - (1.0 - current / (memLength * memWidth * iLimDilAem)));
-        mc::FFVar concInDilIntCem  = concInED        * alphaDilCem;
-        mc::FFVar concOutDilIntCem = concOutDiluteNd * alphaDilCem;
-        mc::FFVar concInDilIntAem  = concInED        * alphaDilAem;
-        mc::FFVar concOutDilIntAem = concOutDiluteNd * alphaDilAem;
+
+        mc::FFVar concInDilIntCem  = concInED        * (1.0 - current / (memLength * memWidth * iLimDilCem));
+        mc::FFVar concOutDilIntCem = concOutDiluteNd * (1.0 - current / (memLength * memWidth * iLimDilCem));
+        mc::FFVar concInDilIntAem  = concInED        * (1.0 - current / (memLength * memWidth * iLimDilAem));
+        mc::FFVar concOutDilIntAem = concOutDiluteNd * (1.0 - current / (memLength * memWidth * iLimDilAem));
 
         // mc::FFVar concOutDilIntCem = concOutDiluteNd * (1.0 - current / (memLength * memWidth) / iLimDilCem);
         // mc::FFVar concInDilIntCem = concInED * (1.0 - current / (memLength * memWidth) / iLimDilCem);
@@ -600,19 +607,19 @@ void EDUnits::buildFullModelDAG() {
         addEqualityConstraint(resDilute * conducDilute * avgConcDil - thicknessDilute);
 
 
-        //addEqualityConstraint(exp(voltNonOhmicCem * faraday / (permSelCem * rg * temp)) * avgConcDilIntCem - avgConcConcIntCem);
-        //addEqualityConstraint(exp(voltNonOhmicAem * faraday / (permSelAem * rg * temp)) * avgConcDilIntAem - avgConcConcIntAem);
-        addEqualityConstraint(
-            voltNonOhmicCem * (faraday / (permSelCem * rg * temp)) 
-            - log(avgConcConcIntCem / avgConcDilIntCem)
-        );
+        addEqualityConstraint(exp(voltNonOhmicCem * faraday / (permSelCem * rg * temp)) * avgConcDilIntCem - avgConcConcIntCem);
+        addEqualityConstraint(exp(voltNonOhmicAem * faraday / (permSelAem * rg * temp)) * avgConcDilIntAem - avgConcConcIntAem);
+        // addEqualityConstraint(
+        //     voltNonOhmicCem * (faraday / (permSelCem * rg * temp)) 
+        //     - log(avgConcConcIntCem / avgConcDilIntCem)
+        // );
 
-        addEqualityConstraint(
-            voltNonOhmicAem * (faraday / (permSelAem * rg * temp)) 
-            - log(avgConcConcIntAem / avgConcDilIntAem)
-        );
+        // addEqualityConstraint(
+        //     voltNonOhmicAem * (faraday / (permSelAem * rg * temp)) 
+        //     - log(avgConcConcIntAem / avgConcDilIntAem)
+        // );
         
-
+       // fix : 1/x vs log(x) issues
         addEqualityConstraint(flowOutConcentrateNd - (flowInConc / scaleFacFlow) -
             (fluxWaterTotal * memLength * memWidth / scaleFacFlow) -
             ((molweightNh4Cl * 0.001 / densityH2O) * fluxIonsTotal * memLength * memWidth / scaleFacFlow));
@@ -628,6 +635,16 @@ void EDUnits::buildFullModelDAG() {
         addEqualityConstraint((flowOutDiluteNd * concOutDiluteNd) -
             (flowInDil * concInED) / (scaleFacFlow * scaleFacConc) +
             fluxIonsTotal * memLength * memWidth / (scaleFacFlow * scaleFacConc));
+
+
+        // REDUNDANT CONSTRAINT: flow balance is already enforced by molNStream and molWStream constraints, but this may help the solver
+        addEqualityConstraint(flowOutConcentrateNd - (flowInConc / scaleFacFlow)+flowOutDiluteNd - (flowInDil / scaleFacFlow));
+        //Redundant constraint: ion flux is already enforced by flowOutConc/Dil*concOutConc/Dil constraints, but may help solver
+        addEqualityConstraint((flowOutConcentrateNd * concOutConcentrateNd) -
+            (flowInConc * concInED) / (scaleFacFlow * scaleFacConc)+(flowOutDiluteNd * concOutDiluteNd) -
+            (flowInDil * concInED) / (scaleFacFlow * scaleFacConc));
+
+
 
         addEqualityConstraint(voltCellPair - (voltNonOhmicCem + voltNonOhmicAem) -
             (resConcentrate + resDilute + resCem + resAem) * (current / (memLength * memWidth)));
