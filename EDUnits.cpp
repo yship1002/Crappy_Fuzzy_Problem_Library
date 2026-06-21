@@ -71,6 +71,8 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
         mc::Interval(0, 1e6),           // opex1
         mc::Interval(0, 1e6),           // opex2
         mc::Interval(0, 1e6),            // costTotal
+        mc::Interval(1e-4, 6e4),            // avgConcDilIntAem
+        mc::Interval(1e-4, 6e4)            // avgConcDilIntCem
 
 
     };  
@@ -205,6 +207,8 @@ void EDUnits::buildDAG() {
         mc::FFVar& opex1 = vars[secondStageStart + 16];
         mc::FFVar& opex2 = vars[secondStageStart + 17];
         mc::FFVar& costTotal = vars[secondStageStart + 18];
+        mc::FFVar& avgConcDilIntAem = vars[secondStageStart + 19];
+        mc::FFVar& avgConcDilIntCem = vars[secondStageStart + 20];
 
 
 
@@ -215,13 +219,13 @@ void EDUnits::buildDAG() {
         mc::FFVar flowInED, concInED;
         if (unitIdx == 1) {
             flowInED = (molNStream1 * molweightN + molWStream1 * molweightH20gMol) / densityH2OGm3;
-            concInED = molNStream1 * densityH2OGm3 / (molNStream1 * molweightN + molWStream1 * molweightH20gMol);
+            concInED = densityH2OGm3 / (molweightN + molWStream1/molNStream1 * molweightH20gMol);
         } else if (unitIdx == 2) {
             flowInED = (molNStream4 * molweightN + molWStream4 * molweightH20gMol) / densityH2OGm3;
-            concInED = molNStream4 * densityH2OGm3 / (molNStream4 * molweightN + molWStream4 * molweightH20gMol);
+            concInED = densityH2OGm3 / (molweightN + molWStream4/molNStream4 * molweightH20gMol);
         } else {
             flowInED = (molNStream5 * molweightN + molWStream5 * molweightH20gMol) / densityH2OGm3;
-            concInED = molNStream5 * densityH2OGm3 / (molNStream5 * molweightN + molWStream5 * molweightH20gMol);
+            concInED = densityH2OGm3 / (molweightN + molWStream5/molNStream5 * molweightH20gMol);
         }
 
         mc::FFVar flowInConc = flowSplit * flowInED / numCells;
@@ -266,10 +270,14 @@ void EDUnits::buildDAG() {
 
 
         mc::FFVar avgConcConcIntCem = 0.5 * (concOutConcIntCem * scaleFacConc + concInConcIntCem);
-        mc::FFVar avgConcDilIntCem = 0.5 * (concOutDilIntCem * scaleFacConc + concInDilIntCem);
         mc::FFVar avgConcConcIntAem = 0.5 * (concOutConcIntAem * scaleFacConc + concInConcIntAem);
-        mc::FFVar avgConcDilIntAem = 0.5 * (concOutDilIntAem * scaleFacConc + concInDilIntAem);
-
+        
+        addEqualityConstraint(avgConcDilIntCem - 0.5 * (concOutDilIntCem * scaleFacConc + concInDilIntCem));
+        addEqualityConstraint(avgConcDilIntAem - 0.5 * (concOutDilIntAem * scaleFacConc + concInDilIntAem));
+        //mc::FFVar avgConcDilIntAem = 0.5 * (concOutDilIntAem * scaleFacConc + concInDilIntAem);
+        //mc::FFVar avgConcDilIntCem = 0.5 * (concOutDilIntCem * scaleFacConc + concInDilIntCem);
+        
+        
         mc::FFVar condFlux = (transCem - (1.0 - transAem)) * (current / (memLength * memWidth * faraday));
         mc::FFVar diffFluxAem = -(saltDiffAem / thicknessAem) * (avgConcConcIntAem - avgConcDilIntAem);
         mc::FFVar diffFluxCem = -(saltDiffCem / thicknessCem) * (avgConcConcIntCem - avgConcDilIntCem);
