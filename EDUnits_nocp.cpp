@@ -33,21 +33,21 @@ EDUnits_nocp::EDUnits_nocp(BranchingStrategy branchingStrategy) : STModel() {
     // };
     this->first_stage_IX = {
         mc::Interval(1e-5, 11),
-        mc::Interval(1e-5, 500),
+        mc::Interval(1e-5, 501),
         mc::Interval(1e-5, 12),
-        mc::Interval(1e-5, 500),
+        mc::Interval(1e-5, 502),
         mc::Interval(1e-5, 13),
-        mc::Interval(1e-5, 500),
+        mc::Interval(1e-5, 503),
         mc::Interval(1e-5, 14),
-        mc::Interval(1e-5, 500),
+        mc::Interval(1e-5, 504),
         mc::Interval(1e-5, 15),
-        mc::Interval(1e-5, 500),
+        mc::Interval(1e-5, 505),
         mc::Interval(1e-5, 16),
-        mc::Interval(1e-5, 500),
+        mc::Interval(1e-5, 506),
         mc::Interval(1e-5, 17),
-        mc::Interval(1e-5, 500),
+        mc::Interval(1e-5, 507),
         mc::Interval(1e-5, 18),
-        mc::Interval(1e-5, 500)
+        mc::Interval(1e-5, 508)
     };
 
     this->second_stage_IX = {
