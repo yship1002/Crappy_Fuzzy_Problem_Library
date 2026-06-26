@@ -71,8 +71,12 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
         mc::Interval(0, 1e6),           // opex1
         mc::Interval(0, 1e6),           // opex2
         mc::Interval(0, 1e6),            // costTotal
-        mc::Interval(1e-4, 6e4),            // avgConcDilIntAem
-        mc::Interval(1e-4, 6e4)            // avgConcDilIntCem
+        mc::Interval(1e-6, 0.99),       // Aemmem
+        mc::Interval(1e-6, 0.99),        // Cemmem
+        mc::Interval(1e-6, 1e7),        // Aemlogratio
+        mc::Interval(1e-6, 1e7)        // Cemlogratio
+
+ 
 
 
     };  
@@ -207,8 +211,12 @@ void EDUnits::buildDAG() {
         mc::FFVar& opex1 = vars[secondStageStart + 16];
         mc::FFVar& opex2 = vars[secondStageStart + 17];
         mc::FFVar& costTotal = vars[secondStageStart + 18];
-        mc::FFVar& avgConcDilIntAem = vars[secondStageStart + 19];
-        mc::FFVar& avgConcDilIntCem = vars[secondStageStart + 20];
+        mc::FFVar& Aemmem = vars[secondStageStart + 19];
+        mc::FFVar& Cemmem = vars[secondStageStart + 20];
+        mc::FFVar& Aemlogratio = vars[secondStageStart + 21];
+        mc::FFVar& Cemlogratio = vars[secondStageStart + 22];
+
+
 
 
 
@@ -262,20 +270,21 @@ void EDUnits::buildDAG() {
             constraints.push_back(expr);
         };
 
-
-        mc::FFVar concOutDilIntAem = concOutDiluteNd * (1.0 - current / (memLength * memWidth * iLimDilAem));
-        mc::FFVar concInDilIntAem = concInED * (1.0 - current / (memLength * memWidth * iLimDilAem));
-        mc::FFVar concInDilIntCem = concInED * (1.0 - current / (memLength * memWidth * iLimDilCem));
-        mc::FFVar concOutDilIntCem = concOutDiluteNd * (1.0 - current / (memLength * memWidth * iLimDilCem));
+        addLessEqualConstraint(Cemmem - 1.0);
+        addLessEqualConstraint(Aemmem - 1.0);
+        addEqualityConstraint(Aemmem - current / (memLength * memWidth * iLimDilAem));
+        addEqualityConstraint(Cemmem - current / (memLength * memWidth * iLimDilCem));
+        mc::FFVar concOutDilIntAem = concOutDiluteNd * (1-Aemmem);
+        mc::FFVar concInDilIntAem = concInED * (1-Aemmem);
+        mc::FFVar concInDilIntCem = concInED * (1-Cemmem);
+        mc::FFVar concOutDilIntCem = concOutDiluteNd * (1-Cemmem);
 
 
         mc::FFVar avgConcConcIntCem = 0.5 * (concOutConcIntCem * scaleFacConc + concInConcIntCem);
         mc::FFVar avgConcConcIntAem = 0.5 * (concOutConcIntAem * scaleFacConc + concInConcIntAem);
         
-        addEqualityConstraint(avgConcDilIntCem - 0.5 * (concOutDilIntCem * scaleFacConc + concInDilIntCem));
-        addEqualityConstraint(avgConcDilIntAem - 0.5 * (concOutDilIntAem * scaleFacConc + concInDilIntAem));
-        //mc::FFVar avgConcDilIntAem = 0.5 * (concOutDilIntAem * scaleFacConc + concInDilIntAem);
-        //mc::FFVar avgConcDilIntCem = 0.5 * (concOutDilIntCem * scaleFacConc + concInDilIntCem);
+        mc::FFVar avgConcDilIntAem = 0.5 * (concOutDilIntAem * scaleFacConc + concInDilIntAem);
+        mc::FFVar avgConcDilIntCem = 0.5 * (concOutDilIntCem * scaleFacConc + concInDilIntCem);
         
         
         mc::FFVar condFlux = (transCem - (1.0 - transAem)) * (current / (memLength * memWidth * faraday));
@@ -313,15 +322,17 @@ void EDUnits::buildDAG() {
 
         //addEqualityConstraint(exp(voltNonOhmicCem * faraday / (permSelCem * rg * temp)) * avgConcDilIntCem - avgConcConcIntCem);
         //addEqualityConstraint(exp(voltNonOhmicAem * faraday / (permSelAem * rg * temp)) * avgConcDilIntAem - avgConcConcIntAem);
+        addEqualityConstraint(Aemlogratio - avgConcConcIntAem / avgConcDilIntAem);
+        addEqualityConstraint(Cemlogratio - avgConcConcIntCem / avgConcDilIntCem);
 
         addEqualityConstraint(
             voltNonOhmicCem * (faraday / (permSelCem * rg * temp)) 
-            - log(avgConcConcIntCem / avgConcDilIntCem)
+            - log(Aemlogratio)
         );
 
         addEqualityConstraint(
             voltNonOhmicAem * (faraday / (permSelAem * rg * temp)) 
-            - log(avgConcConcIntAem / avgConcDilIntAem)
+            - log(Cemlogratio)
         );
 
 
@@ -356,8 +367,6 @@ void EDUnits::buildDAG() {
         addEqualityConstraint(voltCellPair - (voltNonOhmicCem + voltNonOhmicAem) -
             (resConcentrate + resDilute + resCem + resAem) * (current / (memLength * memWidth)));
 
-        addLessEqualConstraint(current / (memLength * memWidth * iLimDilCem) - 1.0);
-        addLessEqualConstraint(current / (memLength * memWidth * iLimDilAem) - 1.0);
 
         addEqualityConstraint(capex - (6800.0 * memLength * memWidth + 2.0 * 100.0 * (numCells - 2.0) * memLength * memWidth));
 
