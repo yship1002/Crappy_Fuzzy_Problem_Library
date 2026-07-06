@@ -68,10 +68,8 @@ EDUnits_nocp::EDUnits_nocp(BranchingStrategy branchingStrategy) : STModel() {
         mc::Interval(1e-4, 0.25),       // voltNonOhmicAEM
         mc::Interval(0, 1e6),           // capex
         mc::Interval(0, 1e6),           // opex1
-        mc::Interval(0, 1e6),           // opex2
-        mc::Interval(0, 1e6)  ,          // costTotal
-        // mc::Interval(0, 0.99),          // 19: ratioCurrentILimCem
-        // mc::Interval(0, 0.99)           // 20: ratioCurrentILimAem
+        mc::Interval(0, 1e6)           // opex2
+
     };  
     // this->second_stage_IX ={
     //     mc::Interval(0.0999999999000337,    0.0999999999000337),   // I
@@ -203,9 +201,7 @@ void EDUnits_nocp::buildDAG() {
         mc::FFVar& capex = vars[secondStageStart + 15];
         mc::FFVar& opex1 = vars[secondStageStart + 16];
         mc::FFVar& opex2 = vars[secondStageStart + 17];
-        mc::FFVar& costTotal = vars[secondStageStart + 18];
-        // mc::FFVar& ratioCurrentILimCem   = vars[secondStageStart + 19];  // replaces auxConcDilCem
-        // mc::FFVar& ratioCurrentILimAem   = vars[secondStageStart + 20];  // replaces auxConcDilAem
+
 
         const int unitIdx = static_cast<int>(scenarioIndex) + 1;
         const double scaleFacFlow = scaleFacFlowByUnit[unitIdx];
@@ -228,9 +224,6 @@ void EDUnits_nocp::buildDAG() {
 
         mc::FFVar uConc = 0.5 * (flowOutConcentrateNd * scaleFacFlow + flowInConc) / (memWidth * thicknessConcentrate);
         mc::FFVar uDil = 0.5 * (flowOutDiluteNd * scaleFacFlow + flowInDil) / (memWidth * thicknessDilute);
-
-        mc::FFVar reConc = densityManure * (flowOutConcentrateNd * scaleFacFlow + flowInConc) / (memWidth * viscosityManure);
-        mc::FFVar reDil = densityManure * (flowOutDiluteNd * scaleFacFlow + flowInDil) / (memWidth * viscosityManure);
 
         mc::FFVar avgConcConc = 0.5 * (concOutConcentrateNd * scaleFacConc + concInED);
         mc::FFVar avgConcDil = 0.5 * (concOutDiluteNd * scaleFacConc + concInED);
@@ -327,16 +320,22 @@ void EDUnits_nocp::buildDAG() {
         addEqualityConstraint(voltCellPair - (voltNonOhmicCem + voltNonOhmicAem) -
             (resConcentrate + resDilute + resCem + resAem) * (current / (memLength * memWidth)));
 
-        addEqualityConstraint(capex - (6800.0 * memLength * memWidth + 2.0 * 100.0 * (numCells - 2.0) * memLength * memWidth));
+        addEqualityConstraint(capex - (6800.0  + 2.0 * 100.0 * (numCells - 2.0)) * memLength * memWidth);
 
         addEqualityConstraint(opex1 - costElec * (24.0 * 1e-3) *
             (resBlank * current / (memLength * memWidth) + numCells * voltCellPair) * current * daysOperation);
 
         mc::FFVar flowOutConc = flowOutConcentrateNd * scaleFacFlow;
         mc::FFVar flowOutDil = flowOutDiluteNd * scaleFacFlow;
+        // addEqualityConstraint(opex2 - costElec * (24.0 * 1e-3) * numCells * daysOperation * (
+        //     densityManure * (1400.0 / reConc) * memLength * pow(uConc, 2.0) / (4.0 * thicknessConcentrate) * ((flowOutConc + flowInConc) / 2.0) +
+        //     densityManure * (104.5 / pow(reDil, 0.37)) * memLength * pow(uDil, 2.0) / (4.0 * thicknessDilute) * ((flowOutDil + flowInDil) / 2.0)));
+        
         addEqualityConstraint(opex2 - costElec * (24.0 * 1e-3) * numCells * daysOperation * (
-            densityManure * (1400.0 / reConc) * memLength * pow(uConc, 2.0) / (4.0 * thicknessConcentrate) * ((flowOutConc + flowInConc) / 2.0) +
-            densityManure * (104.5 / pow(reDil, 0.37)) * memLength * pow(uDil, 2.0) / (4.0 * thicknessDilute) * ((flowOutDil + flowInDil) / 2.0)));
+            175.0 * viscosityManure * memLength * memWidth * uConc * uConc / thicknessConcentrate
+            + 78.70934593096298 * pow(memWidth, 0.37) * memLength * uDil * uDil
+                * pow(flowOutDil + flowInDil, 0.63) / thicknessDilute
+        ));
 
         if (unitIdx == 1) {
             addEqualityConstraint(molNStream2 - flowOutDiluteNd * (scaleFacFlow * numCells) * concOutDiluteNd * scaleFacConc);
@@ -359,7 +358,7 @@ void EDUnits_nocp::buildDAG() {
             addEqualityConstraint(molWStream8 - flowOutDiluteNd * (scaleFacFlow * numCells) * (densityH2OGm3 - concOutDiluteNd * scaleFacConc * molweightN) / molweightH20gMol);
         }
 
-        mc::FFVar objective = this->probability * (capex + opex1 + opex2 + costTotal * 0.0);
+        mc::FFVar objective = this->probability * (capex + opex1 + opex2 );
 
         std::vector<mc::FFVar> functions;
 
@@ -506,7 +505,6 @@ void EDUnits_nocp::buildFullModelDAG() {
         mc::FFVar& capex = vars[secondStageStart + 15];
         mc::FFVar& opex1 = vars[secondStageStart + 16];
         mc::FFVar& opex2 = vars[secondStageStart + 17];
-        mc::FFVar& costTotal = vars[secondStageStart + 18];
         // mc::FFVar& ratioCurrentILimCem   = vars[secondStageStart + 19];  // replaces auxConcDilCem
         // mc::FFVar& ratioCurrentILimAem   = vars[secondStageStart + 20];  // replaces auxConcDilAem
 
@@ -609,7 +607,7 @@ void EDUnits_nocp::buildFullModelDAG() {
             addEqualityConstraint(molWStream8 - flowOutDiluteNd * (scaleFacFlow * numCells) * (densityH2OGm3 - concOutDiluteNd * scaleFacConc * molweightN) / molweightH20gMol);
         }
 
-        objective += this->probability * (capex + opex1 + opex2 + costTotal * 0.0);
+        objective += this->probability * (capex + opex1 + opex2 );
     }
 
     std::vector<mc::FFVar> functions;

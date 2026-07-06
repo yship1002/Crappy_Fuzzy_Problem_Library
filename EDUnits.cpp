@@ -51,56 +51,54 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
     //     mc::Interval(361.769, 361.769)    // molWStream8
     // };
 
+    // this->second_stage_IX = {
+    //     mc::Interval(1, 200),           // I 16
+    //     mc::Interval(0, 1),           // flowSplit 17
+    //     mc::Interval(0.01, 10),          // memLength 18
+    //     mc::Interval(0.01, 10),         // memWidth 19
+    //     mc::Interval(0.001, 0.01),     // thicknessConcentrate 20
+    //     mc::Interval(0.001, 0.01),     // thicknessDilute 21
+    //     mc::Interval(1e-3, 100),         // flowOutConcentrateND 22
+    //     mc::Interval(1e-3, 10),         // flowOutDiluteND 23
+    //     mc::Interval(1e-3, 100),          // concOutConcentrateND 24
+    //     mc::Interval(1e-3, 100),          // concOutDiluteND 25
+    //     mc::Interval(0, 5),          // voltCellPair 26
+    //     mc::Interval(1e-6, 1e-2),       // resConcentrate 27
+    //     mc::Interval(1e-6, 1e-2),       // resDilute 28
+    //     mc::Interval(1e-4, 0.25),       // voltNonOhmicCEM 29
+    //     mc::Interval(1e-4, 0.25),       // voltNonOhmicAEM 30
+    //     mc::Interval(0, 1e6),           // capex
+    //     mc::Interval(0, 1e6),           // opex1
+    //     mc::Interval(0, 1e6),           // opex2
+    //     mc::Interval(0, 1e6),            // costTotal
+    //     mc::Interval(1e-3, 1e6),            // auxVar
+    //     mc::Interval(1e-3, 1e6)            // auxVar2
+
+
+    // };  
     this->second_stage_IX = {
-        mc::Interval(1, 200),           // I
-        mc::Interval(0, 1),           // flowSplit
-        mc::Interval(0.01, 10),          // memLength
-        mc::Interval(0.01, 10),         // memWidth
-        mc::Interval(0.001, 0.01),     // thicknessConcentrate
-        mc::Interval(0.001, 0.01),     // thicknessDilute
-        mc::Interval(1e-3, 100),         // flowOutConcentrateND
-        mc::Interval(1e-3, 10),         // flowOutDiluteND
-        mc::Interval(1e-3, 100),          // concOutConcentrateND
-        mc::Interval(1e-3, 100),          // concOutDiluteND
-        mc::Interval(0, 5),          // voltCellPair
-        mc::Interval(1e-6, 1e-2),       // resConcentrate
-        mc::Interval(1e-6, 1e-2),       // resDilute
-        mc::Interval(1e-4,0.25),       // voltNonOhmicCEM
-        mc::Interval(1e-4, 0.25),       // voltNonOhmicAEM
-        mc::Interval(0, 1e6),           // capex
-        mc::Interval(0, 1e6),           // opex1
-        mc::Interval(0, 1e6),           // opex2
-        mc::Interval(0, 1e6),            // costTotal
-        mc::Interval(1e-6, 0.99),       // Aemmem
-        mc::Interval(1e-6, 0.99),        // Cemmem
-        mc::Interval(1e-6, 1e7),        // Aemlogratio
-        mc::Interval(1e-6, 1e7)        // Cemlogratio
-
- 
-
-
-    };  
-    // this->second_stage_IX ={
-    //     mc::Interval(0.0999999999000337,    0.0999999999000337),   // I
-    //     mc::Interval(0.9995735093972126,    0.9995735093972126),   // flowSplit
-    //     mc::Interval(0.036242856343132054,  0.036242856343132054), // memLength
-    //     mc::Interval(0.009999999900088968,  0.009999999900088968), // memWidth
-    //     mc::Interval(0.000999999900010844,  0.000999999900010844), // thicknessConcentrate
-    //     mc::Interval(0.0009999999000038177, 0.0009999999000038177),// thicknessDilute
-    //     mc::Interval(2.5001359490822983,    2.5001359490822983),   // flowOutConcentrateND
-    //     mc::Interval(0.001,                 0.001),                // flowOutDiluteND
-    //     mc::Interval(5.237617366884594,     5.237617366884594),    // concOutConcentrateND
-    //     mc::Interval(5.152472119923644,     5.152472119923644),    // concOutDiluteND
-    //     mc::Interval(0.15214083523685012,   0.15214083523685012),  // voltCellPair
-    //     mc::Interval(3.217168486072007e-05, 3.217168486072007e-05),// resConcentrate
-    //     mc::Interval(3.2435231169229935e-05,3.2435231169229935e-05),// resDilute
-    //     mc::Interval(0.008015556841086438,  0.008015556841086438), // voltNonOhmicCEM
-    //     mc::Interval(0.007655096301298272,  0.007655096301298272), // voltNonOhmicAEM
-    //     mc::Interval(38.56239876381159,     38.56239876381159),    // capex
-    //     mc::Interval(38.00625183346244,     38.00625183346244),    // opex1
-    //     mc::Interval(0.00028748342492133694,0.00028748342492133694),// opex2
-    //     mc::Interval(0,                     0)                    // costTotal (unknown)
-    // };
+        mc::Interval(1, 1+1),                    // I 16
+        mc::Interval(0.999486-0.1, 0.999486),      // flowSplit 17
+        mc::Interval(0.511088, 0.511088+0.1),      // memLength 18
+        mc::Interval(0.00999999, 0.00999999+0.1),  // memWidth 19
+        mc::Interval(0.00099999, 0.00099999+0.1),  // thicknessConcentrate 20
+        mc::Interval(0.00099999, 0.00099999+0.1),  // thicknessDilute 21
+        mc::Interval(3.39017, 3.39017+0.1),        // flowOutConcentrateND 22
+        mc::Interval(0.00099999, 0.00099999+0.1),  // flowOutDiluteND 23
+        mc::Interval(2.52589, 2.52589+0.1),        // concOutConcentrateND 24
+        mc::Interval(0.0719748, 0.0719748+0.1),    // concOutDiluteND 25
+        mc::Interval(0.206921, 0.206921+0.1),      // voltCellPair 26
+        mc::Interval(6.6719e-05, 6.6719e-05+0.1),  // resConcentrate 27
+        mc::Interval(0.000129758, 0.000129758+0.1),// resDilute 28
+        mc::Interval(0.0431747, 0.0431747+0.1),    // voltNonOhmicCEM 29
+        mc::Interval(0.0411688, 0.0411688+0.1),    // voltNonOhmicAEM 30
+        mc::Interval(543.797, 543.797+0.1),        // capex
+        mc::Interval(516.886, 516.886+0.1),        // opex1
+        mc::Interval(0.00745432, 0.00745432+0.1),  // opex2
+        mc::Interval(500000, 500000+0.1),          // costTotal
+        mc::Interval(155.954, 155.954+0.1),        // auxVar
+        mc::Interval(170.04, 170.04+0.1)           // auxVar2
+    };
 }
 
 void EDUnits::buildDAG() {
@@ -211,13 +209,8 @@ void EDUnits::buildDAG() {
         mc::FFVar& opex1 = vars[secondStageStart + 16];
         mc::FFVar& opex2 = vars[secondStageStart + 17];
         mc::FFVar& costTotal = vars[secondStageStart + 18];
-        mc::FFVar& Aemmem = vars[secondStageStart + 19];
-        mc::FFVar& Cemmem = vars[secondStageStart + 20];
-        mc::FFVar& Aemlogratio = vars[secondStageStart + 21];
-        mc::FFVar& Cemlogratio = vars[secondStageStart + 22];
-
-
-
+        mc::FFVar& avgConcDilIntCem = vars[secondStageStart + 19];
+        mc::FFVar& avgConcDilIntAem = vars[secondStageStart + 20];
 
 
         const int unitIdx = static_cast<int>(scenarioIndex) + 1;
@@ -227,13 +220,13 @@ void EDUnits::buildDAG() {
         mc::FFVar flowInED, concInED;
         if (unitIdx == 1) {
             flowInED = (molNStream1 * molweightN + molWStream1 * molweightH20gMol) / densityH2OGm3;
-            concInED = densityH2OGm3 / (molweightN + molWStream1/molNStream1 * molweightH20gMol);
+            concInED = molNStream1*densityH2OGm3 / (molNStream1*molweightN + molWStream1 * molweightH20gMol);
         } else if (unitIdx == 2) {
             flowInED = (molNStream4 * molweightN + molWStream4 * molweightH20gMol) / densityH2OGm3;
-            concInED = densityH2OGm3 / (molweightN + molWStream4/molNStream4 * molweightH20gMol);
+            concInED = molNStream4*densityH2OGm3 / (molNStream4*molweightN + molWStream4 * molweightH20gMol);
         } else {
             flowInED = (molNStream5 * molweightN + molWStream5 * molweightH20gMol) / densityH2OGm3;
-            concInED = densityH2OGm3 / (molweightN + molWStream5/molNStream5 * molweightH20gMol);
+            concInED = molNStream5*densityH2OGm3 / (molNStream5*molweightN + molWStream5 * molweightH20gMol);
         }
 
         mc::FFVar flowInConc = flowSplit * flowInED / numCells;
@@ -251,16 +244,25 @@ void EDUnits::buildDAG() {
         mc::FFVar avgConcConc = 0.5 * (concOutConcentrateNd * scaleFacConc + concInED);
         mc::FFVar avgConcDil = 0.5 * (concOutDiluteNd * scaleFacConc + concInED);
 
-        mc::FFVar iLimConcCem = shConc * avgConcConc * faraday * saltDiffConc / (2.0 * thicknessConcentrate * (transCem - transIonConc));
-        mc::FFVar iLimDilCem = shDil * avgConcDil * faraday * saltDiffDil / (2.0 * thicknessDilute * (transCem - transIonConc));
-        mc::FFVar iLimConcAem = shConc * avgConcConc * faraday * saltDiffConc / (2.0 * thicknessConcentrate * (transAem - transIonDil));
-        mc::FFVar iLimDilAem = shDil * avgConcDil * faraday * saltDiffDil / (2.0 * thicknessDilute * (transAem - transIonDil));
+        // avgConc*Int* directly, avgConcConc/avgConcDil cancelled out of the correction term
+        mc::FFVar avgConcConcIntCem = avgConcConc +
+            (current / (memLength * memWidth)) * (2.0 * thicknessConcentrate * (transCem - transIonConc)) / (shConc * faraday * saltDiffConc);
 
-        mc::FFVar concInConcIntCem = concInED * (1.0 + current / (memLength * memWidth) / iLimConcCem);
-        mc::FFVar concInConcIntAem = concInED * (1.0 + current / (memLength * memWidth) / iLimConcAem);
-        mc::FFVar concOutConcIntCem = concOutConcentrateNd * (1.0 + current / (memLength * memWidth) / iLimConcCem);
-        mc::FFVar concOutConcIntAem = concOutConcentrateNd * (1.0 + current / (memLength * memWidth) / iLimConcAem);
+        mc::FFVar avgConcConcIntAem = avgConcConc +
+            (current / (memLength * memWidth)) * (2.0 * thicknessConcentrate * (transAem - transIonDil)) / (shConc * faraday * saltDiffConc);
 
+
+
+
+        // mc::FFVar avgConcDilIntCem = avgConcDil -
+        //     (current / (memLength * memWidth)) * (2.0 * thicknessDilute * (transCem - transIonConc)) / (shDil * faraday * saltDiffDil);
+
+        // mc::FFVar avgConcDilIntAem = avgConcDil -
+        //     (current / (memLength * memWidth)) * (2.0 * thicknessDilute * (transAem - transIonDil)) / (shDil * faraday * saltDiffDil);
+        
+        
+        
+        
         std::vector<mc::FFVar> constraints;
         auto addEqualityConstraint = [&](const mc::FFVar& expr) {
             constraints.push_back(expr);
@@ -270,21 +272,11 @@ void EDUnits::buildDAG() {
             constraints.push_back(expr);
         };
 
-        addLessEqualConstraint(Cemmem - 1.0);
-        addLessEqualConstraint(Aemmem - 1.0);
-        addEqualityConstraint(Aemmem - current / (memLength * memWidth * iLimDilAem));
-        addEqualityConstraint(Cemmem - current / (memLength * memWidth * iLimDilCem));
-        mc::FFVar concOutDilIntAem = concOutDiluteNd * (1-Aemmem);
-        mc::FFVar concInDilIntAem = concInED * (1-Aemmem);
-        mc::FFVar concInDilIntCem = concInED * (1-Cemmem);
-        mc::FFVar concOutDilIntCem = concOutDiluteNd * (1-Cemmem);
+        addEqualityConstraint( avgConcDilIntCem -avgConcDil +
+            (current / (memLength * memWidth)) * (2.0 * thicknessDilute * (transCem - transIonConc)) / (shDil * faraday * saltDiffDil));
 
-
-        mc::FFVar avgConcConcIntCem = 0.5 * (concOutConcIntCem * scaleFacConc + concInConcIntCem);
-        mc::FFVar avgConcConcIntAem = 0.5 * (concOutConcIntAem * scaleFacConc + concInConcIntAem);
-        
-        mc::FFVar avgConcDilIntAem = 0.5 * (concOutDilIntAem * scaleFacConc + concInDilIntAem);
-        mc::FFVar avgConcDilIntCem = 0.5 * (concOutDilIntCem * scaleFacConc + concInDilIntCem);
+        addEqualityConstraint( avgConcDilIntAem - avgConcDil +
+            (current / (memLength * memWidth)) * (2.0 * thicknessDilute * (transAem - transIonDil)) / (shDil * faraday * saltDiffDil));
         
         
         mc::FFVar condFlux = (transCem - (1.0 - transAem)) * (current / (memLength * memWidth * faraday));
@@ -292,8 +284,8 @@ void EDUnits::buildDAG() {
         mc::FFVar diffFluxCem = -(saltDiffCem / thicknessCem) * (avgConcConcIntCem - avgConcDilIntCem);
         mc::FFVar fluxIonsTotal = condFlux + diffFluxAem + diffFluxCem;
 
-        mc::FFVar osmWaterFluxAem = waterPermAem * vantHoffNumber * rg * temp * (osmoticCoeff * avgConcConcIntAem - osmoticCoeff * avgConcDilIntAem);
-        mc::FFVar osmWaterFluxCem = waterPermCem * vantHoffNumber * rg * temp * (osmoticCoeff * avgConcConcIntCem - osmoticCoeff * avgConcDilIntCem);
+        mc::FFVar osmWaterFluxAem = waterPermAem * vantHoffNumber * rg * temp * osmoticCoeff * (avgConcConcIntAem - avgConcDilIntAem);
+        mc::FFVar osmWaterFluxCem = waterPermCem * vantHoffNumber * rg * temp * osmoticCoeff * (avgConcConcIntCem - avgConcDilIntCem);
         mc::FFVar eosmWaterFlux = waterTransNumber * fluxIonsTotal * molweightH20 / densityH2O;
         mc::FFVar fluxWaterTotal = osmWaterFluxAem + osmWaterFluxCem + eosmWaterFlux;
 
@@ -322,18 +314,13 @@ void EDUnits::buildDAG() {
 
         //addEqualityConstraint(exp(voltNonOhmicCem * faraday / (permSelCem * rg * temp)) * avgConcDilIntCem - avgConcConcIntCem);
         //addEqualityConstraint(exp(voltNonOhmicAem * faraday / (permSelAem * rg * temp)) * avgConcDilIntAem - avgConcConcIntAem);
-        addEqualityConstraint(Aemlogratio - avgConcConcIntAem / avgConcDilIntAem);
-        addEqualityConstraint(Cemlogratio - avgConcConcIntCem / avgConcDilIntCem);
 
-        addEqualityConstraint(
-            voltNonOhmicCem * (faraday / (permSelCem * rg * temp)) 
-            - log(Aemlogratio)
-        );
 
-        addEqualityConstraint(
-            voltNonOhmicAem * (faraday / (permSelAem * rg * temp)) 
-            - log(Cemlogratio)
-        );
+        addEqualityConstraint(voltNonOhmicCem * (faraday / (permSelCem * rg * temp)) - log(avgConcConcIntCem)+log(avgConcDilIntCem));
+
+
+
+        addEqualityConstraint(voltNonOhmicAem * (faraday / (permSelAem * rg * temp)) - log(avgConcConcIntAem) +log(avgConcDilIntAem));
 
 
         addEqualityConstraint(flowOutConcentrateNd - (flowInConc / scaleFacFlow) -
@@ -376,8 +363,8 @@ void EDUnits::buildDAG() {
         mc::FFVar flowOutConc = flowOutConcentrateNd * scaleFacFlow;
         mc::FFVar flowOutDil = flowOutDiluteNd * scaleFacFlow;
         addEqualityConstraint(opex2 - costElec * (24.0 * 1e-3) * numCells * daysOperation * (
-            densityManure * (1400.0 / reConc) * memLength * pow(flowOutConc / memWidth, 2.0) / (4.0 * thicknessConcentrate) * ((flowOutConc + flowInConc) / 2.0) +
-            densityManure * (104.5 / pow(reDil, 0.37)) * memLength * pow(flowOutDil / memWidth, 2.0) / (4.0 * thicknessDilute) * ((flowOutDil + flowInDil) / 2.0)));
+           densityManure * (1400.0 / reConc) * memLength * pow(flowOutConc / memWidth, 2.0) / (4.0 * thicknessConcentrate) * ((flowOutConc + flowInConc) / 2.0) +
+           densityManure * (104.5 / pow(reDil, 0.37)) * memLength * pow(flowOutDil / memWidth, 2.0) / (4.0 * thicknessDilute) * ((flowOutDil + flowInDil) / 2.0)));
 
         if (unitIdx == 1) {
             addEqualityConstraint(molNStream2 - flowOutDiluteNd * (scaleFacFlow * numCells) * concOutDiluteNd * scaleFacConc);
@@ -400,7 +387,7 @@ void EDUnits::buildDAG() {
             addEqualityConstraint(molWStream8 - flowOutDiluteNd * (scaleFacFlow * numCells) * (densityH2OGm3 - concOutDiluteNd * scaleFacConc * molweightN) / molweightH20gMol);
         }
 
-        mc::FFVar objective = this->probability * (capex + opex1 + opex2 + costTotal * 0.0);
+        mc::FFVar objective = this->probability * (capex + opex1 + opex2);
 
         std::vector<mc::FFVar> functions;
 
@@ -609,8 +596,7 @@ void EDUnits::buildFullModelDAG() {
 
         addEqualityConstraint(avgConcDilIntCem - 0.5 * (concOutDilIntCem * scaleFacConc + concInDilIntCem));
         addEqualityConstraint(avgConcDilIntAem - 0.5 * (concOutDilIntAem * scaleFacConc + concInDilIntAem));
-        //mc::FFVar avgConcDilIntAem = 0.5 * (concOutDilIntAem * scaleFacConc + concInDilIntAem);
-        //mc::FFVar avgConcDilIntCem = 0.5 * (concOutDilIntCem * scaleFacConc + concInDilIntCem);
+
 
         mc::FFVar condFlux = (transCem - (1.0 - transAem)) * (current / (memLength * memWidth * faraday));
         mc::FFVar diffFluxAem = -(saltDiffAem / thicknessAem) * (avgConcConcIntAem - avgConcDilIntAem);
