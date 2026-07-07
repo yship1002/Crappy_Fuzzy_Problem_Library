@@ -14,91 +14,91 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
     this->scenario_name = ScenarioNames::SCENARIO1;
     this->probability = 1.0;
 
-    this->first_stage_IX = {
-        mc::Interval(1e-5, 11), // molNStream1
-        mc::Interval(1e-5, 500), // molWStream1
-        mc::Interval(1e-5, 12), // molNStream2
-        mc::Interval(1e-5, 500), // molWStream2
-        mc::Interval(1e-5, 13), // molNStream3
-        mc::Interval(1e-5, 500), // molWStream3
-        mc::Interval(1e-5, 14), // molNStream4
-        mc::Interval(1e-5, 500), // molWStream4
-        mc::Interval(1e-5, 15), // molNStream5
-        mc::Interval(1e-5, 500), // molWStream5
-        mc::Interval(1e-5, 16), // molNStream6
-        mc::Interval(1e-5, 500), // molWStream6
-        mc::Interval(1e-5, 17), // molNStream7
-        mc::Interval(1e-5, 500), // molWStream7
-        mc::Interval(1e-5, 18), // molNStream8
-        mc::Interval(1e-5, 500) // molWStream8
-    };
     // this->first_stage_IX = {
-    //     mc::Interval(0.222018, 0.222018), // molNStream1
-    //     mc::Interval(123.686, 123.686),   // molWStream1
-    //     mc::Interval(0.06148, 0.06148),   // molNStream2
-    //     mc::Interval(119.5, 119.5),       // molWStream2
-    //     mc::Interval(0.160538, 0.160538), // molNStream3
-    //     mc::Interval(4.18544, 4.18544),   // molWStream3
-    //     mc::Interval(14, 14),             // molNStream4
-    //     mc::Interval(365.954, 365.954),   // molWStream4
-    //     mc::Interval(13.9953, 13.9953),   // molNStream5
-    //     mc::Interval(365.808, 365.808),   // molWStream5
-    //     mc::Interval(0.00466994, 0.00466994), // molNStream6
-    //     mc::Interval(0.145909, 0.145909), // molWStream6
-    //     mc::Interval(0.155868, 0.155868), // molNStream7
-    //     mc::Interval(4.03953, 4.03953),   // molWStream7
-    //     mc::Interval(13.8395, 13.8395),   // molNStream8
-    //     mc::Interval(361.769, 361.769)    // molWStream8
+    //     mc::Interval(1e-5, 11), // molNStream1
+    //     mc::Interval(1e-5, 500), // molWStream1
+    //     mc::Interval(1e-5, 12), // molNStream2
+    //     mc::Interval(1e-5, 500), // molWStream2
+    //     mc::Interval(1e-5, 13), // molNStream3
+    //     mc::Interval(1e-5, 500), // molWStream3
+    //     mc::Interval(1e-5, 14), // molNStream4
+    //     mc::Interval(1e-5, 500), // molWStream4
+    //     mc::Interval(1e-5, 15), // molNStream5
+    //     mc::Interval(1e-5, 500), // molWStream5
+    //     mc::Interval(1e-5, 16), // molNStream6
+    //     mc::Interval(1e-5, 500), // molWStream6
+    //     mc::Interval(1e-5, 17), // molNStream7
+    //     mc::Interval(1e-5, 500), // molWStream7
+    //     mc::Interval(1e-5, 18), // molNStream8
+    //     mc::Interval(1e-5, 500) // molWStream8
+    // };
+    this->first_stage_IX = {
+        mc::Interval(1e-05, 11),      // molNStream1
+        mc::Interval(1e-05, 500),     // molWStream1
+        mc::Interval(1e-05, 0.37501), // molNStream2
+        mc::Interval(1e-05, 500),     // molWStream2
+        mc::Interval(1e-05, 13),      // molNStream3
+        mc::Interval(1e-05, 500),     // molWStream3
+        mc::Interval(1e-05, 14),      // molNStream4
+        mc::Interval(1e-05, 500),     // molWStream4
+        mc::Interval(1e-05, 7.5),     // molNStream5 7.5 15
+        mc::Interval(1e-05, 500),     // molWStream5
+        mc::Interval(1e-05, 16),      // molNStream6
+        mc::Interval(1e-05, 500),     // molWStream6
+        mc::Interval(1e-05, 17),      // molNStream7
+        mc::Interval(1e-05, 500),     // molWStream7
+        mc::Interval(1e-05, 18),      // molNStream8
+        mc::Interval(1e-05, 500)      // molWStream8
+    };
+
+    this->second_stage_IX = {
+        mc::Interval(1, 200),           // I 16
+        mc::Interval(0, 1),           // flowSplit 17
+        mc::Interval(0.01, 10),          // memLength 18
+        mc::Interval(0.01, 10),         // memWidth 19
+        mc::Interval(0.001, 0.01),     // thicknessConcentrate 20
+        mc::Interval(0.001, 0.01),     // thicknessDilute 21
+        mc::Interval(1e-3, 100),         // flowOutConcentrateND 22
+        mc::Interval(1e-3, 10),         // flowOutDiluteND 23
+        mc::Interval(1e-3, 100),          // concOutConcentrateND 24
+        mc::Interval(1e-3, 100),          // concOutDiluteND 25
+        mc::Interval(0, 5),          // voltCellPair 26
+        mc::Interval(1e-6, 1e-2),       // resConcentrate 27
+        mc::Interval(1e-6, 1e-2),       // resDilute 28
+        mc::Interval(1e-4, 0.25),       // voltNonOhmicCEM 29
+        mc::Interval(1e-4, 0.25),       // voltNonOhmicAEM 30
+        mc::Interval(0, 1e6),           // capex
+        mc::Interval(0, 1e6),           // opex1
+        mc::Interval(0, 1e6),           // opex2
+        mc::Interval(0, 1e6),            // costTotal
+        mc::Interval(1e-3, 1e6),            // avgConcDilIntCem
+        mc::Interval(1e-3, 1e6)            // avgConcDilIntAem
+    };  
+    // this->second_stage_IX = {
+    //     mc::Interval(1, 200),
+    //     mc::Interval(0, 1),
+    //     mc::Interval(0.01, 10),
+    //     mc::Interval(0.01, 10),
+    //     mc::Interval(0.001, 0.0055),
+    //     mc::Interval(0.001, 0.01),
+    //     mc::Interval(0.001, 3.12597),
+    //     mc::Interval(0.001, 5.0005),
+    //     mc::Interval(0.001, 100),
+    //     mc::Interval(0.001, 6.25094),
+    //     mc::Interval(0, 5),
+    //     mc::Interval(1e-06, 0.01),
+    //     mc::Interval(1e-06, 0.01),
+    //     mc::Interval(0.0001, 0.12505),
+    //     mc::Interval(0.0001, 0.12505),
+    //     mc::Interval(0, 10.64),
+    //     mc::Interval(0, 31250),
+    //     mc::Interval(0, 125000),
+    //     mc::Interval(0, 1e+06),
+    //     mc::Interval(0.001, 1e+06),
+    //     mc::Interval(0.001, 1e+06)
     // };
 
-    // this->second_stage_IX = {
-    //     mc::Interval(1, 200),           // I 16
-    //     mc::Interval(0, 1),           // flowSplit 17
-    //     mc::Interval(0.01, 10),          // memLength 18
-    //     mc::Interval(0.01, 10),         // memWidth 19
-    //     mc::Interval(0.001, 0.01),     // thicknessConcentrate 20
-    //     mc::Interval(0.001, 0.01),     // thicknessDilute 21
-    //     mc::Interval(1e-3, 100),         // flowOutConcentrateND 22
-    //     mc::Interval(1e-3, 10),         // flowOutDiluteND 23
-    //     mc::Interval(1e-3, 100),          // concOutConcentrateND 24
-    //     mc::Interval(1e-3, 100),          // concOutDiluteND 25
-    //     mc::Interval(0, 5),          // voltCellPair 26
-    //     mc::Interval(1e-6, 1e-2),       // resConcentrate 27
-    //     mc::Interval(1e-6, 1e-2),       // resDilute 28
-    //     mc::Interval(1e-4, 0.25),       // voltNonOhmicCEM 29
-    //     mc::Interval(1e-4, 0.25),       // voltNonOhmicAEM 30
-    //     mc::Interval(0, 1e6),           // capex
-    //     mc::Interval(0, 1e6),           // opex1
-    //     mc::Interval(0, 1e6),           // opex2
-    //     mc::Interval(0, 1e6),            // costTotal
-    //     mc::Interval(1e-3, 1e6),            // auxVar
-    //     mc::Interval(1e-3, 1e6)            // auxVar2
 
-
-    // };  
-    this->second_stage_IX = {
-        mc::Interval(1, 1+1),                    // I 16
-        mc::Interval(0.999486-0.1, 0.999486),      // flowSplit 17
-        mc::Interval(0.511088, 0.511088+0.1),      // memLength 18
-        mc::Interval(0.00999999, 0.00999999+0.1),  // memWidth 19
-        mc::Interval(0.00099999, 0.00099999+0.1),  // thicknessConcentrate 20
-        mc::Interval(0.00099999, 0.00099999+0.1),  // thicknessDilute 21
-        mc::Interval(3.39017, 3.39017+0.1),        // flowOutConcentrateND 22
-        mc::Interval(0.00099999, 0.00099999+0.1),  // flowOutDiluteND 23
-        mc::Interval(2.52589, 2.52589+0.1),        // concOutConcentrateND 24
-        mc::Interval(0.0719748, 0.0719748+0.1),    // concOutDiluteND 25
-        mc::Interval(0.206921, 0.206921+0.1),      // voltCellPair 26
-        mc::Interval(6.6719e-05, 6.6719e-05+0.1),  // resConcentrate 27
-        mc::Interval(0.000129758, 0.000129758+0.1),// resDilute 28
-        mc::Interval(0.0431747, 0.0431747+0.1),    // voltNonOhmicCEM 29
-        mc::Interval(0.0411688, 0.0411688+0.1),    // voltNonOhmicAEM 30
-        mc::Interval(543.797, 543.797+0.1),        // capex
-        mc::Interval(516.886, 516.886+0.1),        // opex1
-        mc::Interval(0.00745432, 0.00745432+0.1),  // opex2
-        mc::Interval(500000, 500000+0.1),          // costTotal
-        mc::Interval(155.954, 155.954+0.1),        // auxVar
-        mc::Interval(170.04, 170.04+0.1)           // auxVar2
-    };
 }
 
 void EDUnits::buildDAG() {
