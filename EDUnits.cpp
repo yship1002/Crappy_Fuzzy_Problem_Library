@@ -351,17 +351,6 @@ void EDUnits::buildDAG() {
             (flowInDil * concInED) / (scaleFacFlow * scaleFacConc) +
             fluxIonsTotal * memLength * memWidth / (scaleFacFlow * scaleFacConc));
 
-
-
-        // REDUNDANT CONSTRAINT: flow balance is already enforced by molNStream and molWStream constraints, but this may help the solver
-        addEqualityConstraint(flowOutConcentrateNd - (flowInConc / scaleFacFlow)+flowOutDiluteNd - (flowInDil / scaleFacFlow));
-        //Redundant constraint: ion flux is already enforced by flowOutConc/Dil*concOutConc/Dil constraints, but may help solver
-        addEqualityConstraint((flowOutConcentrateNd * concOutConcentrateNd) -
-            (flowInConc * concInED) / (scaleFacFlow * scaleFacConc)+(flowOutDiluteNd * concOutDiluteNd) -
-            (flowInDil * concInED) / (scaleFacFlow * scaleFacConc));
-
-
-            
         addEqualityConstraint(voltCellPair - (voltNonOhmicCem + voltNonOhmicAem) -
             (resConcentrate + resDilute + resCem + resAem) * (currentDensity));
 

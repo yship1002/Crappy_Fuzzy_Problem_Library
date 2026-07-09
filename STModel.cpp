@@ -277,6 +277,7 @@ void STModel::generateLP(IloEnv* cplex_env,IloModel* cplexmodel,
     }
     IloExpr objExpr(*cplex_env);
     objExpr+=(*cplex_x)[after_nvars-1]; // objective is always the last variable in our construction
+    //objExpr+=(*cplex_x)[25];
     *(cplex_obj) = IloMinimize(*cplex_env, objExpr);
     objExpr.end();
     
