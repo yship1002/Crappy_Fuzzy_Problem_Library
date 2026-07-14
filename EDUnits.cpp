@@ -15,47 +15,48 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
     this->probability = 1.0;
 
     // this->first_stage_IX = {
-    //     mc::Interval(1e-5, 11), // molNStream1
-    //     mc::Interval(1e-5, 500), // molWStream1
-    //     mc::Interval(1e-5, 12), // molNStream2
-    //     mc::Interval(1e-5, 500), // molWStream2
-    //     mc::Interval(1e-5, 13), // molNStream3
-    //     mc::Interval(1e-5, 500), // molWStream3
-    //     mc::Interval(1e-5, 14), // molNStream4
-    //     mc::Interval(1e-5, 500), // molWStream4
-    //     mc::Interval(1e-5, 15), // molNStream5
-    //     mc::Interval(1e-5, 500), // molWStream5
-    //     mc::Interval(1e-5, 16), // molNStream6
-    //     mc::Interval(1e-5, 500), // molWStream6
-    //     mc::Interval(1e-5, 17), // molNStream7
-    //     mc::Interval(1e-5, 500), // molWStream7
-    //     mc::Interval(1e-5, 18), // molNStream8
-    //     mc::Interval(1e-5, 500) // molWStream8
+    //     mc::Interval(0.2229377820190313-0.1, 0.2229377820190313+0.1),      // molNStream1 0
+    //     mc::Interval(123.68485034381521-0.1,123.68485034381521+0.1),     // molWStream1 1
+    //     mc::Interval(0.06147995475275121,0.06147995475275121+0.1),      // molNStream2 2
+    //     mc::Interval(119.50012464909788-0.1,119.50012464909788+0.1),     // molWStream2 3
+    //     mc::Interval(0.16145782726628008-0.1,0.16145782726628008+0.1),      // molNStream3 4
+    //     mc::Interval(4.184725694717343-0.1,4.184725694717343+0.1),     // molWStream3 5
+    //     mc::Interval(9.9,10),      // molNStream4 6
+    //     mc::Interval(259.16513433898416-0.1,259.16513433898416+0.1),     // molWStream4 7
+    //     mc::Interval(9.994410359108668-0.1,9.994410359108668),     // molNStream5 8
+    //     mc::Interval(259.01994050480965-0.1,259.01994050480965),     // molWStream5 9
+    //     mc::Interval(0.005589640891332909,0.005589640891332909+0.1),      // molNStream6 10
+    //     mc::Interval(0.14519383417451004,0.14519383417451004+0.1),     // molWStream6 11
+    //     mc::Interval(0.15586818637495115,0.15586818637495115+0.1),      // molNStream7 12
+    //     mc::Interval(4.039531860542882,4.039531860542882+0.1),     // molWStream7 13
+    //     mc::Interval(9.83854217273372,9.83854217273372+0.1),      // molNStream8 14
+    //     mc::Interval(254.98040864426682,254.98040864426682+0.1)      // molWStream8 15
     // };
     this->first_stage_IX = {
-        mc::Interval(1e-05, 11),      // molNStream1
-        mc::Interval(1e-05, 500),     // molWStream1
-        mc::Interval(1e-05, 0.37501), // molNStream2
-        mc::Interval(1e-05, 500),     // molWStream2
-        mc::Interval(1e-05, 13),      // molNStream3
-        mc::Interval(1e-05, 500),     // molWStream3
-        mc::Interval(1e-05, 14),      // molNStream4
-        mc::Interval(1e-05, 500),     // molWStream4
-        mc::Interval(1e-05, 7.5),     // molNStream5 7.5 15
-        mc::Interval(1e-05, 500),     // molWStream5
-        mc::Interval(1e-05, 16),      // molNStream6
-        mc::Interval(1e-05, 500),     // molWStream6
-        mc::Interval(1e-05, 17),      // molNStream7
-        mc::Interval(1e-05, 500),     // molWStream7
-        mc::Interval(1e-05, 18),      // molNStream8
-        mc::Interval(1e-05, 500)      // molWStream8
+        mc::Interval(1e-05, 10),      // molNStream1 0
+        mc::Interval(1e-05, 500),     // molWStream1 1
+        mc::Interval(1e-05, 5),      // molNStream2 2
+        mc::Interval(1e-05, 500),     // molWStream2 3
+        mc::Interval(1e-05, 10),      // molNStream3 4
+        mc::Interval(1e-05, 500),     // molWStream3 5
+        mc::Interval(1e-05, 10),      // molNStream4 6
+        mc::Interval(1e-05, 500),     // molWStream4 7
+        mc::Interval(1e-05, 10),     // molNStream5 8
+        mc::Interval(1e-05, 500),     // molWStream5 9
+        mc::Interval(1e-05, 10),      // molNStream6 10
+        mc::Interval(1e-05, 500),     // molWStream6 11
+        mc::Interval(1e-05, 10),      // molNStream7 12
+        mc::Interval(1e-05, 500),     // molWStream7 13
+        mc::Interval(1e-05, 10),      // molNStream8 14
+        mc::Interval(1e-05, 500)      // molWStream8 15
     };
 
     this->second_stage_IX = {
-        mc::Interval(1, 200),           // I 16
+
+        mc::Interval(0, 1e8),           // currentDensity 16
         mc::Interval(0, 1),           // flowSplit 17
-        mc::Interval(0.01, 10),          // memLength 18
-        mc::Interval(0.01, 10),         // memWidth 19
+        mc::Interval(1e-2, 1),          // memLength 18
+        mc::Interval(1e-2, 1),         // memWidth 19
         mc::Interval(0.001, 0.01),     // thicknessConcentrate 20
         mc::Interval(0.001, 0.01),     // thicknessDilute 21
         mc::Interval(1e-3, 100),         // flowOutConcentrateND 22
@@ -67,37 +68,14 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
         mc::Interval(1e-6, 1e-2),       // resDilute 28
         mc::Interval(1e-4, 0.25),       // voltNonOhmicCEM 29
         mc::Interval(1e-4, 0.25),       // voltNonOhmicAEM 30
-        mc::Interval(0, 1e6),           // capex
-        mc::Interval(0, 1e6),           // opex1
-        mc::Interval(0, 1e6),           // opex2
-        mc::Interval(0, 1e6),            // costTotal
-        mc::Interval(1e-3, 1e6),            // avgConcDilIntCem
-        mc::Interval(1e-3, 1e6),            // avgConcDilIntAem
-        mc::Interval(1e-2, 1e3)             // currentDensity
-    };  
-    // this->second_stage_IX = {
-    //     mc::Interval(1, 200),
-    //     mc::Interval(0, 1),
-    //     mc::Interval(0.01, 10),
-    //     mc::Interval(0.01, 10),
-    //     mc::Interval(0.001, 0.0055),
-    //     mc::Interval(0.001, 0.01),
-    //     mc::Interval(0.001, 3.12597),
-    //     mc::Interval(0.001, 5.0005),
-    //     mc::Interval(0.001, 100),
-    //     mc::Interval(0.001, 6.25094),
-    //     mc::Interval(0, 5),
-    //     mc::Interval(1e-06, 0.01),
-    //     mc::Interval(1e-06, 0.01),
-    //     mc::Interval(0.0001, 0.12505),
-    //     mc::Interval(0.0001, 0.12505),
-    //     mc::Interval(0, 10.64),
-    //     mc::Interval(0, 31250),
-    //     mc::Interval(0, 125000),
-    //     mc::Interval(0, 1e+06),
-    //     mc::Interval(0.001, 1e+06),
-    //     mc::Interval(0.001, 1e+06)
-    // };
+        mc::Interval(0, 1e6),           // capex 31
+        mc::Interval(0, 1e6),           // opex1 32
+        mc::Interval(0, 1e6),           // opex2 33
+        mc::Interval(0, 1e6),            // costTotal 34
+        mc::Interval(1e-3, 1e6),            // avgConcDilIntCem 35
+        mc::Interval(1e-3, 1e6),            // avgConcDilIntAem 36
+    };          
+
 
 
 }
@@ -191,7 +169,7 @@ void EDUnits::buildDAG() {
 
         const int secondStageStart = firstStageCount;
 
-        mc::FFVar& current = vars[secondStageStart + 0];
+        mc::FFVar& currentDensity = vars[secondStageStart + 0];
         mc::FFVar& flowSplit = vars[secondStageStart + 1];
         mc::FFVar& memLength = vars[secondStageStart + 2];
         mc::FFVar& memWidth = vars[secondStageStart + 3];
@@ -212,7 +190,6 @@ void EDUnits::buildDAG() {
         mc::FFVar& costTotal = vars[secondStageStart + 18];
         mc::FFVar& avgConcDilIntCem = vars[secondStageStart + 19];
         mc::FFVar& avgConcDilIntAem = vars[secondStageStart + 20];
-        mc::FFVar& currentDensity = vars[secondStageStart + 21];
 
 
         const int unitIdx = static_cast<int>(scenarioIndex) + 1;
@@ -233,6 +210,9 @@ void EDUnits::buildDAG() {
 
         mc::FFVar flowInConc = flowSplit * flowInED / numCells;
         mc::FFVar flowInDil = (1.0 - flowSplit) * flowInED / numCells;
+
+
+        //iSSUES:flowOutConcentrateNd, flowOutDiluteNd,concOutConcentrateNd, concOutDiluteNd
 
         mc::FFVar reConc = densityManure * (flowOutConcentrateNd * scaleFacFlow + flowInConc) / (memWidth * viscosityManure);
         mc::FFVar reDil = densityManure * (flowOutDiluteNd * scaleFacFlow + flowInDil) / (memWidth * viscosityManure);
@@ -266,7 +246,6 @@ void EDUnits::buildDAG() {
         auto addLessEqualConstraint = [&](const mc::FFVar& expr) {
             constraints.push_back(expr);
         };
-        addEqualityConstraint(currentDensity - current / (memLength * memWidth));
 
 
         addEqualityConstraint( avgConcDilIntCem -0.5 * (concOutDiluteNd * scaleFacConc + concInED) +
@@ -358,7 +337,8 @@ void EDUnits::buildDAG() {
         addEqualityConstraint(capex - (6800.0 * memLength * memWidth + 2.0 * 100.0 * (numCells - 2.0) * memLength * memWidth));
 
         addEqualityConstraint(opex1 - costElec * (24.0 * 1e-3) *
-            (resBlank * currentDensity + numCells * voltCellPair) * current * daysOperation);
+            (resBlank * pow(currentDensity, 2.0) + numCells * voltCellPair*currentDensity) * memLength * memWidth * daysOperation);
+
 
         mc::FFVar flowOutConc = flowOutConcentrateNd * scaleFacFlow;
         mc::FFVar flowOutDil = flowOutDiluteNd * scaleFacFlow;
