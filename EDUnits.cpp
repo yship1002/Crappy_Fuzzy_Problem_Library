@@ -15,22 +15,22 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
     this->probability = 1.0;
 
     // this->first_stage_IX = {
-    //     mc::Interval(0.2229377820190313-0.1, 0.2229377820190313+0.1),      // molNStream1 0
-    //     mc::Interval(123.68485034381521-0.1,123.68485034381521+0.1),     // molWStream1 1
-    //     mc::Interval(0.06147995475275121,0.06147995475275121+0.1),      // molNStream2 2
-    //     mc::Interval(119.50012464909788-0.1,119.50012464909788+0.1),     // molWStream2 3
-    //     mc::Interval(0.16145782726628008-0.1,0.16145782726628008+0.1),      // molNStream3 4
-    //     mc::Interval(4.184725694717343-0.1,4.184725694717343+0.1),     // molWStream3 5
+    //     mc::Interval(0.2229377820190313, 0.2229377820190313),      // molNStream1 0
+    //     mc::Interval(123.68485034381521,123.68485034381521),     // molWStream1 1
+    //     mc::Interval(0.06147995475275121,0.06147995475275121),      // molNStream2 2
+    //     mc::Interval(119.50012464909788,119.50012464909788),     // molWStream2 3
+    //     mc::Interval(0.16145782726628008,0.16145782726628008),      // molNStream3 4
+    //     mc::Interval(4.184725694717343,4.184725694717343),     // molWStream3 5
     //     mc::Interval(9.9,10),      // molNStream4 6
-    //     mc::Interval(259.16513433898416-0.1,259.16513433898416+0.1),     // molWStream4 7
-    //     mc::Interval(9.994410359108668-0.1,9.994410359108668),     // molNStream5 8
-    //     mc::Interval(259.01994050480965-0.1,259.01994050480965),     // molWStream5 9
-    //     mc::Interval(0.005589640891332909,0.005589640891332909+0.1),      // molNStream6 10
-    //     mc::Interval(0.14519383417451004,0.14519383417451004+0.1),     // molWStream6 11
-    //     mc::Interval(0.15586818637495115,0.15586818637495115+0.1),      // molNStream7 12
-    //     mc::Interval(4.039531860542882,4.039531860542882+0.1),     // molWStream7 13
-    //     mc::Interval(9.83854217273372,9.83854217273372+0.1),      // molNStream8 14
-    //     mc::Interval(254.98040864426682,254.98040864426682+0.1)      // molWStream8 15
+    //     mc::Interval(259.16513433898416,259.16513433898416),     // molWStream4 7
+    //     mc::Interval(9.994410359108668,9.994410359108668),     // molNStream5 8
+    //     mc::Interval(259.01994050480965,259.01994050480965),     // molWStream5 9
+    //     mc::Interval(0.005589640891332909,0.005589640891332909),      // molNStream6 10
+    //     mc::Interval(0.14519383417451004,0.14519383417451004),     // molWStream6 11
+    //     mc::Interval(0.15586818637495115,0.15586818637495115),      // molNStream7 12
+    //     mc::Interval(4.039531860542882,4.039531860542882),     // molWStream7 13
+    //     mc::Interval(9.83854217273372,9.83854217273372),      // molNStream8 14
+    //     mc::Interval(254.98040864426682,254.98040864426682)      // molWStream8 15
     // };
     this->first_stage_IX = {
         mc::Interval(1e-05, 10),      // molNStream1 0
@@ -55,8 +55,8 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
 
         mc::Interval(0, 1e8),           // currentDensity 16
         mc::Interval(0, 1),           // flowSplit 17
-        mc::Interval(1e-2, 1),          // memLength 18
-        mc::Interval(1e-2, 1),         // memWidth 19
+        mc::Interval(9, 10),          // memLength 18
+        mc::Interval(0.019626763211448694,0.019626763211448694),         // memWidth 19
         mc::Interval(0.001, 0.01),     // thicknessConcentrate 20
         mc::Interval(0.001, 0.01),     // thicknessDilute 21
         mc::Interval(1e-3, 100),         // flowOutConcentrateND 22
