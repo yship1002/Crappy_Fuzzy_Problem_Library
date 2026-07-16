@@ -223,14 +223,14 @@ void STModel::generateLP(IloEnv* cplex_env,IloModel* cplexmodel,
 
 
     Env.options.SANDWICH_RTOL=1e-5;
-    Env.options.SANDWICH_MAXCUT=20;
+    Env.options.SANDWICH_MAXCUT=2; //please delete
 
                            
 
     Env.generate_cuts(this->F[this->scenario_name].size(), PF);
     
     //std::cout<<Env;
-    //std::cout<<this->DAG[this->scenario_name];  
+    //std::cout<<this->DAG[this->scenario_name];   // please delete
     
     // Extract LP data from Env Don't touch below this line
     auto c = Env.Cuts();

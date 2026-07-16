@@ -21,7 +21,7 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
     //     mc::Interval(119.50012464909788,119.50012464909788),     // molWStream2 3
     //     mc::Interval(0.16145782726628008,0.16145782726628008),      // molNStream3 4
     //     mc::Interval(4.184725694717343,4.184725694717343),     // molWStream3 5
-    //     mc::Interval(9.9,10),      // molNStream4 6
+    //     mc::Interval(9.99999996247236,9.99999996247236),       // molNStream4 6
     //     mc::Interval(259.16513433898416,259.16513433898416),     // molWStream4 7
     //     mc::Interval(9.994410359108668,9.994410359108668),     // molNStream5 8
     //     mc::Interval(259.01994050480965,259.01994050480965),     // molWStream5 9
@@ -53,7 +53,7 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
 
     this->second_stage_IX = {
 
-        mc::Interval(0, 1e8),           // currentDensity 16
+        mc::Interval(0,1e4),           // currentDensity 16
         mc::Interval(0, 1),           // flowSplit 17
         mc::Interval(1e-2, 10),          // memLength 18
         mc::Interval(1e-2,10),         // memWidth 19
@@ -74,7 +74,33 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
         mc::Interval(0, 1e6),            // costTotal 34
         mc::Interval(1e-3, 1e6),            // avgConcDilIntCem 35
         mc::Interval(1e-3, 1e6),            // avgConcDilIntAem 36
-    };          
+        mc::Interval(-1e6, 1e6),             // fluxIonsTotal 37
+        mc::Interval(-1e6, 1e6)             // fluxWaterTotal 38
+    };   
+    // this->second_stage_IX = {
+
+    //     mc::Interval(178.74440449245503, 178.74440449245503),     // currentDensity 16
+    //     mc::Interval(0.0, 0.0),                                   // flowSplit 17            (raw -1.0e-10, clamped)
+    //     mc::Interval(10.0, 10.0),                                 // memLength 18            (raw 10.000000000999169, clamped)
+    //     mc::Interval(0.019626763663158974, 0.019626763663158974), // memWidth 19
+    //     mc::Interval(0.001, 0.001),                               // thicknessConcentrate 20 (raw 0.0009999999000000574, clamped)
+    //     mc::Interval(0.001, 0.001),                               // thicknessDilute 21      (raw 0.0009999999000000063, clamped)
+    //     mc::Interval(0.02882349524569438, 0.02882349524569438),   // flowOutConcentrateND 22
+    //     mc::Interval(0.7994392490245111, 0.7994392490245111),     // flowOutDiluteND 23
+    //     mc::Interval(5.241464713644847, 5.241464713644847),       // concOutConcentrateND 24
+    //     mc::Interval(0.07195952395213905, 0.07195952395213905),   // concOutDiluteND 25
+    //     mc::Interval(0.42603262990992163, 0.42603262990992163),   // voltCellPair 26
+    //     mc::Interval(6.134808984046456e-05, 6.134808984046456e-05), // resConcentrate 27
+    //     mc::Interval(0.001040724565921578, 0.001040724565921578), // resDilute 28
+    //     mc::Interval(0.07633097808312074, 0.07633097808312074),   // voltNonOhmicCEM 29
+    //     mc::Interval(0.07585223733344049, 0.07585223733344049),   // voltNonOhmicAEM 30
+    //     mc::Interval(0,1e6),     // capex 31
+    //     mc::Interval(0,1e6),     // opex1 32
+    //     mc::Interval(0, 1e6),   // opex2 33
+    //     mc::Interval(0, 1e6),       // costTotal 34
+    //     mc::Interval(1e-3, 1e6),                                  // avgConcDilIntCem 35     (not in Pyomo output — see note)
+    //     mc::Interval(1e-3, 1e6),                                  // avgConcDilIntAem 36
+    // };       
 
 
 
@@ -125,15 +151,15 @@ void EDUnits::buildDAG() {
 
     const double scaleFacFlowByUnit[4] = {
         0.0,
-        5.388e-06,
-        5.388e-06,
-        5.388e-06
+        5.388e-6,
+        5.388e-6,
+        5.388e-6
     };
     const double scaleFacConcByUnit[4] = {
         0.0,
-        3.967e+02,
-        3.967e+02,
-        3.967e+02
+        3.967e3,
+        3.967e3, // please delete e03
+        3.967e3
     };
 
     for (size_t scenarioIndex = 0; scenarioIndex < this->scenario_names.size(); ++scenarioIndex) {
@@ -190,6 +216,8 @@ void EDUnits::buildDAG() {
         mc::FFVar& costTotal = vars[secondStageStart + 18];
         mc::FFVar& avgConcDilIntCem = vars[secondStageStart + 19];
         mc::FFVar& avgConcDilIntAem = vars[secondStageStart + 20];
+        mc::FFVar& fluxIonsTotal = vars[secondStageStart + 21];
+        mc::FFVar& fluxWaterTotal = vars[secondStageStart + 22];
 
 
         const int unitIdx = static_cast<int>(scenarioIndex) + 1;
@@ -236,7 +264,7 @@ void EDUnits::buildDAG() {
         //     (current / (memLength * memWidth)) * (2.0 * thicknessDilute * (transCem - transIonConc)) / (shDil * faraday * saltDiffDil);
 
         // mc::FFVar avgConcDilIntAem = avgConcDil -
-        //     (current / (memLength * memWidth)) * (2.0 * thicknessDilute * (transAem - transIonDil)) / (shDil * faraday * saltDiffDil);
+        //     (current / (memLength * memWidth)) * (2.0 * thicknessDilute * (transAem - transIonDil)) / (shDil * faraday * saltDiffDil); // please delete
         
         std::vector<mc::FFVar> constraints;
         auto addEqualityConstraint = [&](const mc::FFVar& expr) {
@@ -248,11 +276,11 @@ void EDUnits::buildDAG() {
         };
 
 
-        addEqualityConstraint( avgConcDilIntCem -0.5 * (concOutDiluteNd * scaleFacConc + concInED) +
-            currentDensity * (2.0 * thicknessDilute * (transCem - transIonConc)) / (shDil * faraday * saltDiffDil));
+        //addEqualityConstraint( avgConcDilIntCem -0.5 * (concOutDiluteNd * scaleFacConc + concInED) +
+        //    currentDensity * (2.0 * thicknessDilute * (transCem - transIonConc)) / (shDil * faraday * saltDiffDil));
 
-        addEqualityConstraint( avgConcDilIntAem - 0.5 * (concOutDiluteNd * scaleFacConc + concInED) +
-            currentDensity * (2.0 * thicknessDilute * (transAem - transIonDil)) / (shDil * faraday * saltDiffDil));
+        //addEqualityConstraint( avgConcDilIntAem - 0.5 * (concOutDiluteNd * scaleFacConc + concInED) +
+        //    currentDensity * (2.0 * thicknessDilute * (transAem - transIonDil)) / (shDil * faraday * saltDiffDil));
         
         
         mc::FFVar condFlux = (transCem - (1.0 - transAem)) * (currentDensity / faraday);
@@ -266,7 +294,7 @@ void EDUnits::buildDAG() {
                             +(thicknessDilute * (transCem - transIonConc)) / (shDil * faraday * saltDiffDil)));
         
         
-        mc::FFVar fluxIonsTotal = condFlux + diffFluxAem + diffFluxCem;
+        addEqualityConstraint(fluxIonsTotal - (condFlux + diffFluxAem + diffFluxCem));
 
         mc::FFVar osmWaterFluxAem = waterPermAem * vantHoffNumber * rg * temp * osmoticCoeff * (0.5 * (concOutConcentrateNd * scaleFacConc-concOutDiluteNd * scaleFacConc) +
             2*currentDensity * ((thicknessConcentrate * (transAem - transIonDil)) / (shConc * faraday * saltDiffConc)
@@ -277,9 +305,7 @@ void EDUnits::buildDAG() {
                             +(thicknessDilute * (transCem - transIonConc)) / (shDil * faraday * saltDiffDil)));
 
         mc::FFVar eosmWaterFlux = waterTransNumber * fluxIonsTotal * molweightH20 / densityH2O;
-        mc::FFVar fluxWaterTotal = osmWaterFluxAem + osmWaterFluxCem + eosmWaterFlux;
-
-
+        addEqualityConstraint(fluxWaterTotal - (osmWaterFluxAem + osmWaterFluxCem + eosmWaterFlux));
 
         addEqualityConstraint(molNStream1 - molNFeed - molNStream6);
         addEqualityConstraint(molWStream1 - molWFeed - molWStream6);
@@ -306,11 +332,8 @@ void EDUnits::buildDAG() {
         //addEqualityConstraint(exp(voltNonOhmicAem * faraday / (permSelAem * rg * temp)) * avgConcDilIntAem - avgConcConcIntAem);
 
 
-        addEqualityConstraint(voltNonOhmicCem * (faraday / (permSelCem * rg * temp)) - log(avgConcConcIntCem)+log(avgConcDilIntCem));
-
-
-
-        addEqualityConstraint(voltNonOhmicAem * (faraday / (permSelAem * rg * temp)) - log(avgConcConcIntAem) +log(avgConcDilIntAem));
+        //addEqualityConstraint(voltNonOhmicCem * (faraday / (permSelCem * rg * temp)) - log(avgConcConcIntCem)+log(avgConcDilIntCem));
+        //addEqualityConstraint(voltNonOhmicAem * (faraday / (permSelAem * rg * temp)) - log(avgConcConcIntAem) +log(avgConcDilIntAem)); // please delete
 
 
         addEqualityConstraint(flowOutConcentrateNd - (flowInConc / scaleFacFlow) -
@@ -422,15 +445,15 @@ void EDUnits::buildFullModelDAG() {
 
     const double scaleFacFlowByUnit[4] = {
         0.0,
-        5.388e-06,
-        5.388e-06,
-        5.388e-06
+        5.388e-6,
+        5.388e-6,
+        5.388e-6
     };
     const double scaleFacConcByUnit[4] = {
         0.0,
-        3.967e+02,
-        3.967e+02,
-        3.967e+02
+        3.967e-5,
+        3.967e-5,
+        3.967e-5
     };
 
     const int firstStageCount = static_cast<int>(this->first_stage_IX.size());
