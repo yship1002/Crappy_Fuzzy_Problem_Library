@@ -74,8 +74,6 @@ EDUnits::EDUnits(BranchingStrategy branchingStrategy) : STModel() {
         mc::Interval(0, 1e6),            // costTotal 34
         mc::Interval(1e-3, 1e6),            // avgConcDilIntCem 35
         mc::Interval(1e-3, 1e6),            // avgConcDilIntAem 36
-        mc::Interval(-1e6, 1e6),             // fluxIonsTotal 37
-        mc::Interval(-1e6, 1e6)             // fluxWaterTotal 38
     };   
     // this->second_stage_IX = {
 
@@ -157,9 +155,9 @@ void EDUnits::buildDAG() {
     };
     const double scaleFacConcByUnit[4] = {
         0.0,
-        3.967e3,
-        3.967e3, // please delete e03
-        3.967e3
+        3.967,
+        3.967, // please delete e03
+        3.967
     };
 
     for (size_t scenarioIndex = 0; scenarioIndex < this->scenario_names.size(); ++scenarioIndex) {
@@ -216,8 +214,7 @@ void EDUnits::buildDAG() {
         mc::FFVar& costTotal = vars[secondStageStart + 18];
         mc::FFVar& avgConcDilIntCem = vars[secondStageStart + 19];
         mc::FFVar& avgConcDilIntAem = vars[secondStageStart + 20];
-        mc::FFVar& fluxIonsTotal = vars[secondStageStart + 21];
-        mc::FFVar& fluxWaterTotal = vars[secondStageStart + 22];
+
 
 
         const int unitIdx = static_cast<int>(scenarioIndex) + 1;
@@ -294,7 +291,7 @@ void EDUnits::buildDAG() {
                             +(thicknessDilute * (transCem - transIonConc)) / (shDil * faraday * saltDiffDil)));
         
         
-        addEqualityConstraint(fluxIonsTotal - (condFlux + diffFluxAem + diffFluxCem));
+        mc::FFVar fluxIonsTotal = (condFlux + diffFluxAem + diffFluxCem);
 
         mc::FFVar osmWaterFluxAem = waterPermAem * vantHoffNumber * rg * temp * osmoticCoeff * (0.5 * (concOutConcentrateNd * scaleFacConc-concOutDiluteNd * scaleFacConc) +
             2*currentDensity * ((thicknessConcentrate * (transAem - transIonDil)) / (shConc * faraday * saltDiffConc)
@@ -305,7 +302,7 @@ void EDUnits::buildDAG() {
                             +(thicknessDilute * (transCem - transIonConc)) / (shDil * faraday * saltDiffDil)));
 
         mc::FFVar eosmWaterFlux = waterTransNumber * fluxIonsTotal * molweightH20 / densityH2O;
-        addEqualityConstraint(fluxWaterTotal - (osmWaterFluxAem + osmWaterFluxCem + eosmWaterFlux));
+        mc::FFVar fluxWaterTotal = (osmWaterFluxAem + osmWaterFluxCem + eosmWaterFlux);
 
         addEqualityConstraint(molNStream1 - molNFeed - molNStream6);
         addEqualityConstraint(molWStream1 - molWFeed - molWStream6);
@@ -332,8 +329,8 @@ void EDUnits::buildDAG() {
         //addEqualityConstraint(exp(voltNonOhmicAem * faraday / (permSelAem * rg * temp)) * avgConcDilIntAem - avgConcConcIntAem);
 
 
-        //addEqualityConstraint(voltNonOhmicCem * (faraday / (permSelCem * rg * temp)) - log(avgConcConcIntCem)+log(avgConcDilIntCem));
-        //addEqualityConstraint(voltNonOhmicAem * (faraday / (permSelAem * rg * temp)) - log(avgConcConcIntAem) +log(avgConcDilIntAem)); // please delete
+        addEqualityConstraint(voltNonOhmicCem * (faraday / (permSelCem * rg * temp)) - log(avgConcConcIntCem)+log(avgConcDilIntCem));
+        addEqualityConstraint(voltNonOhmicAem * (faraday / (permSelAem * rg * temp)) - log(avgConcConcIntAem) +log(avgConcDilIntAem));
 
 
         addEqualityConstraint(flowOutConcentrateNd - (flowInConc / scaleFacFlow) -
