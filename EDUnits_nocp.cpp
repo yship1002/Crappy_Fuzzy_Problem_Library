@@ -14,44 +14,44 @@ EDUnits_nocp::EDUnits_nocp(BranchingStrategy branchingStrategy) : STModel() {
     this->probability = 1.0;
 
     // this->first_stage_IX = {
-    //     mc::Interval(0.22285463857648757, 0.22285463857648757), // molNStream1
-    //     mc::Interval(123.68491498701013,123.68491498701013), // molWStream1
-    //     mc::Interval(0.061479954752751274, 0.061479954752751274), // molNStream2
-    //     mc::Interval(119.50012464909804,119.50012464909804), // molWStream2
-    //     mc::Interval(0.1613746838237363,0.1613746838237363), // molNStream3
-    //     mc::Interval(4.184790337912115,4.184790337912115), // molWStream3
-    //     mc::Interval(14,14), // molNStream4
-    //     mc::Interval(363.13431969472566,363.13431969472566), // molWStream4
-    //     mc::Interval(13.994493502551212,13.994493502551212), // molNStream5
-    //     mc::Interval(362.98906121735627,362.98906121735627), // molWStream5
-    //     mc::Interval(0.00550649744878918,0.00550649744878918), // molNStream6
-    //     mc::Interval(0.14525847736943553,0.14525847736943553), // molWStream6
-    //     mc::Interval(0.15586818637494734,0.15586818637494734), // molNStream7
-    //     mc::Interval(4.039531860542781,4.039531860542781), // molWStream7
-    //     mc::Interval(13.838625316176264,13.838625316176264), // molNStream8
-    //     mc::Interval(358.94952935681357,358.94952935681357) // molWStream8
+    //     mc::Interval(0.22127814806092042, 0.22127814806092042), // molNStream1
+    //     mc::Interval(123.68614069261695, 123.68614069261695), // molWStream1
+    //     mc::Interval(0.06147995475275122, 0.06147995475275122), // molNStream2
+    //     mc::Interval(119.50012464909791, 119.50012464909791), // molWStream2
+    //     mc::Interval(0.15979819330816922, 0.15979819330816922), // molNStream3
+    //     mc::Interval(4.186016043519042, 4.186016043519042), // molWStream3
+    //     mc::Interval(0.19509784106870087, 0.19509784106870087), // molNStream4
+    //     mc::Interval(5.156888893299397, 5.156888893299397), // molWStream4
+    //     mc::Interval(0.19116783413547886, 0.19116783413547886), // molNStream5
+    //     mc::Interval(5.010404710323144, 5.010404710323144), // molWStream5
+    //     mc::Interval(0.0039300069332220125, 0.0039300069332220125), // molNStream6
+    //     mc::Interval(0.14648418297625343, 0.14648418297625343), // molWStream6
+    //     mc::Interval(0.1558681863749472, 0.1558681863749472), // molNStream7
+    //     mc::Interval(4.03953186054279, 4.03953186054279), // molWStream7
+    //     mc::Interval(0.03529964776053168, 0.03529964776053168), // molNStream8
+    //     mc::Interval(0.9708728497803544, 0.9708728497803544) // molWStream8
     // };
     this->first_stage_IX = {
-        mc::Interval(1e-5, 11),
-        mc::Interval(1e-5, 501),
-        mc::Interval(1e-5, 12),
-        mc::Interval(1e-5, 502),
-        mc::Interval(1e-5, 13),
-        mc::Interval(1e-5, 503),
-        mc::Interval(1e-5, 14),
-        mc::Interval(1e-5, 504),
-        mc::Interval(1e-5, 15),
-        mc::Interval(1e-5, 505),
-        mc::Interval(1e-5, 16),
-        mc::Interval(1e-5, 506),
-        mc::Interval(1e-5, 17),
-        mc::Interval(1e-5, 507),
-        mc::Interval(1e-5, 18),
-        mc::Interval(1e-5, 508)
+        mc::Interval(1e-5, 10),
+        mc::Interval(1e-5, 500),
+        mc::Interval(1e-5, 10),
+        mc::Interval(1e-5, 500),
+        mc::Interval(1e-5, 10),
+        mc::Interval(1e-5, 500),
+        mc::Interval(1e-5, 10),
+        mc::Interval(1e-5, 500),
+        mc::Interval(1e-5, 10),
+        mc::Interval(1e-5, 500),
+        mc::Interval(1e-5, 10),
+        mc::Interval(1e-5, 500),
+        mc::Interval(1e-5, 10),
+        mc::Interval(1e-5, 500),
+        mc::Interval(1e-5, 10),
+        mc::Interval(1e-5, 500)
     };
 
     this->second_stage_IX = {
-        mc::Interval(1, 200),           // I
+        mc::Interval(1,200),           // current
         mc::Interval(0, 1),           // flowSplit
         mc::Interval(0.01, 10),          // memLength
         mc::Interval(0.01, 10),         // memWidth
@@ -228,7 +228,7 @@ void EDUnits_nocp::buildDAG() {
         mc::FFVar avgConcConc = 0.5 * (concOutConcentrateNd * scaleFacConc + concInED);
         mc::FFVar avgConcDil = 0.5 * (concOutDiluteNd * scaleFacConc + concInED);
 
-        mc::FFVar condFlux = (transCem - (1.0 - transAem)) * (current / (memLength * memWidth * faraday));
+        mc::FFVar condFlux = (transCem - (1.0 - transAem)) * current / (memLength*memWidth*faraday);
         mc::FFVar diffFluxAem = -(saltDiffAem / thicknessAem) * (avgConcConc - avgConcDil);
         mc::FFVar diffFluxCem = -(saltDiffCem / thicknessCem) * (avgConcConc - avgConcDil);
         mc::FFVar fluxIonsTotal = condFlux + diffFluxAem + diffFluxCem;
@@ -248,6 +248,7 @@ void EDUnits_nocp::buildDAG() {
         auto addLessEqualConstraint = [&](const mc::FFVar& expr) {
             constraints.push_back(expr);
         };
+
 
         addEqualityConstraint(molNStream1 - molNFeed - molNStream6);
         addEqualityConstraint(molWStream1 - molWFeed - molWStream6);
@@ -318,12 +319,12 @@ void EDUnits_nocp::buildDAG() {
             fluxIonsTotal * memLength * memWidth / (scaleFacFlow * scaleFacConc));
 
         addEqualityConstraint(voltCellPair - (voltNonOhmicCem + voltNonOhmicAem) -
-            (resConcentrate + resDilute + resCem + resAem) * (current / (memLength * memWidth)));
+            (resConcentrate + resDilute + resCem + resAem) * current/(memLength * memWidth));
 
         addEqualityConstraint(capex - (6800.0  + 2.0 * 100.0 * (numCells - 2.0)) * memLength * memWidth);
 
         addEqualityConstraint(opex1 - costElec * (24.0 * 1e-3) *
-            (resBlank * current / (memLength * memWidth) + numCells * voltCellPair) * current * daysOperation);
+            (resBlank * current/(memLength*memWidth) + numCells * voltCellPair) * current * daysOperation);
 
         mc::FFVar flowOutConc = flowOutConcentrateNd * scaleFacFlow;
         mc::FFVar flowOutDil = flowOutDiluteNd * scaleFacFlow;
@@ -334,8 +335,7 @@ void EDUnits_nocp::buildDAG() {
         addEqualityConstraint(opex2 - costElec * (24.0 * 1e-3) * numCells * daysOperation * (
             175.0 * viscosityManure * memLength * memWidth * uConc * uConc / thicknessConcentrate
             + 78.70934593096298 * pow(memWidth, 0.37) * memLength * uDil * uDil
-                * pow(flowOutDil + flowInDil, 0.63) / thicknessDilute
-        ));
+                * pow(flowOutDil + flowInDil, 0.63) / thicknessDilute));
 
         if (unitIdx == 1) {
             addEqualityConstraint(molNStream2 - flowOutDiluteNd * (scaleFacFlow * numCells) * concOutDiluteNd * scaleFacConc);
