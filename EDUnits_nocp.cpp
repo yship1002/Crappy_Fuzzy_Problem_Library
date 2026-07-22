@@ -13,62 +13,64 @@ EDUnits_nocp::EDUnits_nocp(BranchingStrategy branchingStrategy) : STModel() {
     this->scenario_name = ScenarioNames::SCENARIO1;
     this->probability = 1.0;
 
-    // this->first_stage_IX = {
-    //     mc::Interval(0.22127814806092042, 0.22127814806092042), // molNStream1
-    //     mc::Interval(123.68614069261695, 123.68614069261695), // molWStream1
-    //     mc::Interval(0.06147995475275122, 0.06147995475275122), // molNStream2
-    //     mc::Interval(119.50012464909791, 119.50012464909791), // molWStream2
-    //     mc::Interval(0.15979819330816922, 0.15979819330816922), // molNStream3
-    //     mc::Interval(4.186016043519042, 4.186016043519042), // molWStream3
-    //     mc::Interval(0.19509784106870087, 0.19509784106870087), // molNStream4
-    //     mc::Interval(5.156888893299397, 5.156888893299397), // molWStream4
-    //     mc::Interval(0.19116783413547886, 0.19116783413547886), // molNStream5
-    //     mc::Interval(5.010404710323144, 5.010404710323144), // molWStream5
-    //     mc::Interval(0.0039300069332220125, 0.0039300069332220125), // molNStream6
-    //     mc::Interval(0.14648418297625343, 0.14648418297625343), // molWStream6
-    //     mc::Interval(0.1558681863749472, 0.1558681863749472), // molNStream7
-    //     mc::Interval(4.03953186054279, 4.03953186054279), // molWStream7
-    //     mc::Interval(0.03529964776053168, 0.03529964776053168), // molNStream8
-    //     mc::Interval(0.9708728497803544, 0.9708728497803544) // molWStream8
-    // };
     this->first_stage_IX = {
-        mc::Interval(1e-5, 10),
-        mc::Interval(1e-5, 500),
-        mc::Interval(1e-5, 10),
-        mc::Interval(1e-5, 500),
-        mc::Interval(1e-5, 10),
-        mc::Interval(1e-5, 500),
-        mc::Interval(1e-5, 10),
-        mc::Interval(1e-5, 500),
-        mc::Interval(1e-5, 10),
-        mc::Interval(1e-5, 500),
-        mc::Interval(1e-5, 10),
-        mc::Interval(1e-5, 500),
-        mc::Interval(1e-5, 10),
-        mc::Interval(1e-5, 500),
-        mc::Interval(1e-5, 10),
-        mc::Interval(1e-5, 500)
+        mc::Interval(0.22127814806092042, 0.22127814806092042), // molNStream1
+        mc::Interval(123.68614069261695, 123.68614069261695), // molWStream1
+        mc::Interval(0.06147995475275122, 0.06147995475275122), // molNStream2
+        mc::Interval(119.50012464909791, 119.50012464909791), // molWStream2
+        mc::Interval(0.15979819330816922, 0.15979819330816922), // molNStream3
+        mc::Interval(4.186016043519042, 4.186016043519042), // molWStream3
+        mc::Interval(0.19509784106870087, 0.19509784106870087), // molNStream4
+        mc::Interval(5.156888893299397, 5.156888893299397), // molWStream4
+        mc::Interval(0.19116783413547886, 0.19116783413547886), // molNStream5
+        mc::Interval(5.010404710323144, 5.010404710323144), // molWStream5
+        mc::Interval(0.0039300069332220125, 0.0039300069332220125), // molNStream6
+        mc::Interval(0.14648418297625343, 0.14648418297625343), // molWStream6
+        mc::Interval(0.1558681863749472, 0.1558681863749472), // molNStream7
+        mc::Interval(4.03953186054279, 4.03953186054279), // molWStream7
+        mc::Interval(0.03529964776053168, 0.03529964776053168), // molNStream8
+        mc::Interval(0.9708728497803544, 0.9708728497803544) // molWStream8
     };
+    // this->first_stage_IX = {
+    //     mc::Interval(1e-5, 10),
+    //     mc::Interval(1e-5, 500),
+    //     mc::Interval(1e-5, 10),
+    //     mc::Interval(1e-5, 500),
+    //     mc::Interval(1e-5, 10),
+    //     mc::Interval(1e-5, 500),
+    //     mc::Interval(1e-5, 10),
+    //     mc::Interval(1e-5, 500),
+    //     mc::Interval(1e-5, 10),
+    //     mc::Interval(1e-5, 500),
+    //     mc::Interval(1e-5, 10),
+    //     mc::Interval(1e-5, 500),
+    //     mc::Interval(1e-5, 10),
+    //     mc::Interval(1e-5, 500),
+    //     mc::Interval(1e-5, 10),
+    //     mc::Interval(1e-5, 500)
+    // };
 
     this->second_stage_IX = {
-        mc::Interval(1,200),           // current
-        mc::Interval(0, 1),           // flowSplit
-        mc::Interval(0.01, 10),          // memLength
-        mc::Interval(0.01, 10),         // memWidth
-        mc::Interval(0.001, 0.01),     // thicknessConcentrate
-        mc::Interval(0.001, 0.01),     // thicknessDilute
-        mc::Interval(1e-3, 100),         // flowOutConcentrateND
-        mc::Interval(1e-3, 10),         // flowOutDiluteND
-        mc::Interval(1e-3, 100),          // concOutConcentrateND
-        mc::Interval(1e-3, 100),          // concOutDiluteND
-        mc::Interval(0, 5),          // voltCellPair
-        mc::Interval(1e-6, 1e-2),       // resConcentrate
-        mc::Interval(1e-6, 1e-2),       // resDilute
-        mc::Interval(1e-4, 0.25),       // voltNonOhmicCEM
-        mc::Interval(1e-4, 0.25),       // voltNonOhmicAEM
-        mc::Interval(0, 1e6),           // capex
-        mc::Interval(0, 1e6),           // opex1
-        mc::Interval(0, 1e6)           // opex2
+        mc::Interval(1,200),           // current 16
+        mc::Interval(0, 1),           // flowSplit 17
+        mc::Interval(0.01, 10),          // memLength 18
+        mc::Interval(0.01, 10),         // memWidth 19
+        mc::Interval(0.001, 0.01),     // thicknessConcentrate 20
+        mc::Interval(0.001, 0.01),     // thicknessDilute 21
+        mc::Interval(1e-3, 100),         // flowOutConcentrateND 22
+        mc::Interval(1e-3, 10),         // flowOutDiluteND 23
+        mc::Interval(1e-3, 100),          // concOutConcentrateND 24
+        mc::Interval(1e-3, 100),          // concOutDiluteND 25
+        mc::Interval(0, 5),          // voltCellPair 26
+        mc::Interval(1e-6, 1e-2),       // resConcentrate 27 
+        mc::Interval(1e-6, 1e-2),       // resDilute 28
+        mc::Interval(1e-4, 0.25),       // voltNonOhmicCEM 29
+        mc::Interval(1e-4, 0.25),       // voltNonOhmicAEM 30
+        mc::Interval(0, 1e6),           // capex 31
+        mc::Interval(0, 1e6),           // opex1 32
+        mc::Interval(0, 1e6),           // opex2 33
+        mc::Interval(10, 1e4),           // currentDensity 34
+        mc::Interval(1e-4, 1e2)           // membraneArea 35
 
     };  
     // this->second_stage_IX ={
@@ -150,6 +152,13 @@ void EDUnits_nocp::buildDAG() {
         3.967e+02
     };
 
+    const double memLength_L=this->second_stage_IX[2].l();
+    const double memLength_U=this->second_stage_IX[2].u();
+    const double memWidth_L=this->second_stage_IX[3].l();
+    const double memWidth_U=this->second_stage_IX[3].u();
+    const double currentDensity_L=this->second_stage_IX[18].l();
+    const double currentDensity_U=this->second_stage_IX[18].u();
+
     for (size_t scenarioIndex = 0; scenarioIndex < this->scenario_names.size(); ++scenarioIndex) {
         auto scenarioName = this->scenario_names[scenarioIndex];
         const int firstStageCount = static_cast<int>(this->first_stage_IX.size());
@@ -201,6 +210,8 @@ void EDUnits_nocp::buildDAG() {
         mc::FFVar& capex = vars[secondStageStart + 15];
         mc::FFVar& opex1 = vars[secondStageStart + 16];
         mc::FFVar& opex2 = vars[secondStageStart + 17];
+        mc::FFVar& currentDensity = vars[secondStageStart + 18];
+        mc::FFVar& membraneArea = vars[secondStageStart + 19];
 
 
         const int unitIdx = static_cast<int>(scenarioIndex) + 1;
@@ -228,7 +239,7 @@ void EDUnits_nocp::buildDAG() {
         mc::FFVar avgConcConc = 0.5 * (concOutConcentrateNd * scaleFacConc + concInED);
         mc::FFVar avgConcDil = 0.5 * (concOutDiluteNd * scaleFacConc + concInED);
 
-        mc::FFVar condFlux = (transCem - (1.0 - transAem)) * current / (memLength*memWidth*faraday);
+        mc::FFVar condFlux = (transCem - (1.0 - transAem)) * currentDensity / faraday;
         mc::FFVar diffFluxAem = -(saltDiffAem / thicknessAem) * (avgConcConc - avgConcDil);
         mc::FFVar diffFluxCem = -(saltDiffCem / thicknessCem) * (avgConcConc - avgConcDil);
         mc::FFVar fluxIonsTotal = condFlux + diffFluxAem + diffFluxCem;
@@ -248,6 +259,70 @@ void EDUnits_nocp::buildDAG() {
         auto addLessEqualConstraint = [&](const mc::FFVar& expr) {
             constraints.push_back(expr);
         };
+
+        addEqualityConstraint(currentDensity*membraneArea - current);
+        //addEqualityConstraint(membraneArea -   memLength*memWidth);
+        addEqualityConstraint(membraneArea -   pow(memWidth,2));
+
+
+        // // convex envelope
+        // Facet 1 (eq. 3.17) — all lower bounds
+        // addLessEqualConstraint(memLength_L*memWidth_L*currentDensity
+        // + currentDensity_L*memWidth_L*memLength
+        // + currentDensity_L*memLength_L*memWidth
+        // - 2*currentDensity_L*memLength_L*memWidth_L-current);
+
+        // // Facet 2 (eq. 3.18) — all upper bounds
+        // addLessEqualConstraint(memLength_U*memWidth_U*currentDensity
+        // + currentDensity_U*memWidth_U*memLength
+        // + currentDensity_U*memLength_U*memWidth
+        // - 2*currentDensity_U*memLength_U*memWidth_U-current);
+
+        // // Facet 3 (eq. 3.19)
+        // addLessEqualConstraint(memLength_L*memWidth_U*currentDensity
+        // + currentDensity_L*memWidth_U*memLength
+        // + currentDensity_U*memLength_L*memWidth
+        // - currentDensity_U*memLength_L*memWidth_U
+        // - currentDensity_L*memLength_L*memWidth_U-current);
+
+        // // Facet 4 (eq. 3.20)
+        // addLessEqualConstraint(memLength_U*memWidth_L*currentDensity
+        // + currentDensity_U*memWidth_L*memLength
+        // + currentDensity_L*memLength_U*memWidth
+        // - currentDensity_U*memLength_U*memWidth_L
+        // - currentDensity_L*memLength_U*memWidth_L-current);
+
+        // concave envelope
+        // addLessEqualConstraint(current-(memLength_L*memWidth_L*currentDensity
+        //     + currentDensity_U*memWidth_U*memLength
+        //     + currentDensity_U*memLength_L*memWidth
+        //     - currentDensity_U*memLength_L*(memWidth_L + memWidth_U)));
+
+        // addLessEqualConstraint(current- (memLength_L*memWidth_U*currentDensity
+        //     + currentDensity_U*memWidth_U*memLength
+        //     + currentDensity_L*memLength_L*memWidth
+        //     - memLength_L*memWidth_U*(currentDensity_U + currentDensity_L)));
+
+        // addLessEqualConstraint(current- (memLength_L*memWidth_L*currentDensity
+        //     + currentDensity_U*memWidth_L*memLength
+        //     + currentDensity_U*memLength_U*memWidth
+        //     - currentDensity_U*memWidth_L*(memLength_U + memLength_L)));
+
+        // addLessEqualConstraint(current- (memLength_U*memWidth_L*currentDensity
+        //     + currentDensity_L*memWidth_L*memLength
+        //     + currentDensity_U*memLength_U*memWidth
+        //     - memLength_U*memWidth_L*(currentDensity_L + currentDensity_U)));
+
+        // addLessEqualConstraint(current- (memLength_U*memWidth_U*currentDensity
+        //     + currentDensity_L*memWidth_L*memLength
+        //     + currentDensity_L*memLength_U*memWidth
+        //     - currentDensity_L*memLength_U*(memWidth_L + memWidth_U)));
+
+        // addLessEqualConstraint(current- (memLength_U*memWidth_U*currentDensity
+        //     + currentDensity_L*memWidth_U*memLength
+        //     + currentDensity_L*memLength_L*memWidth
+        //     - currentDensity_L*memWidth_U*(memLength_L + memLength_U)));
+
 
 
         addEqualityConstraint(molNStream1 - molNFeed - molNStream6);
@@ -271,70 +346,47 @@ void EDUnits_nocp::buildDAG() {
         addEqualityConstraint(resDilute * conducDilute * avgConcDil - thicknessDilute);
 
 
-        // Define ratio variables via equality constraints
-        // addEqualityConstraint(ratioCurrentILimCem - current / (memLength * memWidth * iLimDilCem));
-        // addEqualityConstraint(ratioCurrentILimAem - current / (memLength * memWidth * iLimDilAem));
-
-        // Log-form Nernst constraints using safe building blocks:
-        // avgConcConc, avgConcDil > 0 always (built from positive-bounded variables)
-        // log(1 + r_conc): safe since r_conc > 0 always
-        // log(1 - ratio): safe since ratio ∈ [0, 0.99]
-        // addEqualityConstraint(
-        //     voltNonOhmicCem
-        //     - (permSelCem * rg * temp / faraday) * (
-        //         log(current / (memLength * memWidth * iLimConcCem) + 1.0)
-        //     + log(avgConcConc)
-        //     - log(1.0 - ratioCurrentILimCem)
-        //     - log(avgConcDil)
-        //     )
-        // );
-        // addEqualityConstraint(
-        //     voltNonOhmicAem
-        //     - (permSelAem * rg * temp / faraday) * (
-        //         log(current / (memLength * memWidth * iLimConcAem) + 1.0)
-        //     + log(avgConcConc)
-        //     - log(1.0 - ratioCurrentILimAem)
-        //     - log(avgConcDil)
-        //     )
-        // );
-
         addEqualityConstraint(exp(voltNonOhmicCem * faraday / (permSelCem * rg * temp)) * avgConcDil - avgConcConc);
         addEqualityConstraint(exp(voltNonOhmicAem * faraday / (permSelAem * rg * temp)) * avgConcDil - avgConcConc);
 
 
         addEqualityConstraint(flowOutConcentrateNd - (flowInConc / scaleFacFlow) -
-            (fluxWaterTotal * memLength * memWidth / scaleFacFlow) -
-            ((molweightNh4Cl * 0.001 / densityH2O) * fluxIonsTotal * memLength * memWidth / scaleFacFlow));
+            (fluxWaterTotal * membraneArea / scaleFacFlow) -
+            ((molweightNh4Cl * 0.001 / densityH2O) * fluxIonsTotal * membraneArea / scaleFacFlow));
 
         addEqualityConstraint(flowOutDiluteNd - (flowInDil / scaleFacFlow) +
-            (fluxWaterTotal * memLength * memWidth / scaleFacFlow) +
-            ((molweightNh4Cl * 0.001 / densityH2O) * fluxIonsTotal * memLength * memWidth / scaleFacFlow));
+            (fluxWaterTotal * membraneArea / scaleFacFlow) +
+            ((molweightNh4Cl * 0.001 / densityH2O) * fluxIonsTotal * membraneArea / scaleFacFlow));
 
         addEqualityConstraint((flowOutConcentrateNd * concOutConcentrateNd) -
             (flowInConc * concInED) / (scaleFacFlow * scaleFacConc) -
-            fluxIonsTotal * memLength * memWidth / (scaleFacFlow * scaleFacConc));
+            (fluxIonsTotal * membraneArea / (scaleFacFlow * scaleFacConc)));
 
         addEqualityConstraint((flowOutDiluteNd * concOutDiluteNd) -
             (flowInDil * concInED) / (scaleFacFlow * scaleFacConc) +
-            fluxIonsTotal * memLength * memWidth / (scaleFacFlow * scaleFacConc));
+            fluxIonsTotal * membraneArea / (scaleFacFlow * scaleFacConc));
 
-        addEqualityConstraint(voltCellPair - (voltNonOhmicCem + voltNonOhmicAem) -
-            (resConcentrate + resDilute + resCem + resAem) * current/(memLength * memWidth));
+        addEqualityConstraint(
+            voltCellPair - (voltNonOhmicCem + voltNonOhmicAem)
+            - (resConcentrate + resDilute + resCem + resAem) * currentDensity
+        );
 
-        addEqualityConstraint(capex - (6800.0  + 2.0 * 100.0 * (numCells - 2.0)) * memLength * memWidth);
+        addEqualityConstraint(capex - (6800.0  + 2.0 * 100.0 * (numCells - 2.0)) * membraneArea);
 
         addEqualityConstraint(opex1 - costElec * (24.0 * 1e-3) *
-            (resBlank * current/(memLength*memWidth) + numCells * voltCellPair) * current * daysOperation);
+            (resBlank * currentDensity + numCells * voltCellPair) * current * daysOperation);
 
         mc::FFVar flowOutConc = flowOutConcentrateNd * scaleFacFlow;
         mc::FFVar flowOutDil = flowOutDiluteNd * scaleFacFlow;
+
         // addEqualityConstraint(opex2 - costElec * (24.0 * 1e-3) * numCells * daysOperation * (
-        //     densityManure * (1400.0 / reConc) * memLength * pow(uConc, 2.0) / (4.0 * thicknessConcentrate) * ((flowOutConc + flowInConc) / 2.0) +
-        //     densityManure * (104.5 / pow(reDil, 0.37)) * memLength * pow(uDil, 2.0) / (4.0 * thicknessDilute) * ((flowOutDil + flowInDil) / 2.0)));
-        
+        //     175.0 * viscosityManure * membraneArea * pow(uConc, 2.0) / thicknessConcentrate
+        //     + 78.70934593096298 * pow(memWidth, 0.37) * memLength * pow(uDil, 2.0)
+        //         * pow(flowOutDil + flowInDil, 0.63) / thicknessDilute));
+
         addEqualityConstraint(opex2 - costElec * (24.0 * 1e-3) * numCells * daysOperation * (
-            175.0 * viscosityManure * memLength * memWidth * uConc * uConc / thicknessConcentrate
-            + 78.70934593096298 * pow(memWidth, 0.37) * memLength * uDil * uDil
+            175.0 * viscosityManure * membraneArea * pow(uConc, 2.0) / thicknessConcentrate
+            + 78.70934593096298 * pow(memWidth, 1.37) * pow(uDil, 2.0)
                 * pow(flowOutDil + flowInDil, 0.63) / thicknessDilute));
 
         if (unitIdx == 1) {
