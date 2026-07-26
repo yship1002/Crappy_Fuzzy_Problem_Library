@@ -51,9 +51,9 @@ EDUnits_nocp::EDUnits_nocp(BranchingStrategy branchingStrategy) : STModel() {
     // };
 
     this->second_stage_IX = {
-        mc::Interval(1,200),           // current 16
+        mc::Interval(200,200),           // current 16
         mc::Interval(0, 1),           // flowSplit 17
-        mc::Interval(0.01, 10),          // memLength 18
+        mc::Interval(10, 10),          // memLength 18
         mc::Interval(0.01, 10),         // memWidth 19
         mc::Interval(0.001, 0.01),     // thicknessConcentrate 20
         mc::Interval(0.001, 0.01),     // thicknessDilute 21
@@ -70,32 +70,32 @@ EDUnits_nocp::EDUnits_nocp(BranchingStrategy branchingStrategy) : STModel() {
         mc::Interval(0, 1e6),           // opex1 32
         mc::Interval(0, 1e6),           // opex2 33
         mc::Interval(10, 1e4),           // currentDensity 34
-        mc::Interval(1e-4, 1e2)           // membraneArea 35
 
-    };  
-    // this->second_stage_IX ={
-    //     mc::Interval(0.0999999999000337,    0.0999999999000337),   // I
-    //     mc::Interval(0.9995735093972126,    0.9995735093972126),   // flowSplit
-    //     mc::Interval(0.036242856343132054,  0.036242856343132054), // memLength
-    //     mc::Interval(0.009999999900088968,  0.009999999900088968), // memWidth
-    //     mc::Interval(0.000999999900010844,  0.000999999900010844), // thicknessConcentrate
-    //     mc::Interval(0.0009999999000038177, 0.0009999999000038177),// thicknessDilute
-    //     mc::Interval(2.5001359490822983,    2.5001359490822983),   // flowOutConcentrateND
-    //     mc::Interval(0.001,                 0.001),                // flowOutDiluteND
-    //     mc::Interval(5.237617366884594,     5.237617366884594),    // concOutConcentrateND
-    //     mc::Interval(5.152472119923644,     5.152472119923644),    // concOutDiluteND
-    //     mc::Interval(0.15214083523685012,   0.15214083523685012),  // voltCellPair
-    //     mc::Interval(3.217168486072007e-05, 3.217168486072007e-05),// resConcentrate
-    //     mc::Interval(3.2435231169229935e-05,3.2435231169229935e-05),// resDilute
-    //     mc::Interval(0.008015556841086438,  0.008015556841086438), // voltNonOhmicCEM
-    //     mc::Interval(0.007655096301298272,  0.007655096301298272), // voltNonOhmicAEM
-    //     mc::Interval(38.56239876381159,     38.56239876381159),    // capex
-    //     mc::Interval(38.00625183346244,     38.00625183346244),    // opex1
-    //     mc::Interval(0.00028748342492133694,0.00028748342492133694),// opex2
-    //     mc::Interval(0,                     0)                    // costTotal (unknown)
+
+    };
+    // this->second_stage_IX = {
+
+    //     mc::Interval (100.5,100.5), // x[16]
+    //     mc::Interval (0.956123,0.956123), // x[17]
+    //     mc::Interval (5.005,5.005), // x[18]
+    //     mc::Interval (0.0550073,0.0550073), // x[19]
+    //     mc::Interval (0.00100003,0.00100003), // x[20]
+    //     mc::Interval (0.00100002,0.00100002), // x[21]
+    //     mc::Interval (0.0344994,0.0344994), // x[22]
+    //     mc::Interval (0.001,0.001), // x[23]
+    //     mc::Interval (5.18493,5.18493), // x[24]
+    //     mc::Interval (3.67734,3.67734), // x[25]
+    //     mc::Interval (0.171929,0.171929), // x[26]
+    //     mc::Interval (3.26329e-05,3.26329e-05), // x[27]
+    //     mc::Interval (3.82108e-05,3.82108e-05), // x[28]
+    //     mc::Interval (0.00364867,0.00364867), // x[29]
+    //     mc::Interval (0.00364867,0.00364867), // x[30]
+    //     mc::Interval (321.946,321.946), // x[31]
+    //     mc::Interval (427.181,427.181), // x[32]
+    //     mc::Interval (0.0148602,0.0148602), // x[33]
+    //     mc::Interval (328.708,328.708), // x[34]
     // };
-}
-
+    }
 void EDUnits_nocp::buildDAG() {
     const double numCells = 500.0;
     const double daysOperation = 7.0 * 365.0;
@@ -152,13 +152,6 @@ void EDUnits_nocp::buildDAG() {
         3.967e+02
     };
 
-    const double memLength_L=this->second_stage_IX[2].l();
-    const double memLength_U=this->second_stage_IX[2].u();
-    const double memWidth_L=this->second_stage_IX[3].l();
-    const double memWidth_U=this->second_stage_IX[3].u();
-    const double currentDensity_L=this->second_stage_IX[18].l();
-    const double currentDensity_U=this->second_stage_IX[18].u();
-
     for (size_t scenarioIndex = 0; scenarioIndex < this->scenario_names.size(); ++scenarioIndex) {
         auto scenarioName = this->scenario_names[scenarioIndex];
         const int firstStageCount = static_cast<int>(this->first_stage_IX.size());
@@ -211,7 +204,7 @@ void EDUnits_nocp::buildDAG() {
         mc::FFVar& opex1 = vars[secondStageStart + 16];
         mc::FFVar& opex2 = vars[secondStageStart + 17];
         mc::FFVar& currentDensity = vars[secondStageStart + 18];
-        mc::FFVar& membraneArea = vars[secondStageStart + 19];
+
 
 
         const int unitIdx = static_cast<int>(scenarioIndex) + 1;
@@ -251,7 +244,6 @@ void EDUnits_nocp::buildDAG() {
 
         std::vector<mc::FFVar> constraints;
   
-
         auto addEqualityConstraint = [&](const mc::FFVar& expr) {
             constraints.push_back(expr);
             constraints.push_back(-expr);
@@ -260,9 +252,7 @@ void EDUnits_nocp::buildDAG() {
             constraints.push_back(expr);
         };
 
-        addEqualityConstraint(currentDensity*membraneArea - current);
-        //addEqualityConstraint(membraneArea -   memLength*memWidth);
-        addEqualityConstraint(membraneArea -   pow(memWidth,2));
+
 
 
         // // convex envelope
@@ -351,42 +341,37 @@ void EDUnits_nocp::buildDAG() {
 
 
         addEqualityConstraint(flowOutConcentrateNd - (flowInConc / scaleFacFlow) -
-            (fluxWaterTotal * membraneArea / scaleFacFlow) -
-            ((molweightNh4Cl * 0.001 / densityH2O) * fluxIonsTotal * membraneArea / scaleFacFlow));
+            (fluxWaterTotal * pow(memWidth, 2.0) / scaleFacFlow) -
+            ((molweightNh4Cl * 0.001 / densityH2O) * fluxIonsTotal * pow(memWidth, 2.0) / scaleFacFlow));
 
         addEqualityConstraint(flowOutDiluteNd - (flowInDil / scaleFacFlow) +
-            (fluxWaterTotal * membraneArea / scaleFacFlow) +
-            ((molweightNh4Cl * 0.001 / densityH2O) * fluxIonsTotal * membraneArea / scaleFacFlow));
+            (fluxWaterTotal * pow(memWidth, 2.0) / scaleFacFlow) +
+            ((molweightNh4Cl * 0.001 / densityH2O) * fluxIonsTotal * pow(memWidth, 2.0) / scaleFacFlow));
 
         addEqualityConstraint((flowOutConcentrateNd * concOutConcentrateNd) -
             (flowInConc * concInED) / (scaleFacFlow * scaleFacConc) -
-            (fluxIonsTotal * membraneArea / (scaleFacFlow * scaleFacConc)));
+            (fluxIonsTotal * pow(memWidth, 2.0) / (scaleFacFlow * scaleFacConc)));
 
         addEqualityConstraint((flowOutDiluteNd * concOutDiluteNd) -
             (flowInDil * concInED) / (scaleFacFlow * scaleFacConc) +
-            fluxIonsTotal * membraneArea / (scaleFacFlow * scaleFacConc));
+            fluxIonsTotal * pow(memWidth, 2.0) / (scaleFacFlow * scaleFacConc));
 
         addEqualityConstraint(
             voltCellPair - (voltNonOhmicCem + voltNonOhmicAem)
             - (resConcentrate + resDilute + resCem + resAem) * currentDensity
         );
 
-        addEqualityConstraint(capex - (6800.0  + 2.0 * 100.0 * (numCells - 2.0)) * membraneArea);
+        addEqualityConstraint(capex - (6800.0  + 2.0 * 100.0 * (numCells - 2.0)) * pow(memWidth, 2.0));
 
         addEqualityConstraint(opex1 - costElec * (24.0 * 1e-3) *
-            (resBlank * currentDensity + numCells * voltCellPair) * current * daysOperation);
+            (resBlank * pow(currentDensity, 2.0) + numCells * voltCellPair*currentDensity) * pow(memWidth, 2.0) * daysOperation);
 
         mc::FFVar flowOutConc = flowOutConcentrateNd * scaleFacFlow;
         mc::FFVar flowOutDil = flowOutDiluteNd * scaleFacFlow;
 
-        // addEqualityConstraint(opex2 - costElec * (24.0 * 1e-3) * numCells * daysOperation * (
-        //     175.0 * viscosityManure * membraneArea * pow(uConc, 2.0) / thicknessConcentrate
-        //     + 78.70934593096298 * pow(memWidth, 0.37) * memLength * pow(uDil, 2.0)
-        //         * pow(flowOutDil + flowInDil, 0.63) / thicknessDilute));
-
         addEqualityConstraint(opex2 - costElec * (24.0 * 1e-3) * numCells * daysOperation * (
-            175.0 * viscosityManure * membraneArea * pow(uConc, 2.0) / thicknessConcentrate
-            + 78.70934593096298 * pow(memWidth, 1.37) * pow(uDil, 2.0)
+            175.0 * viscosityManure * pow(memWidth, 2.0) * pow(uConc, 2.0) / thicknessConcentrate
+            + 78.70934593096298 * pow(memWidth, 1.37)* pow(uDil, 2.0)
                 * pow(flowOutDil + flowInDil, 0.63) / thicknessDilute));
 
         if (unitIdx == 1) {
@@ -411,6 +396,7 @@ void EDUnits_nocp::buildDAG() {
         }
 
         mc::FFVar objective = this->probability * (capex + opex1 + opex2 );
+
 
         std::vector<mc::FFVar> functions;
 
