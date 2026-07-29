@@ -10,7 +10,7 @@ class EDUnits_nocp : public STModel {
         Ipopt::SmartPtr<STModel> clone() override;
         void buildDAG() override;
         void buildFullModelDAG() override;
-
+        std::vector <double> scale_;
         template<class Archive>
         void serialize(Archive& ar) {
             CEREAL_NVP(first_stage_IX), CEREAL_NVP(second_stage_IX);
