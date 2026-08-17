@@ -23,16 +23,18 @@ ProcessModel::ProcessModel(BranchingStrategy branching_strategy):STModel() {
         {ScenarioNames::SCENARIO8,2.0849789288240969},
         {ScenarioNames::SCENARIO9,5.6016775572644488},
         {ScenarioNames::SCENARIO10,4.3503766112257304},
-        {ScenarioNames::SCENARIO11, 1.0976270078546495},
-        {ScenarioNames::SCENARIO12, 9.430378732744838},
-        {ScenarioNames::SCENARIO13, 6.6027633760716435},
-        {ScenarioNames::SCENARIO14,1.3514894164800063},
-        {ScenarioNames::SCENARIO15,4.236547993428394},
-        {ScenarioNames::SCENARIO16,2.155994520336202},
-        {ScenarioNames::SCENARIO17,5.0580836121681994},
-        {ScenarioNames::SCENARIO18,2.0849789288240969},
-        {ScenarioNames::SCENARIO19,5.6016775572644488},
-        {ScenarioNames::SCENARIO20,4.3503766112257304}
+        {ScenarioNames::SCENARIO11, 1.1976270078546495},
+        {ScenarioNames::SCENARIO12, 9.530378732744838},
+        {ScenarioNames::SCENARIO13, 6.8027633760716435},
+        {ScenarioNames::SCENARIO14,1.4514894164800063},
+        {ScenarioNames::SCENARIO15,4.336547993428394},
+        {ScenarioNames::SCENARIO16,2.255994520336202},
+        {ScenarioNames::SCENARIO17,5.1580836121681994},
+        {ScenarioNames::SCENARIO18,2.1849789288240969},
+        {ScenarioNames::SCENARIO19,5.7016775572644488},
+        {ScenarioNames::SCENARIO20,4.4503766112257304}
+
+
 
     };
     this->first_stage_IX = {

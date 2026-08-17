@@ -311,10 +311,10 @@ void EDUnits_nocp::buildDAG() {
         mc::FFVar flowOutConc = flowOutConcentrateNd * scaleFacFlow;
         mc::FFVar flowOutDil = flowOutDiluteNd * scaleFacFlow;
 
-        // addEqualityConstraint(opex2 - costElec * (24.0 * 1e-3) * numCells * daysOperation * (
-        //     175.0 * viscosityManure * pow(memWidth, 2.0) * pow(uConc, 2.0) / thicknessConcentrate
-        //     + 78.70934593096298 * pow(memWidth, 1.37)* pow(uDil, 2.0)
-        //         * pow(flowOutDil + flowInDil, 0.63) / thicknessDilute));
+        addEqualityConstraint(opex2 - costElec * (24.0 * 1e-3) * numCells * daysOperation * (
+            175.0 * viscosityManure * pow(memWidth, 2.0) * pow(uConc, 2.0) / thicknessConcentrate
+            + 78.70934593096298 * pow(memWidth, 1.37)* pow(uDil, 2.0)
+                * pow(flowOutDil + flowInDil, 0.63) / thicknessDilute));
 
         if (unitIdx == 1) {
             addEqualityConstraint(molNStream2 - flowOutDiluteNd * (scaleFacFlow * numCells) * concOutDiluteNd * scaleFacConc);
