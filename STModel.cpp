@@ -1,5 +1,28 @@
 #include "STModel.h"
+// Formats a PolCut as a human-readable inequality, e.g. "3x1 + 2x2 <= 3"
+static std::string cutToString(const mc::PolCut<mc::Interval>* pc) {
+    const double* coeffs = pc->coef();
+    int n = pc->nvar();
+    auto v = pc->var();
 
+    std::ostringstream oss;
+    for (int i = 0; i < n; ++i) {
+        int col_idx = std::stoi(v[i].name().substr(1));
+        double c = coeffs[i];
+        if (i > 0) oss << (c < 0 ? " - " : " + ");
+        else if (c < 0) oss << "-";
+        oss << std::abs(c) << "x" << col_idx;
+    }
+
+    switch (pc->type()) {
+        case 1: oss << " <= "; break;  // <=
+        case 2: oss << " >= "; break;  // >=
+        default: oss << " == "; break; // ==
+    }
+    oss << pc->rhs();
+
+    return oss.str();
+}
 // Provide definitions for base-class virtuals and constructor so the
 // vtable for STModel is emitted (fixes linker undefined vtable errors).
 void STModel::clearDAG() {
@@ -210,7 +233,9 @@ void STModel::generateLP(IloEnv* cplex_env,IloModel* cplexmodel,
     mc::PolVar<mc::Interval> PF[this->F[this->scenario_name].size()];
 
     this->DAG[this->scenario_name].eval(this->F[this->scenario_name].size(), this->F[this->scenario_name].data(), PF, nvars, this->X[this->scenario_name].data(), PX);
-    
+
+
+    // please delete this part above as it is preuly for testing
     int after_nvars = Env.Vars().size();
     std::vector<mc::Interval> var_bound(after_nvars);
     for (auto v : Env.Vars()) {
@@ -223,14 +248,14 @@ void STModel::generateLP(IloEnv* cplex_env,IloModel* cplexmodel,
 
 
     Env.options.SANDWICH_RTOL=1e-5;
-    Env.options.SANDWICH_MAXCUT= 100; //please delete
+    Env.options.SANDWICH_MAXCUT= 1; //please delete
 
                            
 
     Env.generate_cuts(this->F[this->scenario_name].size(), PF);
     
-    // std::cout<<Env;
-    // std::cout<<this->DAG[this->scenario_name];
+    //std::cout<<Env;
+    //std::cout<<this->DAG[this->scenario_name];
     
     // Extract LP data from Env Don't touch below this line
     auto c = Env.Cuts();
@@ -298,6 +323,226 @@ void STModel::generateLP(IloEnv* cplex_env,IloModel* cplexmodel,
     std::rotate(this->F[this->scenario_name].rbegin(), this->F[this->scenario_name].rbegin() + 1, this->F[this->scenario_name].rend()); // rotate back to original order
 
 
+}
+
+
+// void STModel::generateLP(GRBEnv* grb_env, GRBModel* grb_model,
+//                           std::vector<GRBVar>* grb_x) {
+
+//     // Loop over each scenario to build subproblem
+
+//     const int nvars = this->X[this->scenario_name].size();
+//     std::rotate(this->F[this->scenario_name].begin(), this->F[this->scenario_name].begin() + 1, this->F[this->scenario_name].end());
+
+//     // Evaluate constraints and objective
+//     mc::PolImg<mc::Interval> Env;
+//     mc::PolVar<mc::Interval> PX[nvars];
+
+//     for (int i = 0; i < this->first_stage_IX.size(); ++i) PX[i].set(&Env, this->X[this->scenario_name][i], this->first_stage_IX[i]);
+//     for (int i = this->first_stage_IX.size(); i < nvars; ++i) PX[i].set(&Env, this->X[this->scenario_name][i], this->second_stage_IX[i - this->first_stage_IX.size()]);
+
+//     mc::PolVar<mc::Interval> PF[this->F[this->scenario_name].size()];
+
+//     this->DAG[this->scenario_name].eval(this->F[this->scenario_name].size(), this->F[this->scenario_name].data(), PF, nvars, this->X[this->scenario_name].data(), PX);
+
+//     // please delete this part above as it is purely for testing
+//     int after_nvars = Env.Vars().size();
+//     std::vector<mc::Interval> var_bound(after_nvars);
+//     for (auto v : Env.Vars()) {
+//         int v_idx = v.second->id().second;
+//         var_bound[v_idx] = mc::Interval(v.second->range().l(), v.second->range().u());
+//     }
+
+//     Env.options.SANDWICH_RTOL = 1e-5;
+//     Env.options.SANDWICH_MAXCUT = 10; //please delete
+
+//     // --- generate cuts one constraint at a time, instead of all at once ---
+//     const unsigned n_constraints = this->F[this->scenario_name].size();
+//     for (unsigned i = 0; i < n_constraints; ++i) {
+
+//         size_t cuts_before = Env.Cuts().size();
+
+//         Env.generate_cuts(1, &PF[i]);   // relax just PF[i]
+
+//         // Pull out only the cuts that were just added for PF[i]
+//         auto cuts_now = Env.Cuts();
+//         auto it_new = cuts_now.begin();
+//         std::advance(it_new, cuts_before);
+//         std::vector<decltype(cuts_now)::value_type> new_cuts(it_new, cuts_now.end());
+//         for (const auto& pc : new_cuts) {
+//             std::cout << "F[" << i << "] cut: " << cutToString(pc) << std::endl;
+//         }
+
+//         // <<< SET YOUR BREAKPOINT ON THE NEXT LINE >>>
+//         // Inspect: i, PF[i], new_cuts (each has ->coef(), ->var(), ->rhs(), ->type())
+//         (void)new_cuts;  // no-op so the line above is a valid breakpoint target
+//     }
+//     // ------------------------------------------------------------------
+
+//     // Extract LP data from Env. Don't touch below this line
+
+//     try {
+//         auto c = Env.Cuts();   // now contains all cuts, accumulated incrementally above
+
+//         // Add variables to gurobi in order of their IDs to match indexing.
+//         grb_x->reserve(after_nvars);
+//         for (int i = 0; i < after_nvars; ++i) {
+//             grb_x->push_back(grb_model->addVar(var_bound[i].l(), var_bound[i].u(),
+//                                                 0.0, GRB_CONTINUOUS));
+//         }
+
+//         for (const auto& pc : c) {
+//             const double* coeffs = pc->coef();
+//             int n = pc->nvar();
+//             auto v = pc->var();
+//             GRBLinExpr expr;
+//             for (int i = 0; i < n; ++i) {
+//                 int col_idx = std::stoi(v[i].name().substr(1));
+//                 if (col_idx >= 0 && col_idx < static_cast<int>(grb_x->size())) {
+//                     expr += coeffs[i] * (*grb_x)[col_idx];
+//                 } else {
+//                     throw std::runtime_error("Error in generating constraints from cuts.");
+//                 }
+//             }
+//             if (pc->type() == 1) {
+//                 grb_model->addConstr(expr <= pc->rhs());
+//             } else if (pc->type() == 2) {
+//                 grb_model->addConstr(-expr <= -pc->rhs());
+//             } else {
+//                 grb_model->addConstr(expr <= pc->rhs());
+//                 grb_model->addConstr(-expr <= -pc->rhs());
+//             }
+//         }
+
+//         GRBLinExpr objExpr;
+//         objExpr += (*grb_x)[after_nvars - 1];
+//         grb_model->setObjective(objExpr, GRB_MINIMIZE);
+
+//         for (size_t i = 0; i < sizeof(PF) / sizeof(PF[0]) - 1; ++i) {
+//             int pf_idx = PF[i].id().second;
+//             if (pf_idx >= 0 && pf_idx < static_cast<int>(grb_x->size())) {
+//                 GRBLinExpr expr;
+//                 expr += (*grb_x)[pf_idx];
+//                 grb_model->addConstr(expr <= 0);
+//             } else {
+//                 throw std::runtime_error("Error in generating constraints from cuts.");
+//             }
+//         }
+
+//         grb_model->update();
+
+//     } catch (GRBException& e) {
+//         std::cerr << "Gurobi error code = " << e.getErrorCode() << ": " << e.getMessage() << std::endl;
+//         throw;
+//     }
+
+//     std::rotate(this->F[this->scenario_name].rbegin(), this->F[this->scenario_name].rbegin() + 1, this->F[this->scenario_name].rend());
+// }
+void STModel::generateLP(GRBEnv* grb_env, GRBModel* grb_model,
+                          std::vector<GRBVar>* grb_x) {
+
+    // Loop over each scenario to build subproblem
+
+    const int nvars = this->X[this->scenario_name].size();
+    std::rotate(this->F[this->scenario_name].begin(), this->F[this->scenario_name].begin() + 1, this->F[this->scenario_name].end());
+
+    // Evaluate constraints and objective
+    mc::PolImg<mc::Interval> Env;
+    mc::PolVar<mc::Interval> PX[nvars];
+
+    for (int i = 0; i < this->first_stage_IX.size(); ++i) PX[i].set(&Env, this->X[this->scenario_name][i], this->first_stage_IX[i]);
+    for (int i = this->first_stage_IX.size(); i < nvars; ++i) PX[i].set(&Env, this->X[this->scenario_name][i], this->second_stage_IX[i - this->first_stage_IX.size()]);
+
+    mc::PolVar<mc::Interval> PF[this->F[this->scenario_name].size()];
+
+    this->DAG[this->scenario_name].eval(this->F[this->scenario_name].size(), this->F[this->scenario_name].data(), PF, nvars, this->X[this->scenario_name].data(), PX);
+
+    // please delete this part above as it is purely for testing
+    int after_nvars = Env.Vars().size();
+    std::vector<mc::Interval> var_bound(after_nvars);
+    for (auto v : Env.Vars()) {
+        int v_idx = v.second->id().second;
+        var_bound[v_idx] = mc::Interval(v.second->range().l(), v.second->range().u());
+    }
+
+    Env.options.SANDWICH_RTOL = 1e-5;
+    Env.options.SANDWICH_MAXCUT = 5; //please delete
+
+    Env.generate_cuts(this->F[this->scenario_name].size(), PF);
+    std::cout<<Env;
+    std::cout<<this->DAG[this->scenario_name];
+
+    // Extract LP data from Env. Don't touch below this line
+
+    try {
+        auto c = Env.Cuts();
+
+        // Add variables to gurobi in order of their IDs to match indexing.
+        // Note: unlike IloNumVarArray::add, GRBModel::addVar returns a usable
+        // GRBVar handle immediately -- no need to add it to a container first,
+        // and no model->update() is required before referencing it in expressions.
+        grb_x->reserve(after_nvars);
+        for (int i = 0; i < after_nvars; ++i) {
+            grb_x->push_back(grb_model->addVar(var_bound[i].l(), var_bound[i].u(),
+                                                0.0, GRB_CONTINUOUS));
+        }
+
+        // Loop over cuts to build Ax <= b
+        for (const auto& pc : c) {
+            const double* coeffs = pc->coef();   // pointer to coefficients
+            int n = pc->nvar();                  // number of variables in this constraint
+            // if (this->getconditionnumber(coeffs, n) > 1e15) {
+            //     std::cout << "Skipping cut with condition number: " << this->getconditionnumber(coeffs, n) << std::endl;
+            //     continue;
+            // }
+            auto v = pc->var();                  // variable names that appear in this constraint
+            GRBLinExpr expr;
+            for (int i = 0; i < n; ++i) {
+                int col_idx = std::stoi(v[i].name().substr(1));
+                if (col_idx >= 0 && col_idx < static_cast<int>(grb_x->size())) {
+                    expr += coeffs[i] * (*grb_x)[col_idx];
+                } else {
+                    throw std::runtime_error("Error in generating constraints from cuts.");
+                }
+            }
+            if (pc->type() == 1) {        // <=
+                grb_model->addConstr(expr <= pc->rhs());
+            } else if (pc->type() == 2) { // >=
+                grb_model->addConstr(-expr <= -pc->rhs());
+            } else {                      // ==
+                grb_model->addConstr(expr <= pc->rhs());
+                grb_model->addConstr(-expr <= -pc->rhs());
+            }
+        }
+
+        // Objective is always the last variable in our construction
+        GRBLinExpr objExpr;
+        objExpr += (*grb_x)[after_nvars - 1];
+        grb_model->setObjective(objExpr, GRB_MINIMIZE);
+
+        for (size_t i = 0; i < sizeof(PF) / sizeof(PF[0]) - 1; ++i) {
+            int pf_idx = PF[i].id().second;
+            if (pf_idx >= 0 && pf_idx < static_cast<int>(grb_x->size())) {
+                GRBLinExpr expr;
+                expr += (*grb_x)[pf_idx];
+                grb_model->addConstr(expr <= 0);
+            } else {
+                throw std::runtime_error("Error in generating constraints from cuts.");
+            }
+        }
+
+        // Push all pending variable/constraint/objective changes to the model.
+        // Gurobi defers this internally, but calling update() explicitly here
+        // is good practice if anything after this function needs to query
+        // model.getVars()/getConstrs() by index right away.
+        grb_model->update();
+
+    } catch (GRBException& e) {
+        std::cerr << "Gurobi error code = " << e.getErrorCode() << ": " << e.getMessage() << std::endl;
+        throw;
+    }
+
+    std::rotate(this->F[this->scenario_name].rbegin(), this->F[this->scenario_name].rbegin() + 1, this->F[this->scenario_name].rend()); // rotate back to original order
 }
 void STModel::generateFullLP(IloEnv* cplex_env,IloModel* cplexmodel,
                               IloRangeArray* cplex_constraints,

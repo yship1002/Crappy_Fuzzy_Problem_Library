@@ -13,109 +13,90 @@ EDUnits_nocp::EDUnits_nocp(BranchingStrategy branchingStrategy) : STModel() {
     this->scenario_name = ScenarioNames::SCENARIO1;
     this->probability = 1.0;
 
-    this->scale_=std::vector<double>{
-        200.0,      // current (fixed, scale = value)
-        1.0,        // flowSplit — already O(1), scale 1
-        10.0,       // memLength (fixed)
-        0.316,      // memWidth  sqrt(0.01*10)
-        3.16e-3,    // thicknessConcentrate
-        3.16e-3,    // thicknessDilute
-        0.316,      // flowOutConcentrateND
-        0.1,        // flowOutDiluteND  sqrt(1e-3*10)
-        0.316,      // concOutConcentrateND
-        0.316,      // concOutDiluteND
-        2.5,        // voltCellPair (U/2, L=0)
-        1e-4,       // resConcentrate
-        1e-4,       // resDilute
-        5e-3,       // voltNonOhmicCEM
-        5e-3,       // voltNonOhmicAEM
-        5e5,        // capex (nominal, L=0)
-        5e5,        // opex1
-        5e5,        // opex2
-        316.0       // currentDensity
-    };
+
+    
+    // this->first_stage_IX = {
+    //     mc::Interval(0.22127813805576163,0.22127813805576163), // molNStream1
+    //     mc::Interval(123.68614070039585,123.68614070039585), // molWStream1
+    //     mc::Interval(0.0614799524242567,0.0614799524242567), // molNStream2
+    //     mc::Interval(119.50012012314487,119.50012012314487), // molWStream2
+    //     mc::Interval(0.15979818563150497,0.15979818563150497), // molNStream3
+    //     mc::Interval(4.1860205772510195,4.1860205772510195), // molWStream3
+    //     mc::Interval(0.19506277837138206,0.19506277837138206), // molNStream4
+    //     mc::Interval(5.155969090629074,5.155969090629074), // molWStream4
+    //     mc::Interval(0.1911327814433188,0.1911327814433188), // molNStream5
+    //     mc::Interval(5.009484899873909,5.009484899873909), // molWStream5
+    //     mc::Interval(0.0039299969280632285,0.0039299969280632285), // molNStream6
+    //     mc::Interval(0.14648419075516017,0.14648419075516017), // molWStream6
+    //     mc::Interval(0.15586836101209572,0.15586836101209572), // molNStream7
+    //     mc::Interval(4.039536386497317,4.039536386497317), // molWStream7
+    //     mc::Interval(0.03526442043122308,0.03526442043122308), // molNStream8
+    //     mc::Interval(0.9699485133765927,0.9699485133765927) // molWStream8
+    // };
 
     this->first_stage_IX = {
-        mc::Interval(0.22127813805576163,0.22127813805576163), // molNStream1
-        mc::Interval(123.68614070039585,123.68614070039585), // molWStream1
-        mc::Interval(0.0614799524242567,0.0614799524242567), // molNStream2
-        mc::Interval(119.50012012314487,119.50012012314487), // molWStream2
-        mc::Interval(0.15979818563150497,0.15979818563150497), // molNStream3
-        mc::Interval(4.1860205772510195,4.1860205772510195), // molWStream3
-        mc::Interval(0.19506277837138206,0.19506277837138206), // molNStream4
-        mc::Interval(5.155969090629074,5.155969090629074), // molWStream4
-        mc::Interval(0.1911327814433188,0.1911327814433188), // molNStream5
-        mc::Interval(5.009484899873909,5.009484899873909), // molWStream5
-        mc::Interval(0.0039299969280632285,0.0039299969280632285), // molNStream6
-        mc::Interval(0.14648419075516017,0.14648419075516017), // molWStream6
-        mc::Interval(0.15586836101209572,0.15586836101209572), // molNStream7
-        mc::Interval(4.039536386497317,4.039536386497317), // molWStream7
-        mc::Interval(0.03526442043122308,0.03526442043122308), // molNStream8
-        mc::Interval(0.9699485133765927,0.9699485133765927) // molWStream8
+        mc::Interval(1e-3, 10),
+        mc::Interval(1e-3, 500),
+        mc::Interval(1e-3, 10),
+        mc::Interval(1e-3, 500),
+        mc::Interval(1e-3, 10),
+        mc::Interval(1e-3, 500),
+        mc::Interval(1e-3, 10),
+        mc::Interval(1e-3, 500),
+        mc::Interval(1e-3, 10),
+        mc::Interval(1e-3, 500),
+        mc::Interval(1e-3, 10),
+        mc::Interval(1e-3, 500),
+        mc::Interval(1e-3, 10),
+        mc::Interval(1e-3, 500),
+        mc::Interval(1e-3, 10),
+        mc::Interval(1e-3, 500)
     };
 
-    // this->first_stage_IX = {
-    //     mc::Interval(1e-5, 10),
-    //     mc::Interval(1e-5, 500),
-    //     mc::Interval(1e-5, 10),
-    //     mc::Interval(1e-5, 500),
-    //     mc::Interval(1e-5, 10),
-    //     mc::Interval(1e-5, 500),
-    //     mc::Interval(1e-5, 10),
-    //     mc::Interval(1e-5, 500),
-    //     mc::Interval(1e-5, 10),
-    //     mc::Interval(1e-5, 500),
-    //     mc::Interval(1e-5, 10),
-    //     mc::Interval(1e-5, 500),
-    //     mc::Interval(1e-5, 10),
-    //     mc::Interval(1e-5, 500),
-    //     mc::Interval(1e-5, 10),
-    //     mc::Interval(1e-5, 500)
-    // };
 
     this->second_stage_IX = {
-        mc::Interval(200,200)/this->scale_[0],           // current 16
-        mc::Interval(0, 1)/this->scale_[1],           // flowSplit 17
-        mc::Interval(10, 10)/this->scale_[2],          // memLength 18
-        mc::Interval(0.01, 10)/this->scale_[3],         // memWidth 19
-        mc::Interval(0.001, 0.01)/this->scale_[4],     // thicknessConcentrate 20
-        mc::Interval(0.001, 0.01)/this->scale_[5],     // thicknessDilute 21
-        mc::Interval(1e-3, 100)/this->scale_[6],         // flowOutConcentrateND 22
-        mc::Interval(1e-3, 10)/this->scale_[7],         // flowOutDiluteND 23
-        mc::Interval(1e-3, 100)/this->scale_[8],          // concOutConcentrateND 24
-        mc::Interval(1e-3, 100)/this->scale_[9],          // concOutDiluteND 25
-        mc::Interval(0, 5)/this->scale_[10],          // voltCellPair 26
-        mc::Interval(1e-6, 1e-2)/this->scale_[11],       // resConcentrate 27 
-        mc::Interval(1e-6, 1e-2)/this->scale_[12],       // resDilute 28
-        mc::Interval(1e-4, 0.25)/this->scale_[13],       // voltNonOhmicCEM 29
-        mc::Interval(1e-4, 0.25)/this->scale_[14],       // voltNonOhmicAEM 30
-        mc::Interval(0, 1e6)/this->scale_[15],           // capex 31
-        mc::Interval(0, 1e6)/this->scale_[16],           // opex1 32
-        mc::Interval(0, 1e6)/this->scale_[17],           // opex2 33
-        mc::Interval(10, 1e4)/this->scale_[18],           // currentDensity 34
+        mc::Interval(200,200),           // current 16
+        mc::Interval(0, 1),           // flowSplit 17
+        mc::Interval(10, 10),          // memLength 18
+        mc::Interval(0.01, 10),         // memWidth 19
+        mc::Interval(0.001, 0.01),     // thicknessConcentrate 20
+        mc::Interval(0.001, 0.01),     // thicknessDilute 21
+        mc::Interval(1e-3, 100),         // flowOutConcentrateND 22
+        mc::Interval(1e-3, 10),         // flowOutDiluteND 23
+        mc::Interval(1e-3, 100),          // concOutConcentrateND 24
+        mc::Interval(1e-3, 100),          // concOutDiluteND 25
+        mc::Interval(0, 5),          // voltCellPair 26
+        mc::Interval(1e-6, 1e-2),       // resConcentrate 27 
+        mc::Interval(1e-6, 1e-2),       // resDilute 28
+        mc::Interval(1e-4, 0.25),       // voltNonOhmicCEM 29
+        mc::Interval(1e-4, 0.25),       // voltNonOhmicAEM 30
+        mc::Interval(0, 1e6),           // capex 31
+        mc::Interval(0, 1e6),           // opex1 32
+        mc::Interval(0, 1e6),           // opex2 33
+        mc::Interval(10, 1e4)           // currentDensity 34
     };
-    // this->second_stage_IX = {
+    // this->second_stage_IX={
     //     mc::Interval (1,1), // x[0]
-    //     mc::Interval (0.0211739,0.0211739), // x[1]
+    //     mc::Interval (0,0.0676825), // x[1]
     //     mc::Interval (1,1), // x[2]
-    //     mc::Interval (1.16406,2.29647), // x[3]
+    //     mc::Interval (0.0316456,4.00447), // x[3]
     //     mc::Interval (0.316456,3.16456), // x[4]
     //     mc::Interval (0.316456,3.16456), // x[5]
-    //     mc::Interval (0.0912137,0.0912137), // x[6]
-    //     mc::Interval (7.99439,7.99439), // x[7]
-    //     mc::Interval (16.3694,16.7515), // x[8]
-    //     mc::Interval (0.22772,0.22772), // x[9]
-    //     mc::Interval (0.0059449,2), // x[10]
-    //     mc::Interval (0.528948,6.36602), // x[11]
-    //     mc::Interval (10.3525,100), // x[12]
-    //     mc::Interval (12.9949,13.1768), // x[13]
-    //     mc::Interval (12.9948,13.177), // x[14]
-    //     mc::Interval (0.052243,0.052243), // x[15]
-    //     mc::Interval (0.0577186,0.0577186), // x[16]
-    //     mc::Interval (0,0.0379023), // x[17]
-    //     mc::Interval (0.435101,0.435101), // x[18]
-
+    //     mc::Interval (0.0898193,0.0921745), // x[6]
+    //     mc::Interval (7.99409,7.99409), // x[7]
+    //     mc::Interval (14.611,18.2254), // x[8]
+    //     mc::Interval (0.20766,0.248372), // x[9]
+    //     mc::Interval (0,2), // x[10]
+    //     mc::Interval (0.01,6.94369), // x[11]
+    //     mc::Interval (10.2401,100), // x[12]
+    //     mc::Interval (0.0360134,45.3973), // x[13]
+    //     mc::Interval (0.0360134,45.3973), // x[14]
+    //     mc::Interval (0,0.127779), // x[15]
+    //     mc::Interval (0,0.127071), // x[16]
+    //     mc::Interval (0,0.0202789), // x[17]
+    //     mc::Interval (0.0316456,10.8931), // x[18]
     // };
+
 }
 void EDUnits_nocp::buildDAG() {
     const double numCells = 500.0;
@@ -166,6 +147,7 @@ void EDUnits_nocp::buildDAG() {
         5.388e-06,
         5.388e-06
     };
+
     const double scaleFacConcByUnit[4] = {
         0.0,
         3.967e+02,
@@ -207,27 +189,35 @@ void EDUnits_nocp::buildDAG() {
 
         const int secondStageStart = firstStageCount;
 
-        mc::FFVar current = vars[secondStageStart + 0]*this->scale_[0];
-        mc::FFVar flowSplit = vars[secondStageStart + 1]*this->scale_[1];
-        mc::FFVar memLength = vars[secondStageStart + 2]*this->scale_[2];
-        mc::FFVar memWidth = vars[secondStageStart + 3]*this->scale_[3];
-        mc::FFVar thicknessConcentrate = vars[secondStageStart + 4]*this->scale_[4];
-        mc::FFVar thicknessDilute = vars[secondStageStart + 5]*this->scale_[5];
-        mc::FFVar flowOutConcentrateNd = vars[secondStageStart + 6]*this->scale_[6];
-        mc::FFVar flowOutDiluteNd = vars[secondStageStart + 7]*this->scale_[7];
-        mc::FFVar concOutConcentrateNd = vars[secondStageStart + 8]*this->scale_[8];
-        mc::FFVar concOutDiluteNd = vars[secondStageStart + 9]*this->scale_[9];
-        mc::FFVar voltCellPair = vars[secondStageStart + 10]*this->scale_[10];
-        mc::FFVar resConcentrate = vars[secondStageStart + 11]*this->scale_[11];
-        mc::FFVar resDilute = vars[secondStageStart + 12]*this->scale_[12];
-        mc::FFVar voltNonOhmicCem = vars[secondStageStart + 13]*this->scale_[13];
-        mc::FFVar voltNonOhmicAem = vars[secondStageStart + 14]*this->scale_[14];
-        mc::FFVar capex = vars[secondStageStart + 15]*this->scale_[15];
-        mc::FFVar opex1 = vars[secondStageStart + 16]*this->scale_[16];
-        mc::FFVar opex2 = vars[secondStageStart + 17]*this->scale_[17];
-        mc::FFVar currentDensity = vars[secondStageStart + 18]*this->scale_[18];
+        mc::FFVar current = vars[secondStageStart + 0];
+        mc::FFVar flowSplit = vars[secondStageStart + 1];
+        mc::FFVar memLength = vars[secondStageStart + 2];
+        mc::FFVar memWidth = vars[secondStageStart + 3];
+        mc::FFVar thicknessConcentrate = vars[secondStageStart + 4];
+        mc::FFVar thicknessDilute = vars[secondStageStart + 5];
+        mc::FFVar flowOutConcentrateNd = vars[secondStageStart + 6];
+        mc::FFVar flowOutDiluteNd = vars[secondStageStart + 7];
+        mc::FFVar concOutConcentrateNd = vars[secondStageStart + 8];
+        mc::FFVar concOutDiluteNd = vars[secondStageStart + 9];
+        mc::FFVar voltCellPair = vars[secondStageStart + 10];
+        mc::FFVar resConcentrate = vars[secondStageStart + 11];
+        mc::FFVar resDilute = vars[secondStageStart + 12];
+        mc::FFVar voltNonOhmicCem = vars[secondStageStart + 13];
+        mc::FFVar voltNonOhmicAem = vars[secondStageStart + 14];
+        mc::FFVar capex = vars[secondStageStart + 15];
+        mc::FFVar opex1 = vars[secondStageStart + 16];
+        mc::FFVar opex2 = vars[secondStageStart + 17];
+        mc::FFVar currentDensity = vars[secondStageStart + 18];
 
 
+        std::vector<mc::FFVar> constraints;
+        auto addEqualityConstraint = [&](const mc::FFVar& expr) {
+            constraints.push_back(expr);
+            constraints.push_back(-expr);
+        };
+        auto addLessEqualConstraint = [&](const mc::FFVar& expr) {
+            constraints.push_back(expr);
+        };
 
         const int unitIdx = static_cast<int>(scenarioIndex) + 1;
         const double scaleFacFlow = scaleFacFlowByUnit[unitIdx];
@@ -248,6 +238,7 @@ void EDUnits_nocp::buildDAG() {
         mc::FFVar flowInConc = flowSplit * flowInED / numCells;
         mc::FFVar flowInDil = (1.0 - flowSplit) * flowInED / numCells;
 
+
         mc::FFVar uConc = 0.5 * (flowOutConcentrateNd * scaleFacFlow + flowInConc) / (memWidth * thicknessConcentrate);
         mc::FFVar uDil = 0.5 * (flowOutDiluteNd * scaleFacFlow + flowInDil) / (memWidth * thicknessDilute);
 
@@ -264,15 +255,6 @@ void EDUnits_nocp::buildDAG() {
         mc::FFVar eosmWaterFlux = waterTransNumber * fluxIonsTotal * molweightH20 / densityH2O;
         mc::FFVar fluxWaterTotal = osmWaterFluxAem + osmWaterFluxCem + eosmWaterFlux;
 
-        std::vector<mc::FFVar> constraints;
-  
-        auto addEqualityConstraint = [&](const mc::FFVar& expr) {
-            constraints.push_back(expr);
-            constraints.push_back(-expr);
-        };
-        auto addLessEqualConstraint = [&](const mc::FFVar& expr) {
-            constraints.push_back(expr);
-        };
 
 
         addEqualityConstraint(molNStream1 - molNFeed - molNStream6);
@@ -329,10 +311,10 @@ void EDUnits_nocp::buildDAG() {
         mc::FFVar flowOutConc = flowOutConcentrateNd * scaleFacFlow;
         mc::FFVar flowOutDil = flowOutDiluteNd * scaleFacFlow;
 
-        addEqualityConstraint(opex2 - costElec * (24.0 * 1e-3) * numCells * daysOperation * (
-            175.0 * viscosityManure * pow(memWidth, 2.0) * pow(uConc, 2.0) / thicknessConcentrate
-            + 78.70934593096298 * pow(memWidth, 1.37)* pow(uDil, 2.0)
-                * pow(flowOutDil + flowInDil, 0.63) / thicknessDilute));
+        // addEqualityConstraint(opex2 - costElec * (24.0 * 1e-3) * numCells * daysOperation * (
+        //     175.0 * viscosityManure * pow(memWidth, 2.0) * pow(uConc, 2.0) / thicknessConcentrate
+        //     + 78.70934593096298 * pow(memWidth, 1.37)* pow(uDil, 2.0)
+        //         * pow(flowOutDil + flowInDil, 0.63) / thicknessDilute));
 
         if (unitIdx == 1) {
             addEqualityConstraint(molNStream2 - flowOutDiluteNd * (scaleFacFlow * numCells) * concOutDiluteNd * scaleFacConc);
@@ -618,7 +600,7 @@ void EDUnits_nocp::buildFullModelDAG() {
 
 Ipopt::SmartPtr<STModel> EDUnits_nocp::clone() {
     Ipopt::SmartPtr<EDUnits_nocp> copy = new EDUnits_nocp();
-
+    copy->scale_ = this->scale_;
     copy->scenario_name = this->scenario_name;
     copy->first_stage_IX = this->first_stage_IX;
     copy->second_stage_IX = this->second_stage_IX;
@@ -632,3 +614,5 @@ Ipopt::SmartPtr<STModel> EDUnits_nocp::clone() {
     }
     return copy;
 }
+
+// try updated bound information

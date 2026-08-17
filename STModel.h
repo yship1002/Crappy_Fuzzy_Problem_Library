@@ -96,9 +96,11 @@ class STModel:public Ipopt::TNLP{
         std::vector<mc::Interval> first_stage_IX;
         /// initial variable intervals for second stage variables
         std::vector<mc::Interval> second_stage_IX;
+        std::vector<double> scale_;
 
         ScenarioNames scenario_name; //by default
         bool full_model_built = false;
+  
         virtual Ipopt::SmartPtr<STModel> clone() = 0;
         virtual void buildDAG() = 0;
         virtual void buildFullModelDAG() = 0;
@@ -110,6 +112,8 @@ class STModel:public Ipopt::TNLP{
                               IloRangeArray* cplex_constraints,
                               IloObjective* cplex_obj,
                               IloNumVarArray* cplex_x);
+        void generateLP(GRBEnv* grb_env, GRBModel* grb_model,
+                          std::vector<GRBVar>* grb_x);
         void generateFullLP(IloEnv* cplex_env,IloModel* cplexmodel,
                               IloRangeArray* cplex_constraints,
                               IloObjective* cplex_obj,
