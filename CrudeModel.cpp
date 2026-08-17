@@ -4,12 +4,12 @@ CrudeModel::CrudeModel(BranchingStrategy branching_strategy):STModel() {
     this->branching_strategy = branching_strategy;
     this->scenario_names = {ScenarioNames::SCENARIO1
         , ScenarioNames::SCENARIO2, ScenarioNames::SCENARIO3
-        ,ScenarioNames::SCENARIO4, ScenarioNames::SCENARIO5
+        // ,ScenarioNames::SCENARIO4, ScenarioNames::SCENARIO5
         // ,ScenarioNames::SCENARIO6, ScenarioNames::SCENARIO7, ScenarioNames::SCENARIO8, 
         // ScenarioNames::SCENARIO9, ScenarioNames::SCENARIO10
     };
     this->scenario_name = ScenarioNames::SCENARIO1; //default
-    this->probability = 0.2; //default
+    this->probability = 0.3333; //default
     std::vector<double> scenario1_coeff = {
         // g_1_1: CrudeQuantity[1..10]
         0.0020105335707024776,// CrudeQty[1]
@@ -408,14 +408,14 @@ CrudeModel::CrudeModel(BranchingStrategy branching_strategy):STModel() {
     this->perturb_coeffs={
         {ScenarioNames::SCENARIO1, scenario1_coeff},
         {ScenarioNames::SCENARIO2, scenario2_coeff},
-        {ScenarioNames::SCENARIO3, scenario1_coeff},
-        {ScenarioNames::SCENARIO4, scenario2_coeff},
-        {ScenarioNames::SCENARIO5, scenario1_coeff},
-        {ScenarioNames::SCENARIO6, scenario2_coeff},
-        {ScenarioNames::SCENARIO7, scenario1_coeff},
-        {ScenarioNames::SCENARIO8, scenario2_coeff},
-        {ScenarioNames::SCENARIO9, scenario1_coeff},
-        {ScenarioNames::SCENARIO10, scenario2_coeff}
+        {ScenarioNames::SCENARIO3, scenario3_coeff}
+        // {ScenarioNames::SCENARIO4, scenario2_coeff},
+        // {ScenarioNames::SCENARIO5, scenario1_coeff},
+        // {ScenarioNames::SCENARIO6, scenario2_coeff},
+        // {ScenarioNames::SCENARIO7, scenario1_coeff},
+        // {ScenarioNames::SCENARIO8, scenario2_coeff},
+        // {ScenarioNames::SCENARIO9, scenario1_coeff},
+        // {ScenarioNames::SCENARIO10, scenario2_coeff}
     };
     this->first_stage_map = {
         {"CrudeQuantity[1]",0},
@@ -734,154 +734,7 @@ CrudeModel::CrudeModel(BranchingStrategy branching_strategy):STModel() {
         mc::Interval(0.0,832.9366968110423), //119:volume_HF
         mc::Interval(0.0,1206.896551724138) //120:volume_PG98
     };
-    
-        // this->first_stage_IX = {
-        //     mc::Interval(0.0, 0.0),                                    // crudeQuantity[1]
-        //     mc::Interval(0.0, 0.0),                                    // crudeQuantity[2]
-        //     mc::Interval(0.0, 0.0),                                    // crudeQuantity[3]
-        //     mc::Interval(0.0, 0.0),                                    // crudeQuantity[4]
-        //     mc::Interval(0.0, 0.0),                                    // crudeQuantity[5]
-        //     mc::Interval(0.0, 0.0),                                    // crudeQuantity[6]
-        //     mc::Interval(0.0, 0.0),                                    // crudeQuantity[7]
-        //     mc::Interval(0.0, 0.0),                                    // crudeQuantity[8]
-        //     mc::Interval(0.0, 0.0),                                    // crudeQuantity[9]
-        //     mc::Interval(0.0, 0.0),                                    // crudeQuantity[10]
-        //     mc::Interval(0.0, 0.0),                                    // pickCrude[1]
-        //     mc::Interval(1.0, 1.0),                                    // pickCrude[2]
-        //     mc::Interval(1.0, 1.0),                                    // pickCrude[3]
-        //     mc::Interval(1.0, 1.0),                                    // pickCrude[4]
-        //     mc::Interval(0.0, 0.0),                                    // pickCrude[5]
-        //     mc::Interval(0.0, 0.0),                                    // pickCrude[6]
-        //     mc::Interval(0.0, 0.0),                                    // pickCrude[7]
-        //     mc::Interval(1.0, 1.0),                                    // pickCrude[8]
-        //     mc::Interval(0.0, 0.0),                                    // pickCrude[9]
-        //     mc::Interval(1.0, 1.0)                                     // pickCrude[10]
-        // };
 
-        // this->second_stage_IX = {
-        //     mc::Interval(0.0, 0.0),                                         // 0: blin_AGO_LG[1]
-        //     mc::Interval(0.0, 0.0),                                         // 1: blin_AGO_LG[2]
-        //     mc::Interval(0.0, 0.0),                                         // 2: blin_AGO_LG[3]
-        //     mc::Interval(0.0, 0.0),                                         // 3: blin_AGO_LG[4]
-        //     mc::Interval(0.0, 0.0),                                         // 4: blin_CDU_LG[1]
-        //     mc::Interval(0.0, 0.0),                                         // 5: blin_CDU_LG[2]
-        //     mc::Interval(0.0, 0.0),                                         // 6: blin_CDU_LG[3]
-        //     mc::Interval(0.0, 0.0),                                         // 7: blin_CDU_LG[4]
-        //     mc::Interval(0.0, 0.0),                                         // 8: blin_Cracker_AGO[1]
-        //     mc::Interval(0.0, 0.0),                                         // 9: blin_Cracker_AGO[2]
-        //     mc::Interval(0.0, 0.0),                                         // 10: blin_Cracker_AGO[3]
-        //     mc::Interval(0.0, 0.0),                                         // 11: blin_Cracker_Mogas[1]
-        //     mc::Interval(0.0, 0.0),                                         // 12: blin_Cracker_Mogas[2]
-        //     mc::Interval(0.0, 0.0),                                         // 13: blin_Cracker_Mogas[3]
-        //     mc::Interval(0.0, 0.0),                                         // 14: blin_Mogas_LG[1]
-        //     mc::Interval(0.0, 0.0),                                         // 15: blin_Mogas_LG[2]
-        //     mc::Interval(0.0, 0.0),                                         // 16: blin_Mogas_LG[3]
-        //     mc::Interval(0.0, 0.0),                                         // 17: blin_Mogas_LG[4]
-        //     mc::Interval(0.0, 0.0),                                         // 18: blin_Reformer100_LG[1]
-        //     mc::Interval(0.0, 0.0),                                         // 19: blin_Reformer100_LG[2]
-        //     mc::Interval(0.0, 0.0),                                         // 20: blin_Reformer100_LG[3]
-        //     mc::Interval(0.0, 0.0),                                         // 21: blin_Reformer100_LG[4]
-        //     mc::Interval(0.0, 0.0),                                         // 22: blin_Reformer95_LG[1]
-        //     mc::Interval(0.0, 0.0),                                         // 23: blin_Reformer95_LG[2]
-        //     mc::Interval(0.0, 0.0),                                         // 24: blin_Reformer95_LG[3]
-        //     mc::Interval(0.0, 0.0),                                         // 25: blin_Reformer95_LG[4]
-        //     mc::Interval(201.29570747217807, 201.29570747217807),           // 26: flow_AGO_1[1]
-        //     mc::Interval(212.48012718600953, 212.48012718600953),           // 27: flow_AGO_1[2]
-        //     mc::Interval(201.29570747217807, 201.29570747217807),           // 28: flow_AGO_1[3]
-        //     mc::Interval(199.57869634340224, 199.57869634340224),           // 29: flow_AGO_1[4]
-        //     mc::Interval(210.54848966613673, 210.54848966613673),           // 30: flow_AGO_1[5]
-        //     mc::Interval(222.1383147853736, 222.1383147853736),             // 31: flow_AGO_1[6]
-        //     mc::Interval(196.7885532591415, 196.7885532591415),             // 32: flow_AGO_1[7]
-        //     mc::Interval(208.54531001589828, 208.54531001589828),           // 33: flow_AGO_1[8]
-        //     mc::Interval(204.3720190779014, 204.3720190779014),             // 34: flow_AGO_1[9]
-        //     mc::Interval(210.2623211446741, 210.2623211446741),             // 35: flow_AGO_1[10]
-        //     mc::Interval(125.0, 125.0),                                     // 36: flow_AGO_2[1]
-        //     mc::Interval(125.0, 125.0),                                     // 37: flow_AGO_2[2]
-        //     mc::Interval(125.0, 125.0),                                     // 38: flow_AGO_2[3]
-        //     mc::Interval(125.0, 125.0),                                     // 39: flow_AGO_2[4]
-        //     mc::Interval(125.0, 125.0),                                     // 40: flow_AGO_2[5]
-        //     mc::Interval(125.0, 125.0),                                     // 41: flow_AGO_2[6]
-        //     mc::Interval(125.0, 125.0),                                     // 42: flow_AGO_2[7]
-        //     mc::Interval(125.0, 125.0),                                     // 43: flow_AGO_2[8]
-        //     mc::Interval(125.0, 125.0),                                     // 44: flow_AGO_2[9]
-        //     mc::Interval(125.0, 125.0),                                     // 45: flow_AGO_2[10]
-        //     mc::Interval(700.0, 700.0),                                     // 46: flow_AGO_3[1]
-        //     mc::Interval(175.0, 175.0),                                     // 47: flow_AGO_3[2]
-        //     mc::Interval(175.0, 175.0),                                     // 48: flow_AGO_3[3]
-        //     mc::Interval(0.0, 0.0),                                         // 49: flow_Burn[1]
-        //     mc::Interval(0.0, 0.0),                                         // 50: flow_Burn[2]
-        //     mc::Interval(0.0, 0.0),                                         // 51: flow_Burn[3]
-        //     mc::Interval(0.0, 0.0),                                         // 52: flow_Cracker_AGO
-        //     mc::Interval(0.0, 0.0),                                         // 53: flow_Cracker_Mogas
-        //     mc::Interval(0.0, 0.0),                                         // 54: flow_Desulphurisation_1[1]
-        //     mc::Interval(0.0, 0.0),                                         // 55: flow_Desulphurisation_1[2]
-        //     mc::Interval(0.0, 0.0),                                         // 56: flow_Desulphurisation_1[3]
-        //     mc::Interval(0.0, 0.0),                                         // 57: flow_Desulphurisation_1[4]
-        //     mc::Interval(0.0, 0.0),                                         // 58: flow_Desulphurisation_1[5]
-        //     mc::Interval(0.0, 0.0),                                         // 59: flow_Desulphurisation_1[6]
-        //     mc::Interval(0.0, 0.0),                                         // 60: flow_Desulphurisation_1[7]
-        //     mc::Interval(0.0, 0.0),                                         // 61: flow_Desulphurisation_1[8]
-        //     mc::Interval(0.0, 0.0),                                         // 62: flow_Desulphurisation_1[9]
-        //     mc::Interval(0.0, 0.0),                                         // 63: flow_Desulphurisation_1[10]
-        //     mc::Interval(0.0, 0.0),                                         // 64: flow_Desulphurisation_CGO
-        //     mc::Interval(700.0, 700.0),                                     // 65: flow_ES95[1]
-        //     mc::Interval(700.0, 700.0),                                     // 66: flow_ES95[2]
-        //     mc::Interval(700.0, 700.0),                                     // 67: flow_ES95[3]
-        //     mc::Interval(700.0, 700.0),                                     // 68: flow_ES95[4]
-        //     mc::Interval(700.0, 700.0),                                     // 69: flow_ES95[5]
-        //     mc::Interval(700.0, 700.0),                                     // 70: flow_ES95[6]
-        //     mc::Interval(201.29570747217807, 201.29570747217807),           // 71: flow_HF_1[1]
-        //     mc::Interval(212.48012718600953, 212.48012718600953),           // 72: flow_HF_1[2]
-        //     mc::Interval(201.29570747217807, 201.29570747217807),           // 73: flow_HF_1[3]
-        //     mc::Interval(199.57869634340224, 199.57869634340224),           // 74: flow_HF_1[4]
-        //     mc::Interval(210.54848966613673, 210.54848966613673),           // 75: flow_HF_1[5]
-        //     mc::Interval(222.1383147853736, 222.1383147853736),             // 76: flow_HF_1[6]
-        //     mc::Interval(196.7885532591415, 196.7885532591415),             // 77: flow_HF_1[7]
-        //     mc::Interval(208.54531001589828, 208.54531001589828),           // 78: flow_HF_1[8]
-        //     mc::Interval(204.3720190779014, 204.3720190779014),             // 79: flow_HF_1[9]
-        //     mc::Interval(210.2623211446741, 210.2623211446741),             // 80: flow_HF_1[10]
-        //     mc::Interval(175.0, 175.0),                                     // 81: flow_HF_2
-        //     mc::Interval(201.29570747217807, 201.29570747217807),           // 82: flow_HF_3[1]
-        //     mc::Interval(212.48012718600953, 212.48012718600953),           // 83: flow_HF_3[2]
-        //     mc::Interval(201.29570747217807, 201.29570747217807),           // 84: flow_HF_3[3]
-        //     mc::Interval(199.57869634340224, 199.57869634340224),           // 85: flow_HF_3[4]
-        //     mc::Interval(210.54848966613673, 210.54848966613673),           // 86: flow_HF_3[5]
-        //     mc::Interval(222.1383147853736, 222.1383147853736),             // 87: flow_HF_3[6]
-        //     mc::Interval(196.7885532591415, 196.7885532591415),             // 88: flow_HF_3[7]
-        //     mc::Interval(208.54531001589828, 208.54531001589828),           // 89: flow_HF_3[8]
-        //     mc::Interval(204.3720190779014, 204.3720190779014),             // 90: flow_HF_3[9]
-        //     mc::Interval(210.2623211446741, 210.2623211446741),             // 91: flow_HF_3[10]
-        //     mc::Interval(0.0, 0.0),                                         // 92: flow_Import[1]
-        //     mc::Interval(0.0, 0.0),                                         // 93: flow_Import[2]
-        //     mc::Interval(0.0, 0.0),                                         // 94: flow_Import[3]
-        //     mc::Interval(0.0, 0.0),                                         // 95: flow_Import[4]
-        //     mc::Interval(0.0, 0.0),                                         // 96: flow_Import[5]
-        //     mc::Interval(0.0, 0.0),                                         // 97: flow_Import[6]
-        //     mc::Interval(0.0, 0.0),                                         // 98: flow_Import[7]
-        //     mc::Interval(0.0, 0.0),                                         // 99: flow_Isomerisation
-        //     mc::Interval(700.0, 700.0),                                     // 100: flow_JPF[1]
-        //     mc::Interval(700.0, 700.0),                                     // 101: flow_JPF[2]
-        //     mc::Interval(700.0, 700.0),                                     // 102: flow_LG_producing
-        //     mc::Interval(700.0, 700.0),                                     // 103: flow_LN_producing
-        //     mc::Interval(700.0, 700.0),                                     // 104: flow_PG98[1]
-        //     mc::Interval(700.0, 700.0),                                     // 105: flow_PG98[2]
-        //     mc::Interval(700.0, 700.0),                                     // 106: flow_PG98[3]
-        //     mc::Interval(700.0, 700.0),                                     // 107: flow_PG98[4]
-        //     mc::Interval(700.0, 700.0),                                     // 108: flow_PG98[5]
-        //     mc::Interval(700.0, 700.0),                                     // 109: flow_PG98[6]
-        //     mc::Interval(0.0, 60.0),                                        // 110: flow_Reformer100
-        //     mc::Interval(5.0, 65.0),                                        // 111: flow_Reformer95
-        //     mc::Interval(0.0, 1.0),                                         // 112: fraction_CGO[1]
-        //     mc::Interval(0.0, 1.0),                                         // 113: fraction_CGO[2]
-        //     mc::Interval(0.0, 1.0),                                         // 114: fraction_LG[1]
-        //     mc::Interval(0.0, 1.0),                                         // 115: fraction_LG[2]
-        //     mc::Interval(0.0, 1.0),                                         // 116: fraction_LG[3]
-        //     mc::Interval(0.0, 1.0),                                         // 117: fraction_LG[4]
-        //     mc::Interval(0.0, 1.0),                                         // 118: fraction_LG[5]
-        //     mc::Interval(0.0, 1206.896551724138),                           // 119: volume_ES95
-        //     mc::Interval(0.0, 832.9366968110423),                           // 120: volume_HF
-        //     mc::Interval(0.0, 1206.896551724138)                            // 121: volume_PG98
-        // };
     
     
 };
