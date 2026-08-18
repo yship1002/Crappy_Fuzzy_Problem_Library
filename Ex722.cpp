@@ -12,7 +12,7 @@ Ex722Model::Ex722Model(BranchingStrategy branching_strategy):STModel() {
     this->perturb = {
         {ScenarioNames::SCENARIO1, 4.0}, 
         {ScenarioNames::SCENARIO2, 3.0}, 
-        {ScenarioNames::SCENARIO3, 4.0}
+        {ScenarioNames::SCENARIO3, 3.5}
         // {ScenarioNames::SCENARIO4, 3.0}, 
         // {ScenarioNames::SCENARIO5, 4.0}, 
         // {ScenarioNames::SCENARIO6, 3.0},
