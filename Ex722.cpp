@@ -3,23 +3,23 @@
 Ex722Model::Ex722Model(BranchingStrategy branching_strategy):STModel() {
 
     this->branching_strategy = branching_strategy;
-    this->scenario_names = { ScenarioNames::SCENARIO1, ScenarioNames::SCENARIO2,ScenarioNames::SCENARIO3
-    //  ScenarioNames::SCENARIO4, ScenarioNames::SCENARIO5,ScenarioNames::SCENARIO6,
-    //  ScenarioNames::SCENARIO7,ScenarioNames::SCENARIO8,ScenarioNames::SCENARIO9,ScenarioNames::SCENARIO10
+    this->scenario_names = { ScenarioNames::SCENARIO1, ScenarioNames::SCENARIO2,ScenarioNames::SCENARIO3,
+     ScenarioNames::SCENARIO4, ScenarioNames::SCENARIO5,ScenarioNames::SCENARIO6,
+     ScenarioNames::SCENARIO7,ScenarioNames::SCENARIO8,ScenarioNames::SCENARIO9,ScenarioNames::SCENARIO10
     };
     this->scenario_name = ScenarioNames::SCENARIO1; //default
-    this->probability = 0.33333333333333; // equal probability for each scenario
+    this->probability = 0.1; // equal probability for each scenario
     this->perturb = {
         {ScenarioNames::SCENARIO1, 4.0}, 
         {ScenarioNames::SCENARIO2, 3.0}, 
-        {ScenarioNames::SCENARIO3, 3.5}
-        // {ScenarioNames::SCENARIO4, 3.0}, 
-        // {ScenarioNames::SCENARIO5, 4.0}, 
-        // {ScenarioNames::SCENARIO6, 3.0},
-        // {ScenarioNames::SCENARIO7, 4.0}, 
-        // {ScenarioNames::SCENARIO8, 3.0}, 
-        // {ScenarioNames::SCENARIO9, 4.0},
-        // {ScenarioNames::SCENARIO10, 3.0}
+        {ScenarioNames::SCENARIO3, 3.5},
+        {ScenarioNames::SCENARIO4, 3.4}, 
+        {ScenarioNames::SCENARIO5, 3.3}, 
+        {ScenarioNames::SCENARIO6, 3.2},
+        {ScenarioNames::SCENARIO7, 3.1}, 
+        {ScenarioNames::SCENARIO8, 3.6}, 
+        {ScenarioNames::SCENARIO9, 3.7},
+        {ScenarioNames::SCENARIO10, 3.8}
         // {ScenarioNames::SCENARIO11, -1}, 
         // {ScenarioNames::SCENARIO12, -1}, 
         // {ScenarioNames::SCENARIO13, 0.2602763376071644},
@@ -67,15 +67,15 @@ Ex722Model::Ex722Model(BranchingStrategy branching_strategy):STModel() {
     // };
 
     this->first_stage_IX = {
-        mc::Interval(0, 1),
-        mc::Interval(0, 1),
-        mc::Interval(0, 1),
-        mc::Interval(0, 1)
+        mc::Interval(1e-5,16), //x5
+        mc::Interval(1e-5,16) //x6
     };
         
     this->second_stage_IX = {
-        mc::Interval(1e-5,16),
-        mc::Interval(1e-5,16)
+        mc::Interval(0, 1), //x1
+        mc::Interval(0, 1), //x2
+        mc::Interval(0, 1),  //x3
+        mc::Interval(0, 1) //x4
 
     };
  
@@ -100,25 +100,25 @@ void Ex722Model::buildDAG() {
         mc::FFVar nc1,nc2,nc3,nc4;
 
         //.  0.09755988*x1*x5 + x1 == 1;
-        c1=0.09755988*this->X[scenario_name][0]*this->X[scenario_name][4]+this->X[scenario_name][0]-1;
+        c1=0.09755988*this->X[scenario_name][2]*this->X[scenario_name][0]+this->X[scenario_name][2]-1;
         nc1=-c1;
 
         //.  0.0965842812*x2*x6 + x2 - x1 == 0;
-        c2=0.0965842812*this->X[scenario_name][1]*this->X[scenario_name][5]+this->X[scenario_name][1]-this->X[scenario_name][0];
+        c2=0.0965842812*this->X[scenario_name][3]*this->X[scenario_name][1]+this->X[scenario_name][3]-this->X[scenario_name][2];
         nc2=-c2;
 
         //.  0.0391908*x3*x5 + x3 + x1 == 1;
-        c3=0.0391908*this->X[scenario_name][2]*this->X[scenario_name][4]+this->X[scenario_name][2]+this->X[scenario_name][0]-1;
+        c3=0.0391908*this->X[scenario_name][4]*this->X[scenario_name][0]+this->X[scenario_name][4]+this->X[scenario_name][2]-1;
         nc3=-c3;
 
         // 0.03527172*x4*x6 + x4 - x1 + x2 - x3 == 0;
-        c4=0.03527172*this->X[scenario_name][3]*this->X[scenario_name][5]+this->X[scenario_name][3]-this->X[scenario_name][0]+this->X[scenario_name][1]-this->X[scenario_name][2];
+        c4=0.03527172*this->X[scenario_name][5]*this->X[scenario_name][1]+this->X[scenario_name][5]-this->X[scenario_name][2]+this->X[scenario_name][3]-this->X[scenario_name][4];
         nc4=-c4;
 
         // x5**0.5 + x6**0.5 =L= 4;
-        c5=pow(this->X[scenario_name][4], 0.5)+pow(this->X[scenario_name][5], 0.5)-this->perturb[scenario_name];
+        c5=pow(this->X[scenario_name][0], 0.5)+pow(this->X[scenario_name][1], 0.5)-this->perturb[scenario_name];
 
-        mc::FFVar objective =-10000*this->probability*this->X[scenario_name][3];
+        mc::FFVar objective =-10000*this->probability*this->X[scenario_name][5];
         this->F[scenario_name]={objective,c1,c2,c3,c4,c5,nc1,nc2,nc3,nc4};
     }
 }
@@ -147,25 +147,25 @@ void Ex722Model::buildFullModelDAG(){
         mc::FFVar nc1,nc2,nc3,nc4;
 
         //.  0.09755988*x1*x5 + x1 == 1;
-        c1=0.09755988*this->X[ScenarioNames::SCENARIO1][0]*this->X[ScenarioNames::SCENARIO1][second_stage_start_idx]+this->X[ScenarioNames::SCENARIO1][0]-1;
+        c1=0.09755988*this->X[ScenarioNames::SCENARIO1][second_stage_start_idx]*this->X[ScenarioNames::SCENARIO1][0]+this->X[ScenarioNames::SCENARIO1][second_stage_start_idx]-1;
         nc1=-c1;
 
         //.  0.0965842812*x2*x6 + x2 - x1 == 0;
-        c2=0.0965842812*this->X[ScenarioNames::SCENARIO1][1]*this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1]+this->X[ScenarioNames::SCENARIO1][1]-this->X[ScenarioNames::SCENARIO1][0];
+        c2=0.0965842812*this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1]*this->X[ScenarioNames::SCENARIO1][1]+this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1]-this->X[ScenarioNames::SCENARIO1][second_stage_start_idx];
         nc2=-c2;
 
         //.  0.0391908*x3*x5 + x3 + x1 == 1;
-        c3=0.0391908*this->X[ScenarioNames::SCENARIO1][2]*this->X[ScenarioNames::SCENARIO1][second_stage_start_idx]+this->X[ScenarioNames::SCENARIO1][2]+this->X[ScenarioNames::SCENARIO1][0]-1;
+        c3=0.0391908*this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+2]*this->X[ScenarioNames::SCENARIO1][0]+this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+2]+this->X[ScenarioNames::SCENARIO1][second_stage_start_idx]-1;
         nc3=-c3;
 
         // 0.03527172*x4*x6 + x4 - x1 + x2 - x3 == 0;
-        c4=0.03527172*this->X[ScenarioNames::SCENARIO1][3]*this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1]+this->X[ScenarioNames::SCENARIO1][3]-this->X[ScenarioNames::SCENARIO1][0]+this->X[ScenarioNames::SCENARIO1][1]-this->X[ScenarioNames::SCENARIO1][2];
+        c4=0.03527172*this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3]*this->X[ScenarioNames::SCENARIO1][1]+this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3]-this->X[ScenarioNames::SCENARIO1][second_stage_start_idx]+this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1]-this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+2];
         nc4=-c4;
 
         // x5**0.5 + x6**0.5 =L= 4;
-        c5=pow(this->X[ScenarioNames::SCENARIO1][second_stage_start_idx], 0.5)+pow(this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1], 0.5)-this->perturb[this->scenario_names[s_idx]];
+        c5=pow(this->X[ScenarioNames::SCENARIO1][0], 0.5)+pow(this->X[ScenarioNames::SCENARIO1][1], 0.5)-this->perturb[this->scenario_names[s_idx]];
 
-        objective +=-10000*this->probability*this->X[ScenarioNames::SCENARIO1][3];
+        objective +=-10000*this->probability*this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3];
 
         std::vector<mc::FFVar> scenario_constraints = {c1,c2,c3,c4,nc1,nc2,nc3,nc4,c5};
         this->F[ScenarioNames::SCENARIO1].insert(this->F[ScenarioNames::SCENARIO1].end(), scenario_constraints.begin(), scenario_constraints.end());
