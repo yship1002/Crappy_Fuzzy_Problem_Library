@@ -11,15 +11,15 @@ Ex722Model::Ex722Model(BranchingStrategy branching_strategy):STModel() {
     this->probability = 0.1; // equal probability for each scenario
     this->perturb = {
         {ScenarioNames::SCENARIO1, 3}, 
-        {ScenarioNames::SCENARIO2, 4}, 
-        {ScenarioNames::SCENARIO3, 5},
-        {ScenarioNames::SCENARIO4, 6}, 
-        {ScenarioNames::SCENARIO5, 7}, 
-        {ScenarioNames::SCENARIO6, 8},
-        {ScenarioNames::SCENARIO7, 9}, 
-        {ScenarioNames::SCENARIO8, 10}, 
-        {ScenarioNames::SCENARIO9, 11},
-        {ScenarioNames::SCENARIO10, 12}
+        {ScenarioNames::SCENARIO2, 3.1}, 
+        {ScenarioNames::SCENARIO3, 3.2},
+        {ScenarioNames::SCENARIO4, 3.3}, 
+        {ScenarioNames::SCENARIO5, 3.4}, 
+        {ScenarioNames::SCENARIO6, 3.5},
+        {ScenarioNames::SCENARIO7, 3.6}, 
+        {ScenarioNames::SCENARIO8, 3.7}, 
+        {ScenarioNames::SCENARIO9, 3.8},
+        {ScenarioNames::SCENARIO10, 3.9}
         // {ScenarioNames::SCENARIO11, -1}, 
         // {ScenarioNames::SCENARIO12, -1}, 
         // {ScenarioNames::SCENARIO13, 0.2602763376071644},
