@@ -14,14 +14,14 @@ Ex722Model::Ex722Model(BranchingStrategy branching_strategy):STModel() {
     this->perturb = {
         {ScenarioNames::SCENARIO1, 4.0}, 
         {ScenarioNames::SCENARIO2, 3.0}, 
-        {ScenarioNames::SCENARIO3, 4.0},
-        {ScenarioNames::SCENARIO4, 3.0}, 
-        {ScenarioNames::SCENARIO5, 4.0}, 
-        {ScenarioNames::SCENARIO6, 3.0},
-        {ScenarioNames::SCENARIO7, 4.0}, 
-        {ScenarioNames::SCENARIO8, 3.0}, 
-        {ScenarioNames::SCENARIO9, 4.0},
-        {ScenarioNames::SCENARIO10, 3.0}
+        {ScenarioNames::SCENARIO3, 2.0},
+        {ScenarioNames::SCENARIO4, 1.0}, 
+        {ScenarioNames::SCENARIO5, 4e-1}, 
+        {ScenarioNames::SCENARIO6, 3e-1},
+        {ScenarioNames::SCENARIO7, 2e-1}, 
+        {ScenarioNames::SCENARIO8, 1e-1}, 
+        {ScenarioNames::SCENARIO9, 5},
+        {ScenarioNames::SCENARIO10, 6}
         // {ScenarioNames::SCENARIO11, 3.1}, 
         // {ScenarioNames::SCENARIO12, 3.2}, 
         // {ScenarioNames::SCENARIO13, 3.3},
