@@ -16,12 +16,12 @@ Ex722Model::Ex722Model(BranchingStrategy branching_strategy):STModel() {
         {ScenarioNames::SCENARIO2, 20.0}, 
         {ScenarioNames::SCENARIO3, 30.0},
         {ScenarioNames::SCENARIO4, 40.0}, 
-        {ScenarioNames::SCENARIO5, 5e-1}, 
-        {ScenarioNames::SCENARIO6, 6},
-        {ScenarioNames::SCENARIO7, 7e-2}, 
-        {ScenarioNames::SCENARIO8, 800}, 
-        {ScenarioNames::SCENARIO9, 9},
-        {ScenarioNames::SCENARIO10, 10}
+        {ScenarioNames::SCENARIO5, 15}, 
+        {ScenarioNames::SCENARIO6, 25},
+        {ScenarioNames::SCENARIO7, 35}, 
+        {ScenarioNames::SCENARIO8, 45}, 
+        {ScenarioNames::SCENARIO9, 50},
+        {ScenarioNames::SCENARIO10, 5}
         // {ScenarioNames::SCENARIO11, 1000}, 
         // {ScenarioNames::SCENARIO12, 3.2}, 
         // {ScenarioNames::SCENARIO13, 3.3},
