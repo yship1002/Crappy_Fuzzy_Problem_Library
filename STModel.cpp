@@ -70,7 +70,7 @@ void STModel::generateMINLP(GRBModel* grbmodel){
     grbmodel->update();
 
     for (int i = 0; i < this->F[this->scenario_name].size(); ++i) {
-        mc::FFSubgraph subgraph = this->DAG[this->scenario_name].subgraph(std::vector<mc::FFVar> {this->F[this->scenario_name][i]});
+        mc::FFSubgraph subgraph = this->DAG[this->scenario_name].subgraph(std::vector<mc::FFVar const*> {&this->F[this->scenario_name][i]});
         for (auto op : subgraph.l_op) {
             if (op->varin.size()==0) continue;
             if (op->varout[0]->id().first == mc::FFVar::CINT || op->varout[0]->id().first == mc::FFVar::CREAL || op->varout[0]->id().first == mc::FFVar::VAR) continue;
@@ -254,8 +254,8 @@ void STModel::generateLP(IloEnv* cplex_env,IloModel* cplexmodel,
 
     Env.generate_cuts(this->F[this->scenario_name].size(), PF);
     
-    std::cout<<Env;
-    std::cout<<this->DAG[this->scenario_name];
+    //std::cout<<Env;
+    //std::cout<<this->DAG[this->scenario_name];
     
     // Extract LP data from Env Don't touch below this line
     auto c = Env.Cuts();
@@ -787,7 +787,7 @@ bool STModel::eval_f(
 {
 
 
-    mc::FFSubgraph   op_f= this->DAG[this->scenario_name].subgraph(std::vector<mc::FFVar> {this->F[this->scenario_name][0]});
+    mc::FFSubgraph   op_f= this->DAG[this->scenario_name].subgraph(std::vector<mc::FFVar const*> {&this->F[this->scenario_name][0]});
     std::vector<double> dwk;
     std::vector<mc::FFVar>  Fvar;
 
@@ -806,7 +806,7 @@ bool STModel::eval_grad_f(
     std::vector<fadbad::B<double>> BXval(n);
     fadbad::B<double>   BCval;
     std::vector<fadbad::B<double>> Bwk;
-    mc::FFSubgraph   op_f= this->DAG[this->scenario_name].subgraph(std::vector<mc::FFVar> {this->F[this->scenario_name][0]});
+    mc::FFSubgraph   op_f= this->DAG[this->scenario_name].subgraph(std::vector<mc::FFVar const*> {&this->F[this->scenario_name][0]});
     for( Ipopt::Index i=0; i<n; i++ ){
           BXval[i] = x[i];
     }

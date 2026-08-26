@@ -8,7 +8,8 @@ class Ex722Model:public STModel {
         Ex722Model()=default; // default constructor
         /// A vector of ScenarioNames
         double probability;
-
+        std::map<ScenarioNames, std::array<double, 4>> perturb_coeffs;  // {a1, a2, a3, a4} per scenario
+        std::map<ScenarioNames, double> recourse_cost; 
         Ipopt::SmartPtr<STModel> clone() override;
         void buildDAG() override;
         void buildFullModelDAG() override;

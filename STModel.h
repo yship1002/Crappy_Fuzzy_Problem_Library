@@ -84,7 +84,7 @@ class STModel:public Ipopt::TNLP{
         /// A vector of ScenarioNames
         std::map<std::string, int> first_stage_map;
         std::map<std::string, int> second_stage_map;
-        std::map<ScenarioNames, mc::FFGraph> DAG;
+        std::map<ScenarioNames, mc::FFGraph<>> DAG;
         std::map<ScenarioNames, std::vector<mc::FFVar>> X;
         std::map<ScenarioNames, std::vector<mc::FFVar>> F;
         SOLUTION_OPT solution;
