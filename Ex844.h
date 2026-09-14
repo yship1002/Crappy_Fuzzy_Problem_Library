@@ -6,6 +6,19 @@ class Ex844Model:public STModel {
         Ex844Model(BranchingStrategy branching_strategy);
         Ex844Model(const Ex844Model& other)=default;
         Ex844Model()=default; // default constructor
+
+        std::map<ScenarioNames, double> perturb_a;
+        std::map<ScenarioNames, double> perturb_b;
+        std::map<ScenarioNames, double> perturb_c;
+        std::map<ScenarioNames, double> perturb_d;
+        std::map<ScenarioNames, double> perturb_e;
+        std::map<ScenarioNames, double> target_shift_x1;
+        std::map<ScenarioNames, double> target_shift_x2;
+        std::map<ScenarioNames, double> target_shift_x3;
+        std::map<ScenarioNames, double> target_shift_x4;
+        std::map<ScenarioNames, double> target_shift_x5;
+        std::map<ScenarioNames, double> prob;
+
         /// A vector of ScenarioNames
         double probability;
         Ipopt::SmartPtr<STModel> clone() override;

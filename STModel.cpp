@@ -236,15 +236,15 @@ void STModel::generateLP(IloEnv* cplex_env,IloModel* cplexmodel,
 
 
     // please delete this part above as it is preuly for testing
-    int after_nvars = Env.Vars().size();
-    std::vector<mc::Interval> var_bound(after_nvars);
-    for (auto v : Env.Vars()) {
-        int v_idx = v.second->id().second;
-        // v.second->var() is the FFVar — ask the DAG for its current interval
+    // int after_nvars = Env.Vars().size();
+    // std::vector<mc::Interval> var_bound(after_nvars);
+    // for (auto v : Env.Vars()) {
+    //     int v_idx = v.second->id().second;
+    //     // v.second->var() is the FFVar — ask the DAG for its current interval
 
-        var_bound[v_idx] = mc::Interval(v.second->range().l(), v.second->range().u());
+    //     var_bound[v_idx] = mc::Interval(v.second->range().l(), v.second->range().u());
 
-    }
+    // }
 
 
     Env.options.SANDWICH_RTOL=1e-5;
@@ -259,12 +259,12 @@ void STModel::generateLP(IloEnv* cplex_env,IloModel* cplexmodel,
     
     // Extract LP data from Env Don't touch below this line
     auto c = Env.Cuts();
-    //int after_nvars = Env.Vars().size();
-    // std::vector<mc::Interval> var_bound(after_nvars);
-    // for (auto v : Env.Vars()) { // Note: Env.Vars() ordering is not v1,v2, ... rather based on z1,z2 so we need to get indices
-    //     int v_idx=v.second->id().second;
-    //     var_bound[v_idx]=mc::Interval(v.second->range().l(),v.second->range().u());
-    // }
+    int after_nvars = Env.Vars().size();
+    std::vector<mc::Interval> var_bound(after_nvars);
+    for (auto v : Env.Vars()) { // Note: Env.Vars() ordering is not v1,v2, ... rather based on z1,z2 so we need to get indices
+        int v_idx=v.second->id().second;
+        var_bound[v_idx]=mc::Interval(v.second->range().l(),v.second->range().u());
+    }
     // Add variables to cplex in order of their IDs to match indexing
     for (int i = 0; i < after_nvars; ++i) {
         cplex_x->add(IloNumVar((*cplex_env), var_bound[i].l(), var_bound[i].u()));
