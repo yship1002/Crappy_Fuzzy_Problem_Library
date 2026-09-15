@@ -297,7 +297,7 @@ void Ex844Model::buildDAG() {
         nc12 = -c12;
 
         // -------- objective: scenario-specific targets and scenario-specific probability --------
-        mc::FFVar objective = 10000 * p_s * (
+        mc::FFVar objective = 1000*p_s * (
               pow((base_x1 + ts1) + this->X[scenario_name][12], 2)
             + pow((base_x2 + ts2) + this->X[scenario_name][13], 2)
             + pow((base_x3 + ts3) + this->X[scenario_name][14], 2)
@@ -330,9 +330,9 @@ void Ex844Model::buildFullModelDAG() {
     // per-scenario count is just its size -- dividing by scenario_names.size()
     // (as the template did) truncates to 0 under integer division and
     // breaks the model.
-    int n_second_stage_vars = this->second_stage_IX.size();
+    int n_second_stage_vars = this->second_stage_IX.size()/this->scenario_names.size();
     int n_scenarios = this->scenario_names.size();
-    int nvars = n_first_stage_vars + n_scenarios * n_second_stage_vars;
+    int nvars = n_first_stage_vars +   n_scenarios*n_second_stage_vars;
 
     this->X[ScenarioNames::SCENARIO1].resize(nvars);
 
@@ -419,7 +419,7 @@ void Ex844Model::buildFullModelDAG() {
         c12 = scale * c12;
         nc12 = -c12;
 
-        objective += 10000 * p_s * (
+        objective += 1000*p_s * (
               pow((base_x1 + ts1) + X[second_stage_start_idx], 2)
             + pow((base_x2 + ts2) + X[second_stage_start_idx + 1], 2)
             + pow((base_x3 + ts3) + X[second_stage_start_idx + 2], 2)
