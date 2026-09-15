@@ -329,7 +329,7 @@ void ProcessModel::buildFullModelDAG(){
     // scenario's second-stage variables (x1,x2,x3,x5 are shared, x4/x6/x7/x8/x9/x10
     // are per-scenario).
     int n_first_stage_vars = this->first_stage_IX.size();
-    int n_second_stage_vars = this->second_stage_IX.size(); // per-scenario count (6), NOT divided by #scenarios
+    int n_second_stage_vars = this->second_stage_IX.size()/this->scenario_names.size(); // per-scenario count (6), NOT divided by #scenarios
     int n_scenarios = this->scenario_names.size();
     int nvars = n_first_stage_vars + n_second_stage_vars * n_scenarios;
 
