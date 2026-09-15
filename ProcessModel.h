@@ -7,6 +7,7 @@ class ProcessModel:public STModel {
         ProcessModel(const ProcessModel& other)=default;
         ProcessModel()=default; // default constructor
         /// A vector of ScenarioNames
+        std::map<ScenarioNames, double> price; // per-scenario price/revenue coefficient, appears only in the objective
         double probability;
         Ipopt::SmartPtr<STModel> clone() override;
         void buildDAG() override;
