@@ -197,46 +197,280 @@
 //     return p;
 // }
 
+
+
+//  *******************second attempt********************************
+//
+// #include "ProcessModel.h"
+// ProcessModel::ProcessModel(BranchingStrategy branching_strategy):STModel() {
+
+//     this->branching_strategy = branching_strategy;
+
+//     // pm.S = {0,...,9}  ->  10 scenarios (was 20 in the old template)
+//     this->scenario_names = { ScenarioNames::SCENARIO1, ScenarioNames::SCENARIO2, ScenarioNames::SCENARIO3,
+//      ScenarioNames::SCENARIO4, ScenarioNames::SCENARIO5, ScenarioNames::SCENARIO6,
+//      ScenarioNames::SCENARIO7, ScenarioNames::SCENARIO8, ScenarioNames::SCENARIO9, ScenarioNames::SCENARIO10
+//     };
+//     this->scenario_name = ScenarioNames::SCENARIO1; //default
+//     this->probability = 0.1; // pm.prob[s] = 1/len(S) = 1/10, equal for every scenario
+
+//     // pm.perturb : balance perturbation used in e1 / e2 / e3
+//     this->perturb = {
+//         {ScenarioNames::SCENARIO1,  -18.0},
+//         {ScenarioNames::SCENARIO2,  -14.0},
+//         {ScenarioNames::SCENARIO3,  -10.0},
+//         {ScenarioNames::SCENARIO4,   -6.0},
+//         {ScenarioNames::SCENARIO5,   -2.0},
+//         {ScenarioNames::SCENARIO6,    2.0},
+//         {ScenarioNames::SCENARIO7,    6.0},
+//         {ScenarioNames::SCENARIO8,   10.0},
+//         {ScenarioNames::SCENARIO9,   14.0},
+//         {ScenarioNames::SCENARIO10,  18.0}
+//     };
+
+//     // pm.price : per-scenario price/revenue coefficient, appears only in the objective
+//     // (this is the new member added on top of the old template -- see ProcessModel.h note below)
+//     this->price = {
+//         {ScenarioNames::SCENARIO1,  0.020},
+//         {ScenarioNames::SCENARIO2,  0.030},
+//         {ScenarioNames::SCENARIO3,  0.045},
+//         {ScenarioNames::SCENARIO4,  0.055},
+//         {ScenarioNames::SCENARIO5,  0.063},
+//         {ScenarioNames::SCENARIO6,  0.075},
+//         {ScenarioNames::SCENARIO7,  0.090},
+//         {ScenarioNames::SCENARIO8,  0.105},
+//         {ScenarioNames::SCENARIO9,  0.120},
+//         {ScenarioNames::SCENARIO10, 0.140}
+//     };
+
+//     // first-stage vars: x1, x2, x3, x5 (shared across all scenarios)
+//     this->first_stage_IX = {
+//         mc::Interval(10, 2000),
+//         mc::Interval(0,16000),
+//         mc::Interval(0,120),
+//         mc::Interval(0,2000)
+//     };
+//     // second-stage vars (per scenario): x4, x6, x7, x8, x9, x10
+//     this->second_stage_IX = {
+//         mc::Interval(0, 5000),
+//         mc::Interval(85,93),
+//         mc::Interval(90,95),
+//         mc::Interval(3,12),
+//         mc::Interval(1.2,4),
+//         mc::Interval(145,162)
+//     };
+
+// };
+
+// void ProcessModel::buildDAG(){
+
+//     for (const auto& scenario_name : this->scenario_names) {
+
+//         int n_first_stage_vars = this->first_stage_IX.size();
+
+//         // Loop over each scenario to build subproblem
+
+//         const int nvars = n_first_stage_vars + this->second_stage_IX.size();
+
+//         this->X[scenario_name].resize(nvars);
+
+//         for (int i = 0; i < nvars; ++i) this->X[scenario_name][i].set(&this->DAG[scenario_name]);
+
+//         // scenario perturbation and price
+//         // NOTE: the old template read `this->perturb[this->scenario_name]` here, which
+//         // always resolves to the default member `scenario_name` (SCENARIO1) rather than
+//         // the loop variable, so every scenario silently reused scenario 1's perturbation.
+//         // Fixed below to key off the loop variable, consistent with this->X[scenario_name].
+//         double p = this->perturb[scenario_name];
+//         double price_s = this->price[scenario_name];
+
+//         // Constraints translated from the (updated) Pyomo model, indices:
+//         // X[0]=m.x1, X[1]=m.x2, X[2]=m.x3, X[3]=m.x5, X[4]=m.x4[s], X[5]=m.x6[s],
+//         // X[6]=m.x7[s], X[7]=m.x8[s], X[8]=m.x9[s], X[9]=m.x10[s]
+//         mc::FFVar c1,c2,c4,c5,c6,c7,c8;
+//         mc::FFVar nc1,nc4,nc5,nc6,nc7,nc8;
+
+//         // e1: -x1 * (-0.00667*x8^2 + 0.13167*x8 + 1.12) + x4 == perturb
+//         c1 = (-this->X[scenario_name][0] * (-0.00667 * pow(this->X[scenario_name][7],2) + 0.13167 * this->X[scenario_name][7] + 1.12) + this->X[scenario_name][4]) - p;
+//         nc1 = -c1;
+
+//         // e2: -x1 + 1.22*x4 - x5 <= perturb   (single-sided inequality only --
+//         // the Pyomo source dropped the symmetric lower-bound side that the old
+//         // template had as e2_1/e2_2, restoring a degree of freedom, so there is
+//         // no nc2/c3 counterpart here)
+//         c2 = (-this->X[scenario_name][0] + 1.22 * this->X[scenario_name][4] - this->X[scenario_name][3]) - p;
+
+//         // e3: -0.001*x4*x9*x6 == (perturb - x3)*(98 - x6)
+//         c4 = (-0.001 * this->X[scenario_name][4] * this->X[scenario_name][8] * this->X[scenario_name][5]) - (98 - this->X[scenario_name][5]) * (p - this->X[scenario_name][2]);
+//         nc4 = -c4;
+
+//         // e4: 0.038*x8^2 - 1.098*x8 - 0.325*x6 + x7 == 57.425
+//         c5 = (0.038 * pow(this->X[scenario_name][7],2) - 1.098 * this->X[scenario_name][7] - 0.325 * this->X[scenario_name][5] + this->X[scenario_name][6]) - 57.425;
+//         nc5 = -c5;
+
+//         // e5: x2 + x5 == x1*x8
+//         c6 = this->X[scenario_name][7] * this->X[scenario_name][0] - (this->X[scenario_name][1] + this->X[scenario_name][3]);
+//         nc6 = -c6;
+
+//         // e6: x9 + 0.222*x10 == 35.82
+//         c7 = (this->X[scenario_name][8] + 0.222 * this->X[scenario_name][9]) - 35.82;
+//         nc7 = -c7;
+
+//         // e7: -3*x7 + x10 == -133
+//         c8 = (-3 * this->X[scenario_name][6] + this->X[scenario_name][9]) + 133;
+//         nc8 = -c8;
+
+//         // per-scenario objective contribution:
+//         // prob[s] * (5.04*x1 + 0.035*x2 + 10*x3 + 3.36*x5 - price[s]*x4[s]*x7[s])
+//         mc::FFVar objective = this->probability * ( 5.04 * this->X[scenario_name][0] + 0.035 * this->X[scenario_name][1] + 10.0 * this->X[scenario_name][2] + 3.36 * this->X[scenario_name][3] - price_s * this->X[scenario_name][4] * this->X[scenario_name][6]);
+
+//         this->F[scenario_name] = {objective,c1,c2,c4,c5,c6,c7,c8,nc1,nc4,nc5,nc6,nc7,nc8};
+//     }
+// }
+
+// void ProcessModel::buildFullModelDAG(){
+//     // for full model solve we will stay in scenario 1's DAG, but it must hold every
+//     // scenario's second-stage variables (x1,x2,x3,x5 are shared, x4/x6/x7/x8/x9/x10
+//     // are per-scenario).
+//     int n_first_stage_vars = this->first_stage_IX.size();
+//     int n_second_stage_vars = this->second_stage_IX.size()/this->scenario_names.size(); // per-scenario count (6), NOT divided by #scenarios
+//     int n_scenarios = this->scenario_names.size();
+//     int nvars = n_first_stage_vars + n_second_stage_vars * n_scenarios;
+
+//     // NOTE: the old template computed n_second_stage_vars as
+//     // second_stage_IX.size()/scenario_names.size(), which integer-divides to 0
+//     // and, combined with resizing X to only first_stage+second_stage (10 slots
+//     // total instead of 4 + 6*n_scenarios), made every scenario alias the very
+//     // same 6 second-stage variable slots. Fixed here so each scenario gets its
+//     // own block of second-stage variables.
+//     this->X[ScenarioNames::SCENARIO1].resize(nvars);
+
+//     mc::FFVar objective=0;
+//     for (int i = 0; i < n_first_stage_vars; ++i) this->X[ScenarioNames::SCENARIO1][i].set(&this->DAG[ScenarioNames::SCENARIO1]);
+//     for (int s_idx=0; s_idx<n_scenarios; ++s_idx){
+//         int second_stage_start_idx = n_first_stage_vars + s_idx * n_second_stage_vars;
+//         for (int i = 0; i < n_second_stage_vars; ++i){
+//             this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+i].set(&this->DAG[ScenarioNames::SCENARIO1]);
+//         }
+//     }
+//     for (int s_idx=0; s_idx<n_scenarios; ++s_idx){
+//         int second_stage_start_idx = n_first_stage_vars + s_idx * n_second_stage_vars;
+
+//         double p = this->perturb[this->scenario_names[s_idx]];
+//         double price_s = this->price[this->scenario_names[s_idx]];
+
+//         // local second-stage slice within this scenario's block:
+//         // [+0]=x4[s], [+1]=x6[s], [+2]=x7[s], [+3]=x8[s], [+4]=x9[s], [+5]=x10[s]
+
+//         // e1: -x1 * (-0.00667*x8^2 + 0.13167*x8 + 1.12) + x4 == perturb
+//         this->F[ScenarioNames::SCENARIO1].push_back((-this->X[ScenarioNames::SCENARIO1][0] * (-0.00667 * pow(this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3],2) + 0.13167 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3] + 1.12) + this->X[ScenarioNames::SCENARIO1][second_stage_start_idx]) - p);
+//         this->F[ScenarioNames::SCENARIO1].push_back(-((-this->X[ScenarioNames::SCENARIO1][0] * (-0.00667 * pow(this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3],2) + 0.13167 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3] + 1.12) + this->X[ScenarioNames::SCENARIO1][second_stage_start_idx]) - p));
+
+//         // e2: -x1 + 1.22*x4 - x5 <= perturb  (single-sided only)
+//         this->F[ScenarioNames::SCENARIO1].push_back((-this->X[ScenarioNames::SCENARIO1][0] + 1.22 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx] - this->X[ScenarioNames::SCENARIO1][3]) - p);
+
+//         // e3: -0.001*x4*x9*x6 == (perturb - x3)*(98 - x6)
+//         this->F[ScenarioNames::SCENARIO1].push_back((-0.001 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx] * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+4] * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1]) - (98 - this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1]) * (p - this->X[ScenarioNames::SCENARIO1][2]));
+//         this->F[ScenarioNames::SCENARIO1].push_back(-((-0.001 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx] * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+4] * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1]) - (98 - this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1]) * (p - this->X[ScenarioNames::SCENARIO1][2])));
+
+//         // e4: 0.038*x8^2 - 1.098*x8 - 0.325*x6 + x7 == 57.425
+//         this->F[ScenarioNames::SCENARIO1].push_back((0.038 * pow(this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3],2) - 1.098 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3] - 0.325 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1] + this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+2]) - 57.425);
+//         this->F[ScenarioNames::SCENARIO1].push_back(-((0.038 * pow(this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3],2) - 1.098 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3] - 0.325 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1] + this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+2]) - 57.425));
+
+//         // e5: x2 + x5 == x1*x8
+//         this->F[ScenarioNames::SCENARIO1].push_back(this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3] * this->X[ScenarioNames::SCENARIO1][0] - (this->X[ScenarioNames::SCENARIO1][1] + this->X[ScenarioNames::SCENARIO1][3]));
+//         this->F[ScenarioNames::SCENARIO1].push_back(-(this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3] * this->X[ScenarioNames::SCENARIO1][0] - (this->X[ScenarioNames::SCENARIO1][1] + this->X[ScenarioNames::SCENARIO1][3])));
+
+//         // e6: x9 + 0.222*x10 == 35.82
+//         this->F[ScenarioNames::SCENARIO1].push_back((this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+4] + 0.222 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+5]) - 35.82);
+//         this->F[ScenarioNames::SCENARIO1].push_back(-((this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+4] + 0.222 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+5]) - 35.82));
+
+//         // e7: -3*x7 + x10 == -133
+//         this->F[ScenarioNames::SCENARIO1].push_back((-3 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+2] + this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+5]) + 133);
+//         this->F[ScenarioNames::SCENARIO1].push_back(-((-3 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+2] + this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+5]) + 133));
+
+//         objective += this->probability * ( 5.04 * this->X[ScenarioNames::SCENARIO1][0] + 0.035 * this->X[ScenarioNames::SCENARIO1][1] + 10.0 * this->X[ScenarioNames::SCENARIO1][2] + 3.36 * this->X[ScenarioNames::SCENARIO1][3] - price_s * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx] * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+2]);
+//     }
+
+//     this->F[ScenarioNames::SCENARIO1].insert(this->F[ScenarioNames::SCENARIO1].begin(), objective);
+//     this->full_model_built = true;
+// }
+// Ipopt::SmartPtr<STModel> ProcessModel::clone(){
+//     Ipopt::SmartPtr<ProcessModel> p = new ProcessModel();
+
+//     p->scenario_name=this->scenario_name;
+//     p->first_stage_IX=this->first_stage_IX;
+//     p->second_stage_IX=this->second_stage_IX;
+//     p->perturb=this->perturb;
+//     p->price=this->price;
+//     p->scenario_names=this->scenario_names;
+//     p->probability=this->probability;
+//     p->clearDAG(); // clear the DAG for the cloned model
+//     if (this->full_model_built) {
+//         p->buildFullModelDAG();
+//     } else {
+//         p->buildDAG();
+//     }
+//     return p;
+// }
+
 #include "ProcessModel.h"
+
+namespace {
+    // Market-saturation (linear inverse-demand) coefficient on alkylate yield x4.
+    // Adds +beta*x4^2 to every scenario's cost, i.e. effective revenue is
+    // price[s]*x4*x7 - beta*x4^2. This makes each scenario's optimal throughput
+    // interior and proportional to its own margin (price[s]*x7 - unit cost), so
+    // scenario optima spread out instead of all piling up on the x2/x5 capacity bounds.
+    // Kept file-local so ProcessModel.h / clone() do not need to change.
+    constexpr double kVolumeCoeff = 0.0035;
+}
+
 ProcessModel::ProcessModel(BranchingStrategy branching_strategy):STModel() {
 
     this->branching_strategy = branching_strategy;
 
-    // pm.S = {0,...,9}  ->  10 scenarios (was 20 in the old template)
     this->scenario_names = { ScenarioNames::SCENARIO1, ScenarioNames::SCENARIO2, ScenarioNames::SCENARIO3,
      ScenarioNames::SCENARIO4, ScenarioNames::SCENARIO5, ScenarioNames::SCENARIO6,
      ScenarioNames::SCENARIO7, ScenarioNames::SCENARIO8, ScenarioNames::SCENARIO9, ScenarioNames::SCENARIO10
     };
     this->scenario_name = ScenarioNames::SCENARIO1; //default
-    this->probability = 0.1; // pm.prob[s] = 1/len(S) = 1/10, equal for every scenario
+    this->probability = 0.1; // 1/10, equal for every scenario
 
-    // pm.perturb : balance perturbation used in e1 / e2 / e3
+    // Balance perturbation used in e1 / e2 / e3.
+    // Reduced from +/-18 to +/-2.7: with +/-18, the p-term in e3 forces the shared
+    // acid rate x3 to satisfy all scenarios at once, which is only possible at very
+    // high throughput (x4 ~ 2400). The recourse problem then becomes net-positive cost
+    // (objective > 0 while wait-and-see < 0), and the relative gap is no longer
+    // well defined. +/-2.7 keeps the perturbation active but not feasibility-dominating.
     this->perturb = {
-        {ScenarioNames::SCENARIO1,  -18.0},
-        {ScenarioNames::SCENARIO2,  -14.0},
-        {ScenarioNames::SCENARIO3,  -10.0},
-        {ScenarioNames::SCENARIO4,   -6.0},
-        {ScenarioNames::SCENARIO5,   -2.0},
-        {ScenarioNames::SCENARIO6,    2.0},
-        {ScenarioNames::SCENARIO7,    6.0},
-        {ScenarioNames::SCENARIO8,   10.0},
-        {ScenarioNames::SCENARIO9,   14.0},
-        {ScenarioNames::SCENARIO10,  18.0}
+        {ScenarioNames::SCENARIO1,  -2.7},
+        {ScenarioNames::SCENARIO2,  -2.1},
+        {ScenarioNames::SCENARIO3,  -1.5},
+        {ScenarioNames::SCENARIO4,  -0.9},
+        {ScenarioNames::SCENARIO5,  -0.3},
+        {ScenarioNames::SCENARIO6,   0.3},
+        {ScenarioNames::SCENARIO7,   0.9},
+        {ScenarioNames::SCENARIO8,   1.5},
+        {ScenarioNames::SCENARIO9,   2.1},
+        {ScenarioNames::SCENARIO10,  2.7}
     };
 
-    // pm.price : per-scenario price/revenue coefficient, appears only in the objective
-    // (this is the new member added on top of the old template -- see ProcessModel.h note below)
+    // Per-scenario price. Break-even is roughly 0.06: scenarios 1-5 are
+    // below/at break-even (optimal to run near minimum), scenarios 6-10 are
+    // increasingly profitable. The spread of margins is large relative to the
+    // mean margin, which is what drives the wait-and-see vs. recourse gap.
     this->price = {
         {ScenarioNames::SCENARIO1,  0.020},
         {ScenarioNames::SCENARIO2,  0.030},
-        {ScenarioNames::SCENARIO3,  0.045},
-        {ScenarioNames::SCENARIO4,  0.055},
-        {ScenarioNames::SCENARIO5,  0.063},
-        {ScenarioNames::SCENARIO6,  0.075},
-        {ScenarioNames::SCENARIO7,  0.090},
-        {ScenarioNames::SCENARIO8,  0.105},
-        {ScenarioNames::SCENARIO9,  0.120},
-        {ScenarioNames::SCENARIO10, 0.140}
+        {ScenarioNames::SCENARIO3,  0.040},
+        {ScenarioNames::SCENARIO4,  0.050},
+        {ScenarioNames::SCENARIO5,  0.060},
+        {ScenarioNames::SCENARIO6,  0.080},
+        {ScenarioNames::SCENARIO7,  0.110},
+        {ScenarioNames::SCENARIO8,  0.150},
+        {ScenarioNames::SCENARIO9,  0.200},
+        {ScenarioNames::SCENARIO10, 0.260}
     };
 
     // first-stage vars: x1, x2, x3, x5 (shared across all scenarios)
@@ -263,26 +497,16 @@ void ProcessModel::buildDAG(){
     for (const auto& scenario_name : this->scenario_names) {
 
         int n_first_stage_vars = this->first_stage_IX.size();
-
-        // Loop over each scenario to build subproblem
-
         const int nvars = n_first_stage_vars + this->second_stage_IX.size();
 
         this->X[scenario_name].resize(nvars);
-
         for (int i = 0; i < nvars; ++i) this->X[scenario_name][i].set(&this->DAG[scenario_name]);
 
-        // scenario perturbation and price
-        // NOTE: the old template read `this->perturb[this->scenario_name]` here, which
-        // always resolves to the default member `scenario_name` (SCENARIO1) rather than
-        // the loop variable, so every scenario silently reused scenario 1's perturbation.
-        // Fixed below to key off the loop variable, consistent with this->X[scenario_name].
         double p = this->perturb[scenario_name];
         double price_s = this->price[scenario_name];
 
-        // Constraints translated from the (updated) Pyomo model, indices:
-        // X[0]=m.x1, X[1]=m.x2, X[2]=m.x3, X[3]=m.x5, X[4]=m.x4[s], X[5]=m.x6[s],
-        // X[6]=m.x7[s], X[7]=m.x8[s], X[8]=m.x9[s], X[9]=m.x10[s]
+        // X[0]=x1, X[1]=x2, X[2]=x3, X[3]=x5, X[4]=x4[s], X[5]=x6[s],
+        // X[6]=x7[s], X[7]=x8[s], X[8]=x9[s], X[9]=x10[s]
         mc::FFVar c1,c2,c4,c5,c6,c7,c8;
         mc::FFVar nc1,nc4,nc5,nc6,nc7,nc8;
 
@@ -290,10 +514,7 @@ void ProcessModel::buildDAG(){
         c1 = (-this->X[scenario_name][0] * (-0.00667 * pow(this->X[scenario_name][7],2) + 0.13167 * this->X[scenario_name][7] + 1.12) + this->X[scenario_name][4]) - p;
         nc1 = -c1;
 
-        // e2: -x1 + 1.22*x4 - x5 <= perturb   (single-sided inequality only --
-        // the Pyomo source dropped the symmetric lower-bound side that the old
-        // template had as e2_1/e2_2, restoring a degree of freedom, so there is
-        // no nc2/c3 counterpart here)
+        // e2: -x1 + 1.22*x4 - x5 <= perturb   (single-sided)
         c2 = (-this->X[scenario_name][0] + 1.22 * this->X[scenario_name][4] - this->X[scenario_name][3]) - p;
 
         // e3: -0.001*x4*x9*x6 == (perturb - x3)*(98 - x6)
@@ -316,81 +537,69 @@ void ProcessModel::buildDAG(){
         c8 = (-3 * this->X[scenario_name][6] + this->X[scenario_name][9]) + 133;
         nc8 = -c8;
 
-        // per-scenario objective contribution:
-        // prob[s] * (5.04*x1 + 0.035*x2 + 10*x3 + 3.36*x5 - price[s]*x4[s]*x7[s])
-        mc::FFVar objective = this->probability * ( 5.04 * this->X[scenario_name][0] + 0.035 * this->X[scenario_name][1] + 10.0 * this->X[scenario_name][2] + 3.36 * this->X[scenario_name][3] - price_s * this->X[scenario_name][4] * this->X[scenario_name][6]);
+        // per-scenario objective:
+        // prob[s] * (5.04*x1 + 0.035*x2 + 10*x3 + 3.36*x5 - price[s]*x4*x7 + beta*x4^2)
+        mc::FFVar objective = this->probability * ( 5.04 * this->X[scenario_name][0]
+                                                  + 0.035 * this->X[scenario_name][1]
+                                                  + 10.0 * this->X[scenario_name][2]
+                                                  + 3.36 * this->X[scenario_name][3]
+                                                  - price_s * this->X[scenario_name][4] * this->X[scenario_name][6]
+                                                  + kVolumeCoeff * pow(this->X[scenario_name][4],2) );
 
         this->F[scenario_name] = {objective,c1,c2,c4,c5,c6,c7,c8,nc1,nc4,nc5,nc6,nc7,nc8};
     }
 }
 
 void ProcessModel::buildFullModelDAG(){
-    // for full model solve we will stay in scenario 1's DAG, but it must hold every
-    // scenario's second-stage variables (x1,x2,x3,x5 are shared, x4/x6/x7/x8/x9/x10
-    // are per-scenario).
+    // Full (extensive-form) model lives in scenario 1's DAG: x1,x2,x3,x5 shared,
+    // x4/x6/x7/x8/x9/x10 duplicated per scenario.
     int n_first_stage_vars = this->first_stage_IX.size();
-    int n_second_stage_vars = this->second_stage_IX.size()/this->scenario_names.size(); // per-scenario count (6), NOT divided by #scenarios
+    // BUG FIX: previous code divided by scenario_names.size() here (6/10 -> 0),
+    // so nvars == 4 and every X[second_stage_start_idx + i] below was out of bounds.
     int n_scenarios = this->scenario_names.size();
-    int nvars = n_first_stage_vars + n_second_stage_vars * n_scenarios;
+    int n_second_stage_vars = this->second_stage_IX.size()/n_scenarios;   // 6 per scenario
+    int nvars = n_first_stage_vars + n_second_stage_vars * n_scenarios;   // 4 + 6*10 = 64
 
-    // NOTE: the old template computed n_second_stage_vars as
-    // second_stage_IX.size()/scenario_names.size(), which integer-divides to 0
-    // and, combined with resizing X to only first_stage+second_stage (10 slots
-    // total instead of 4 + 6*n_scenarios), made every scenario alias the very
-    // same 6 second-stage variable slots. Fixed here so each scenario gets its
-    // own block of second-stage variables.
-    this->X[ScenarioNames::SCENARIO1].resize(nvars);
+    auto& X = this->X[ScenarioNames::SCENARIO1];
+    auto& F = this->F[ScenarioNames::SCENARIO1];
 
-    mc::FFVar objective=0;
-    for (int i = 0; i < n_first_stage_vars; ++i) this->X[ScenarioNames::SCENARIO1][i].set(&this->DAG[ScenarioNames::SCENARIO1]);
-    for (int s_idx=0; s_idx<n_scenarios; ++s_idx){
-        int second_stage_start_idx = n_first_stage_vars + s_idx * n_second_stage_vars;
-        for (int i = 0; i < n_second_stage_vars; ++i){
-            this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+i].set(&this->DAG[ScenarioNames::SCENARIO1]);
-        }
-    }
-    for (int s_idx=0; s_idx<n_scenarios; ++s_idx){
-        int second_stage_start_idx = n_first_stage_vars + s_idx * n_second_stage_vars;
+    X.resize(nvars);
+    for (int i = 0; i < nvars; ++i) X[i].set(&this->DAG[ScenarioNames::SCENARIO1]);
+
+    mc::FFVar objective = 0;
+    for (int s_idx = 0; s_idx < n_scenarios; ++s_idx){
+        const int k = n_first_stage_vars + s_idx * n_second_stage_vars;
 
         double p = this->perturb[this->scenario_names[s_idx]];
         double price_s = this->price[this->scenario_names[s_idx]];
 
-        // local second-stage slice within this scenario's block:
-        // [+0]=x4[s], [+1]=x6[s], [+2]=x7[s], [+3]=x8[s], [+4]=x9[s], [+5]=x10[s]
+        // [k+0]=x4[s], [k+1]=x6[s], [k+2]=x7[s], [k+3]=x8[s], [k+4]=x9[s], [k+5]=x10[s]
+        mc::FFVar e1 = (-X[0] * (-0.00667 * pow(X[k+3],2) + 0.13167 * X[k+3] + 1.12) + X[k]) - p;
+        mc::FFVar e2 = (-X[0] + 1.22 * X[k] - X[3]) - p;                       // <= 0, single-sided
+        mc::FFVar e3 = (-0.001 * X[k] * X[k+4] * X[k+1]) - (98 - X[k+1]) * (p - X[2]);
+        mc::FFVar e4 = (0.038 * pow(X[k+3],2) - 1.098 * X[k+3] - 0.325 * X[k+1] + X[k+2]) - 57.425;
+        mc::FFVar e5 = X[k+3] * X[0] - (X[1] + X[3]);
+        mc::FFVar e6 = (X[k+4] + 0.222 * X[k+5]) - 35.82;
+        mc::FFVar e7 = (-3 * X[k+2] + X[k+5]) + 133;
 
-        // e1: -x1 * (-0.00667*x8^2 + 0.13167*x8 + 1.12) + x4 == perturb
-        this->F[ScenarioNames::SCENARIO1].push_back((-this->X[ScenarioNames::SCENARIO1][0] * (-0.00667 * pow(this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3],2) + 0.13167 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3] + 1.12) + this->X[ScenarioNames::SCENARIO1][second_stage_start_idx]) - p);
-        this->F[ScenarioNames::SCENARIO1].push_back(-((-this->X[ScenarioNames::SCENARIO1][0] * (-0.00667 * pow(this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3],2) + 0.13167 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3] + 1.12) + this->X[ScenarioNames::SCENARIO1][second_stage_start_idx]) - p));
+        // same ordering as before: each equality as (g, -g) pair, e2 once
+        F.push_back(e1);  F.push_back(-e1);
+        F.push_back(e2);
+        F.push_back(e3);  F.push_back(-e3);
+        F.push_back(e4);  F.push_back(-e4);
+        F.push_back(e5);  F.push_back(-e5);
+        F.push_back(e6);  F.push_back(-e6);
+        F.push_back(e7);  F.push_back(-e7);
 
-        // e2: -x1 + 1.22*x4 - x5 <= perturb  (single-sided only)
-        this->F[ScenarioNames::SCENARIO1].push_back((-this->X[ScenarioNames::SCENARIO1][0] + 1.22 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx] - this->X[ScenarioNames::SCENARIO1][3]) - p);
-
-        // e3: -0.001*x4*x9*x6 == (perturb - x3)*(98 - x6)
-        this->F[ScenarioNames::SCENARIO1].push_back((-0.001 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx] * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+4] * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1]) - (98 - this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1]) * (p - this->X[ScenarioNames::SCENARIO1][2]));
-        this->F[ScenarioNames::SCENARIO1].push_back(-((-0.001 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx] * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+4] * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1]) - (98 - this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1]) * (p - this->X[ScenarioNames::SCENARIO1][2])));
-
-        // e4: 0.038*x8^2 - 1.098*x8 - 0.325*x6 + x7 == 57.425
-        this->F[ScenarioNames::SCENARIO1].push_back((0.038 * pow(this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3],2) - 1.098 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3] - 0.325 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1] + this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+2]) - 57.425);
-        this->F[ScenarioNames::SCENARIO1].push_back(-((0.038 * pow(this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3],2) - 1.098 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3] - 0.325 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1] + this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+2]) - 57.425));
-
-        // e5: x2 + x5 == x1*x8
-        this->F[ScenarioNames::SCENARIO1].push_back(this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3] * this->X[ScenarioNames::SCENARIO1][0] - (this->X[ScenarioNames::SCENARIO1][1] + this->X[ScenarioNames::SCENARIO1][3]));
-        this->F[ScenarioNames::SCENARIO1].push_back(-(this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+3] * this->X[ScenarioNames::SCENARIO1][0] - (this->X[ScenarioNames::SCENARIO1][1] + this->X[ScenarioNames::SCENARIO1][3])));
-
-        // e6: x9 + 0.222*x10 == 35.82
-        this->F[ScenarioNames::SCENARIO1].push_back((this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+4] + 0.222 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+5]) - 35.82);
-        this->F[ScenarioNames::SCENARIO1].push_back(-((this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+4] + 0.222 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+5]) - 35.82));
-
-        // e7: -3*x7 + x10 == -133
-        this->F[ScenarioNames::SCENARIO1].push_back((-3 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+2] + this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+5]) + 133);
-        this->F[ScenarioNames::SCENARIO1].push_back(-((-3 * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+2] + this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+5]) + 133));
-
-        objective += this->probability * ( 5.04 * this->X[ScenarioNames::SCENARIO1][0] + 0.035 * this->X[ScenarioNames::SCENARIO1][1] + 10.0 * this->X[ScenarioNames::SCENARIO1][2] + 3.36 * this->X[ScenarioNames::SCENARIO1][3] - price_s * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx] * this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+2]);
+        objective += this->probability * ( 5.04 * X[0] + 0.035 * X[1] + 10.0 * X[2] + 3.36 * X[3]
+                                         - price_s * X[k] * X[k+2]
+                                         + kVolumeCoeff * pow(X[k],2) );
     }
 
-    this->F[ScenarioNames::SCENARIO1].insert(this->F[ScenarioNames::SCENARIO1].begin(), objective);
+    F.insert(F.begin(), objective);
     this->full_model_built = true;
 }
+
 Ipopt::SmartPtr<STModel> ProcessModel::clone(){
     Ipopt::SmartPtr<ProcessModel> p = new ProcessModel();
 
@@ -401,7 +610,7 @@ Ipopt::SmartPtr<STModel> ProcessModel::clone(){
     p->price=this->price;
     p->scenario_names=this->scenario_names;
     p->probability=this->probability;
-    p->clearDAG(); // clear the DAG for the cloned model
+    p->clearDAG();
     if (this->full_model_built) {
         p->buildFullModelDAG();
     } else {
