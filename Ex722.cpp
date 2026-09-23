@@ -328,7 +328,7 @@ void Ex722Model::buildFullModelDAG(){
     // that previously gave n_second_stage_vars = 2/5 = 0 (integer
     // division), which undersized the allocation and made every
     // scenario silently alias the same two "second stage" slots.
-    int n_second_stage_vars = this->second_stage_IX.size(); // per-scenario count (2: x4, x5)
+    int n_second_stage_vars = this->second_stage_IX.size()/this->scenario_names.size(); // per-scenario count (2: x4, x5)
     int nvars = n_first_stage_vars + n_second_stage_vars * this->scenario_names.size(); // 4 + 2*5 = 14
 
     this->X[ScenarioNames::SCENARIO1].resize(nvars);
