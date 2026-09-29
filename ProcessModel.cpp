@@ -432,10 +432,15 @@ ProcessModel::ProcessModel(BranchingStrategy branching_strategy):STModel() {
 
     this->scenario_names = { ScenarioNames::SCENARIO1, ScenarioNames::SCENARIO2, ScenarioNames::SCENARIO3,
      ScenarioNames::SCENARIO4, ScenarioNames::SCENARIO5, ScenarioNames::SCENARIO6,
-     ScenarioNames::SCENARIO7, ScenarioNames::SCENARIO8, ScenarioNames::SCENARIO9, ScenarioNames::SCENARIO10
+     ScenarioNames::SCENARIO7, ScenarioNames::SCENARIO8, ScenarioNames::SCENARIO9, ScenarioNames::SCENARIO10,
+     // Added scenarios 11-20: deliberately outside the original perturb/price envelope
+     // (see below) so their recourse optima do not just interpolate scenarios 1-10.
+     ScenarioNames::SCENARIO11, ScenarioNames::SCENARIO12, ScenarioNames::SCENARIO13,
+     ScenarioNames::SCENARIO14, ScenarioNames::SCENARIO15, ScenarioNames::SCENARIO16,
+     ScenarioNames::SCENARIO17, ScenarioNames::SCENARIO18, ScenarioNames::SCENARIO19, ScenarioNames::SCENARIO20
     };
     this->scenario_name = ScenarioNames::SCENARIO1; //default
-    this->probability = 0.1; // 1/10, equal for every scenario
+    this->probability = 1.0/20.0; // equal probability across all 20 scenarios
 
     // Balance perturbation used in e1 / e2 / e3.
     // Reduced from +/-18 to +/-2.7: with +/-18, the p-term in e3 forces the shared
@@ -453,7 +458,21 @@ ProcessModel::ProcessModel(BranchingStrategy branching_strategy):STModel() {
         {ScenarioNames::SCENARIO7,   0.9},
         {ScenarioNames::SCENARIO8,   1.5},
         {ScenarioNames::SCENARIO9,   2.1},
-        {ScenarioNames::SCENARIO10,  2.7}
+        {ScenarioNames::SCENARIO10,  2.7},
+        // Scenarios 11-20: wider perturb magnitude (up to +/-4.5, vs +/-2.7 originally)
+        // crossed against price in the opposite direction from the scenario 1-10 pattern
+        // (high perturb paired with low price, and vice versa) so the resulting recourse
+        // decisions are qualitatively different, not a linear extension of 1-10.
+        {ScenarioNames::SCENARIO11, -4.5},
+        {ScenarioNames::SCENARIO12, -3.9},
+        {ScenarioNames::SCENARIO13, -3.3},
+        {ScenarioNames::SCENARIO14,  3.3},
+        {ScenarioNames::SCENARIO15,  3.9},
+        {ScenarioNames::SCENARIO16,  4.5},
+        {ScenarioNames::SCENARIO17, -4.2},
+        {ScenarioNames::SCENARIO18,  4.2},
+        {ScenarioNames::SCENARIO19, -3.6},
+        {ScenarioNames::SCENARIO20,  3.6}
     };
 
     // Per-scenario price. Break-even is roughly 0.06: scenarios 1-5 are
@@ -470,7 +489,19 @@ ProcessModel::ProcessModel(BranchingStrategy branching_strategy):STModel() {
         {ScenarioNames::SCENARIO7,  0.110},
         {ScenarioNames::SCENARIO8,  0.150},
         {ScenarioNames::SCENARIO9,  0.200},
-        {ScenarioNames::SCENARIO10, 0.260}
+        {ScenarioNames::SCENARIO10, 0.260},
+        // Scenarios 11-20: price extremes below and above the 0.02-0.26 range used by
+        // 1-10, crossed against the perturb sign above (see comment there).
+        {ScenarioNames::SCENARIO11, 0.005},
+        {ScenarioNames::SCENARIO12, 0.010},
+        {ScenarioNames::SCENARIO13, 0.320},
+        {ScenarioNames::SCENARIO14, 0.007},
+        {ScenarioNames::SCENARIO15, 0.340},
+        {ScenarioNames::SCENARIO16, 0.360},
+        {ScenarioNames::SCENARIO17, 0.380},
+        {ScenarioNames::SCENARIO18, 0.015},
+        {ScenarioNames::SCENARIO19, 0.400},
+        {ScenarioNames::SCENARIO20, 0.009}
     };
 
     // first-stage vars: x1, x2, x3, x5 (shared across all scenarios)
