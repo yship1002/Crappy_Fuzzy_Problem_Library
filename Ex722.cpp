@@ -206,45 +206,97 @@ Ex722Model::Ex722Model(BranchingStrategy branching_strategy):STModel() {
     this->scenario_name = ScenarioNames::SCENARIO1; //default
     this->probability = 0.2; // equal probability for each scenario
 
-    // feed-type driver -> e5's bound directly, same values as before
-    this->perturb = {
-        {ScenarioNames::SCENARIO1, 10.0},
-        {ScenarioNames::SCENARIO2, 20.0},
-        {ScenarioNames::SCENARIO3, 30.0},
-        {ScenarioNames::SCENARIO4, 40.0},
-        {ScenarioNames::SCENARIO5, 15}
-    };
+    // ===== ORIGINAL Ex722 scenarios (near-identical; UBD ~ -378487.78) =====
+    // To REVERT: uncomment this block and comment out the NEW block below.
+    // // feed-type driver -> e5's bound directly, same values as before
+    // this->perturb = {
+    //     {ScenarioNames::SCENARIO1, 10.0},
+    //     {ScenarioNames::SCENARIO2, 20.0},
+    //     {ScenarioNames::SCENARIO3, 30.0},
+    //     {ScenarioNames::SCENARIO4, 40.0},
+    //     {ScenarioNames::SCENARIO5, 15}
+    // };
+    //
+    // // ------------------------------------------------------------------
+    // // Scenario data matching the Python const_model(): explicit lists,
+    // // one value per scenario, for the underlying uncertain quantities.
+    // // temp_factor scales the bilinear coupling coefficients (a1-a4);
+    // // price_shock scales the second-stage recourse cost. Every
+    // // scenario-dependent coefficient below is derived from these lists,
+    // // in the same order as this->scenario_names.
+    // // ------------------------------------------------------------------
+    // std::vector<double> temp_factor = {
+    //     0.85, 0.90, 0.95, 1.00, 1.05
+    // };
+    // std::vector<double> price_shock = {
+    //     1.00, 1.05, 0.95, 1.10, 0.90
+    // };
+    //
+    // for (size_t i = 0; i < this->scenario_names.size(); ++i) {
+    //     ScenarioNames sn = this->scenario_names[i];
+    //     double tf = temp_factor[i];
+    //
+    //     // {a1, a2, a3, a4} for this scenario, matching Python's
+    //     // a1_vals/a2_vals/a3_vals/a4_vals
+    //     this->perturb_coeffs[sn] = {
+    //         0.09755988 * tf,             // a1
+    //         0.0965842812 * std::sqrt(tf),// a2
+    //         0.0391908 * tf,              // a3
+    //         0.03527172 * std::sqrt(tf)   // a4
+    //     };
+    //
+    //     this->recourse_cost[sn] = 1000.0 * price_shock[i];
+    // }
 
+    // ===== NEW diverse 5-scenario problem (UBD -92551.4) =====
+    // BEGIN NEW BLOCK
     // ------------------------------------------------------------------
-    // Scenario data matching the Python const_model(): explicit lists,
-    // one value per scenario, for the underlying uncertain quantities.
-    // temp_factor scales the bilinear coupling coefficients (a1-a4);
-    // price_shock scales the second-stage recourse cost. Every
-    // scenario-dependent coefficient below is derived from these lists,
-    // in the same order as this->scenario_names.
+    // Five deliberately DIFFERENT scenarios (were near-copies before).
+    //
+    // Structure: the equalities e1-e4 only keep a common first-stage
+    // manifold across scenarios if the ratios a3/a1 and a4/a2 are the
+    // same in every scenario (otherwise no x0..x3 is feasible for all
+    // scenarios). So each scenario scales the pair (a1,a3) by k1 and
+    // the pair (a2,a4) by k2 over orders of magnitude; this moves the
+    // recourse values x4 = (1-x0)/(a1*x1), x5 = (x0-x1)/(a2*x2) and
+    // hence the e5 (sqrt budget) / x4,x5-bound cuts on the first stage.
+    // perturb[s] is the e5 budget and recourse_cost[s] the recourse price.
+    //
+    //   scen  k1    k2    budget  recourse   character
+    //   S1    3.5   0.4   12.5    45000      costly recourse, mid x3
+    //   S2    0.4   5.0   5.5     40000      tight budget + costly: wants x3~0.1
+    //   S3    0.8   0.4   15.5    25         cheap recourse: wants x3 max (~0.40)
+    //   S4    1.0   15.0  9.0     100        cheap, x5 tiny: wants x3 max
+    //   S5    0.8   2.5   7.5     60000      costly recourse: wants x3~0.1
+    //
+    // Individually the scenarios prefer clearly different first-stage
+    // points (S3,S4: x3~0.40; S1: x3~0.33; S2,S5: x3~0.10) and their
+    // feasible first-stage sets cover 0.3%-3.5% of the grid, yet the
+    // intersection is non-empty (checked numerically).
     // ------------------------------------------------------------------
-    std::vector<double> temp_factor = {
-        0.85, 0.90, 0.95, 1.00, 1.05
+    this->perturb = {
+        {ScenarioNames::SCENARIO1, 12.5},
+        {ScenarioNames::SCENARIO2, 5.5},
+        {ScenarioNames::SCENARIO3, 15.5},
+        {ScenarioNames::SCENARIO4, 9.0},
+        {ScenarioNames::SCENARIO5, 7.5}
     };
-    std::vector<double> price_shock = {
-        1.00, 1.05, 0.95, 1.10, 0.90
-    };
+    std::vector<double> k1 = {3.5, 0.4, 0.8, 1.0, 0.8};   // scales a1,a3
+    std::vector<double> k2 = {0.4, 5.0, 0.4, 15.0, 2.5};  // scales a2,a4
+    std::vector<double> rcs = {45000.0, 40000.0, 25.0, 100.0, 60000.0};
 
     for (size_t i = 0; i < this->scenario_names.size(); ++i) {
         ScenarioNames sn = this->scenario_names[i];
-        double tf = temp_factor[i];
-
-        // {a1, a2, a3, a4} for this scenario, matching Python's
-        // a1_vals/a2_vals/a3_vals/a4_vals
+        // {a1, a2, a3, a4}; base values from the Python const_model()
         this->perturb_coeffs[sn] = {
-            0.09755988 * tf,             // a1
-            0.0965842812 * std::sqrt(tf),// a2
-            0.0391908 * tf,              // a3
-            0.03527172 * std::sqrt(tf)   // a4
+            0.09755988 * k1[i],     // a1
+            0.0965842812 * k2[i],   // a2
+            0.0391908 * k1[i],      // a3 (a3/a1 fixed)
+            0.03527172 * k2[i]      // a4 (a4/a2 fixed)
         };
-
-        this->recourse_cost[sn] = 1000.0 * price_shock[i];
+        this->recourse_cost[sn] = rcs[i];
     }
+    // END NEW BLOCK
 
     // NOTE: roles now match the Python const_model() (4 first-stage
     // variables x0-x3, bounds [0,1], shared across scenarios / no
