@@ -752,7 +752,9 @@ void CrudeModel::buildDAG() {
     constexpr int B107= 80;  // g_1_107 AGO coeffs (20 entries)
     constexpr int BOBJ=100;  // objective Desulph_1 (10 entries)
 
-    for (auto& scenario_name : this->scenario_names) {
+    // Only build the scenario currently being asked for (this->scenario_name)
+    {
+        const ScenarioNames scenario_name = this->scenario_name;
         int n_first_stage_vars = this->first_stage_IX.size();
 
         // Loop over each scenario to build subproblem

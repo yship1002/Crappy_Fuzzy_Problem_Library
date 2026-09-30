@@ -667,7 +667,9 @@ void Ex844Model::buildDAG() {
     const int n1 = this->first_stage_IX.size();                 // 3
     const int nvars = n1 + this->second_stage_IX.size();        // 5
 
-    for (auto& scenario_name : this->scenario_names) {
+    // Only build the scenario currently being asked for (this->scenario_name)
+    {
+        const ScenarioNames scenario_name = this->scenario_name;
 
         this->X[scenario_name].resize(nvars);
         for (int i = 0; i < nvars; ++i) this->X[scenario_name][i].set(&this->DAG[scenario_name]);

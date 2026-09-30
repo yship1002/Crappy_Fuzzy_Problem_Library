@@ -82,7 +82,9 @@ void CHPModel::buildDAG() {
     const double c_part = -Qdot_rel_min * Qdot_eps;        // -0.00115
     const double T_OP_coeff = 1e-6 * 6000.0;               // 1e-6 * T_OP
 
-    for (auto& sn : this->scenario_names) {
+    // Only build the scenario currently being asked for (this->scenario_name)
+    {
+        const ScenarioNames sn = this->scenario_name;
         this->X[sn].resize(nvars);
         for (int i = 0; i < nvars; ++i)
             this->X[sn][i].set(&this->DAG[sn]);

@@ -268,7 +268,9 @@ Ex722Model::Ex722Model(BranchingStrategy branching_strategy):STModel() {
 
 };
 void Ex722Model::buildDAG() {
-    for (auto& scenario_name : this->scenario_names) {
+    // Only build the scenario currently being asked for (this->scenario_name)
+    {
+        const ScenarioNames scenario_name = this->scenario_name;
         int n_first_stage_vars = this->first_stage_IX.size();
 
         // Loop over each scenario to build subproblem

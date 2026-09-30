@@ -135,8 +135,10 @@ void NFUnit::buildDAG() {
     const double molWFeed   = feedFlow * (densityH2OGm3 - feedConcLi * molweightLi
                                           - feedConcCo * molweightCo) / molweightH2OgMol;
 
-    for (size_t scenarioIndex = 0; scenarioIndex < this->scenario_names.size(); ++scenarioIndex) {
-        auto scenarioName = this->scenario_names[scenarioIndex];
+    // Only build the scenario currently being asked for (this->scenario_name)
+    {
+        const size_t scenarioIndex = std::find(this->scenario_names.begin(), this->scenario_names.end(), this->scenario_name) - this->scenario_names.begin();
+        auto scenarioName = this->scenario_name;
         const int firstStageCount  = static_cast<int>(this->first_stage_IX.size());
         const int secondStageCount = static_cast<int>(this->second_stage_IX.size());
         const int nvars = firstStageCount + secondStageCount;
