@@ -520,7 +520,9 @@ Ex844Model::Ex844Model(BranchingStrategy branching_strategy):STModel() {
         ScenarioNames::SCENARIO1,  ScenarioNames::SCENARIO2,  ScenarioNames::SCENARIO3,
         ScenarioNames::SCENARIO4,  ScenarioNames::SCENARIO5,  ScenarioNames::SCENARIO6,
         ScenarioNames::SCENARIO7,  ScenarioNames::SCENARIO8,  ScenarioNames::SCENARIO9,
-        ScenarioNames::SCENARIO10
+        ScenarioNames::SCENARIO10,
+        ScenarioNames::SCENARIO11, ScenarioNames::SCENARIO12, ScenarioNames::SCENARIO13, ScenarioNames::SCENARIO14, ScenarioNames::SCENARIO15,
+        ScenarioNames::SCENARIO16, ScenarioNames::SCENARIO17, ScenarioNames::SCENARIO18, ScenarioNames::SCENARIO19, ScenarioNames::SCENARIO20
     };
     this->scenario_name = ScenarioNames::SCENARIO1;
 
@@ -535,7 +537,17 @@ Ex844Model::Ex844Model(BranchingStrategy branching_strategy):STModel() {
         {ScenarioNames::SCENARIO7,  0.12796293092061584},
         {ScenarioNames::SCENARIO8,  0.27539587318079806},
         {ScenarioNames::SCENARIO9,  0.052349989758507444},
-        {ScenarioNames::SCENARIO10, 0.5220869085453218}
+        {ScenarioNames::SCENARIO10, 0.5220869085453218},
+        {ScenarioNames::SCENARIO11, 0.75},
+        {ScenarioNames::SCENARIO12, -0.8},
+        {ScenarioNames::SCENARIO13, 0.68},
+        {ScenarioNames::SCENARIO14, -0.7},
+        {ScenarioNames::SCENARIO15, 0.85},
+        {ScenarioNames::SCENARIO16, -0.9},
+        {ScenarioNames::SCENARIO17, 0.05},
+        {ScenarioNames::SCENARIO18, 0.2},
+        {ScenarioNames::SCENARIO19, -0.75},
+        {ScenarioNames::SCENARIO20, 0.7}
     };
     this->perturb_b = {
         {ScenarioNames::SCENARIO1,  0.3790242649458386},
@@ -547,7 +559,17 @@ Ex844Model::Ex844Model(BranchingStrategy branching_strategy):STModel() {
         {ScenarioNames::SCENARIO7,  0.4358147068198639},
         {ScenarioNames::SCENARIO8,  0.049753464298910054},
         {ScenarioNames::SCENARIO9, -0.24034573135513826},
-        {ScenarioNames::SCENARIO10,-0.09277533456280986}
+        {ScenarioNames::SCENARIO10,-0.09277533456280986},
+        {ScenarioNames::SCENARIO11, -0.7},
+        {ScenarioNames::SCENARIO12, 0.65},
+        {ScenarioNames::SCENARIO13, 0.72},
+        {ScenarioNames::SCENARIO14, -0.78},
+        {ScenarioNames::SCENARIO15, 0.1},
+        {ScenarioNames::SCENARIO16, -0.15},
+        {ScenarioNames::SCENARIO17, 0.85},
+        {ScenarioNames::SCENARIO18, -0.85},
+        {ScenarioNames::SCENARIO19, 0.3},
+        {ScenarioNames::SCENARIO20, -0.55}
     };
 
     // Objective target shifts (same numbers as before, only two are used now)
@@ -561,7 +583,17 @@ Ex844Model::Ex844Model(BranchingStrategy branching_strategy):STModel() {
         {ScenarioNames::SCENARIO7,  0.21327155153435973},
         {ScenarioNames::SCENARIO8,  0.4589931219679968},
         {ScenarioNames::SCENARIO9,  0.08724998293084574},
-        {ScenarioNames::SCENARIO10, 0.8701448475755365}
+        {ScenarioNames::SCENARIO10, 0.8701448475755365},
+        {ScenarioNames::SCENARIO11, 1.25},
+        {ScenarioNames::SCENARIO12, -1.333333},
+        {ScenarioNames::SCENARIO13, 1.133333},
+        {ScenarioNames::SCENARIO14, -1.166667},
+        {ScenarioNames::SCENARIO15, 1.416667},
+        {ScenarioNames::SCENARIO16, -1.5},
+        {ScenarioNames::SCENARIO17, 0.083333},
+        {ScenarioNames::SCENARIO18, 0.333333},
+        {ScenarioNames::SCENARIO19, -1.25},
+        {ScenarioNames::SCENARIO20, 1.166667}
     };
     this->target_shift_x2 = {
         {ScenarioNames::SCENARIO1,  0.6317071082430643},
@@ -573,7 +605,17 @@ Ex844Model::Ex844Model(BranchingStrategy branching_strategy):STModel() {
         {ScenarioNames::SCENARIO7,  0.7263578446997732},
         {ScenarioNames::SCENARIO8,  0.08292244049818343},
         {ScenarioNames::SCENARIO9, -0.40057621892523043},
-        {ScenarioNames::SCENARIO10,-0.1546255576046831}
+        {ScenarioNames::SCENARIO10,-0.1546255576046831},
+        {ScenarioNames::SCENARIO11, -1.166667},
+        {ScenarioNames::SCENARIO12, 1.083333},
+        {ScenarioNames::SCENARIO13, 1.2},
+        {ScenarioNames::SCENARIO14, -1.3},
+        {ScenarioNames::SCENARIO15, 0.166667},
+        {ScenarioNames::SCENARIO16, -0.25},
+        {ScenarioNames::SCENARIO17, 1.416667},
+        {ScenarioNames::SCENARIO18, -1.416667},
+        {ScenarioNames::SCENARIO19, 0.5},
+        {ScenarioNames::SCENARIO20, -0.916667}
     };
 
     // Scenario probabilities (sum to 1)
@@ -587,8 +629,25 @@ Ex844Model::Ex844Model(BranchingStrategy branching_strategy):STModel() {
         {ScenarioNames::SCENARIO7,  0.10586093},
         {ScenarioNames::SCENARIO8,  0.14440115},
         {ScenarioNames::SCENARIO9,  0.08138826},
-        {ScenarioNames::SCENARIO10, 0.06149118}
+        {ScenarioNames::SCENARIO10, 0.06149118},
+        {ScenarioNames::SCENARIO11, 0.12},
+        {ScenarioNames::SCENARIO12, 0.08},
+        {ScenarioNames::SCENARIO13, 0.1},
+        {ScenarioNames::SCENARIO14, 0.11},
+        {ScenarioNames::SCENARIO15, 0.09},
+        {ScenarioNames::SCENARIO16, 0.07},
+        {ScenarioNames::SCENARIO17, 0.13},
+        {ScenarioNames::SCENARIO18, 0.1},
+        {ScenarioNames::SCENARIO19, 0.11},
+        {ScenarioNames::SCENARIO20, 0.09}
     };
+
+    // 10 -> 20 scenarios: renormalise so the (old + new) probabilities sum to 1
+    {
+        double total = 0.0;
+        for (auto& kv : this->prob) total += kv.second;
+        for (auto& kv : this->prob) kv.second /= total;
+    }
 
     this->first_stage_IX = {
         mc::Interval(0, 2),   // z1
@@ -642,9 +701,9 @@ void Ex844Model::buildDAG() {
 void Ex844Model::buildFullModelDAG() {
 
     const int n1 = this->first_stage_IX.size();                 // 3
-    const int nS = this->scenario_names.size();                 // 10
+    const int nS = this->scenario_names.size();                 // 20
     const int n2 = this->second_stage_IX.size()/nS;                // 2 per scenario
-    const int nvars = n1 + nS * n2;                             // 23
+    const int nvars = n1 + nS * n2;                             // 43
 
     auto& X = this->X[ScenarioNames::SCENARIO1];
     X.resize(nvars);
