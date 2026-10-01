@@ -298,6 +298,42 @@ Ex722Model::Ex722Model(BranchingStrategy branching_strategy):STModel() {
     }
     // END NEW BLOCK
 
+    // ===== SCALE-UP BEGIN (N=5 -> 20): comment out this block to revert =====
+    // 15 extra scenarios, all OUTSIDE/cross-paired against the original 5
+    // (original envelope: k1 [0.4,3.5], k2 [0.4,15], budget [5.5,15.5],
+    // recourse [25,60000]; original pattern: costly recourse <-> tight
+    // budget, cheap <-> loose). New ones use k1 [0.15,5], k2 [0.15,20],
+    // budget [4.5,20], recourse [3,95000], and include costly+loose and
+    // cheap+tight pairings. a3/a1 and a4/a2 ratios stay fixed (see above).
+    {
+        const ScenarioNames new_names[15] = {
+            ScenarioNames::SCENARIO6,  ScenarioNames::SCENARIO7,  ScenarioNames::SCENARIO8,
+            ScenarioNames::SCENARIO9,  ScenarioNames::SCENARIO10, ScenarioNames::SCENARIO11,
+            ScenarioNames::SCENARIO12, ScenarioNames::SCENARIO13, ScenarioNames::SCENARIO14,
+            ScenarioNames::SCENARIO15, ScenarioNames::SCENARIO16, ScenarioNames::SCENARIO17,
+            ScenarioNames::SCENARIO18, ScenarioNames::SCENARIO19, ScenarioNames::SCENARIO20};
+        const double new_k1[15]  = {5.0, 0.15, 2.0, 0.2, 4.0, 0.3, 1.5, 2.5, 0.15, 2.5, 0.6, 3.0, 1.2, 0.25, 4.5};
+        const double new_k2[15]  = {0.15, 20.0, 8.0, 0.2, 20.0, 1.0, 0.15, 0.3, 3.0, 0.6, 12.0, 0.5, 0.3, 18.0, 1.5};
+        const double new_bud[15] = {18.0, 4.8, 20.0, 6.0, 12.0, 17.0, 5.0, 8.0, 19.0, 4.5, 14.0, 6.5, 11.0, 10.0, 16.0};
+        const double new_rcs[15] = {80000.0, 10.0, 70000.0, 5.0, 90000.0, 30000.0, 8.0, 50.0, 85000.0, 15.0, 75000.0, 12.0, 95000.0, 3.0, 40000.0};
+        for (int j = 0; j < 15; ++j) {
+            ScenarioNames sn = new_names[j];
+            this->scenario_names.push_back(sn);
+            this->perturb[sn] = new_bud[j];
+            this->perturb_coeffs[sn] = {
+                0.09755988 * new_k1[j],
+                0.0965842812 * new_k2[j],
+                0.0391908 * new_k1[j],
+                0.03527172 * new_k2[j]
+            };
+            this->recourse_cost[sn] = new_rcs[j];
+        }
+    }
+    // ===== SCALE-UP END =====
+    // Equal weights; with the block above commented out this is 0.2 again.
+    // (original literal: this->probability = 0.2;)
+    this->probability = 1.0 / this->scenario_names.size();
+
     // NOTE: roles now match the Python const_model() (4 first-stage
     // variables x0-x3, bounds [0,1], shared across scenarios / no
     // scenario subscript; 2 second-stage variables x4,x5 per scenario,
