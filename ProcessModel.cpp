@@ -439,8 +439,18 @@ ProcessModel::ProcessModel(BranchingStrategy branching_strategy):STModel() {
      ScenarioNames::SCENARIO14, ScenarioNames::SCENARIO15, ScenarioNames::SCENARIO16,
      ScenarioNames::SCENARIO17, ScenarioNames::SCENARIO18, ScenarioNames::SCENARIO19, ScenarioNames::SCENARIO20
     };
+    // ===== SCALE-UP BEGIN (N=20 -> 40): comment out this block to revert to the 20-scenario problem =====
+    for (auto s : { ScenarioNames::SCENARIO21, ScenarioNames::SCENARIO22, ScenarioNames::SCENARIO23,
+         ScenarioNames::SCENARIO24, ScenarioNames::SCENARIO25, ScenarioNames::SCENARIO26,
+         ScenarioNames::SCENARIO27, ScenarioNames::SCENARIO28, ScenarioNames::SCENARIO29, ScenarioNames::SCENARIO30,
+         ScenarioNames::SCENARIO31, ScenarioNames::SCENARIO32, ScenarioNames::SCENARIO33,
+         ScenarioNames::SCENARIO34, ScenarioNames::SCENARIO35, ScenarioNames::SCENARIO36,
+         ScenarioNames::SCENARIO37, ScenarioNames::SCENARIO38, ScenarioNames::SCENARIO39, ScenarioNames::SCENARIO40 })
+        this->scenario_names.push_back(s);
+    // ===== SCALE-UP END =====
     this->scenario_name = ScenarioNames::SCENARIO1; //default
-    this->probability = 1.0/20.0; // equal probability across all 20 scenarios
+    // equal probability across all scenarios (was literal 1.0/20.0 for the 20-scenario version)
+    this->probability = 1.0 / this->scenario_names.size();
 
     // Balance perturbation used in e1 / e2 / e3.
     // Reduced from +/-18 to +/-2.7: with +/-18, the p-term in e3 forces the shared
@@ -475,6 +485,29 @@ ProcessModel::ProcessModel(BranchingStrategy branching_strategy):STModel() {
         {ScenarioNames::SCENARIO20,  3.6}
     };
 
+    // ===== SCALE-UP BEGIN (N=20 -> 40): comment out this block to revert =====
+    this->perturb[ScenarioNames::SCENARIO21] = -5.4;
+    this->perturb[ScenarioNames::SCENARIO22] = 5.4;
+    this->perturb[ScenarioNames::SCENARIO23] = -5.1;
+    this->perturb[ScenarioNames::SCENARIO24] = 5.1;
+    this->perturb[ScenarioNames::SCENARIO25] = -4.8;
+    this->perturb[ScenarioNames::SCENARIO26] = 4.8;
+    this->perturb[ScenarioNames::SCENARIO27] = -2.4;
+    this->perturb[ScenarioNames::SCENARIO28] = 2.4;
+    this->perturb[ScenarioNames::SCENARIO29] = -1.2;
+    this->perturb[ScenarioNames::SCENARIO30] = 1.2;
+    this->perturb[ScenarioNames::SCENARIO31] = -0.6;
+    this->perturb[ScenarioNames::SCENARIO32] = 0.6;
+    this->perturb[ScenarioNames::SCENARIO33] = -5.7;
+    this->perturb[ScenarioNames::SCENARIO34] = 5.7;
+    this->perturb[ScenarioNames::SCENARIO35] = -3.0;
+    this->perturb[ScenarioNames::SCENARIO36] = 3.0;
+    this->perturb[ScenarioNames::SCENARIO37] = -0.1;
+    this->perturb[ScenarioNames::SCENARIO38] = 0.1;
+    this->perturb[ScenarioNames::SCENARIO39] = -4.0;
+    this->perturb[ScenarioNames::SCENARIO40] = 4.0;
+    // ===== SCALE-UP END =====
+
     // Per-scenario price. Break-even is roughly 0.06: scenarios 1-5 are
     // below/at break-even (optimal to run near minimum), scenarios 6-10 are
     // increasingly profitable. The spread of margins is large relative to the
@@ -503,6 +536,29 @@ ProcessModel::ProcessModel(BranchingStrategy branching_strategy):STModel() {
         {ScenarioNames::SCENARIO19, 0.400},
         {ScenarioNames::SCENARIO20, 0.009}
     };
+
+    // ===== SCALE-UP BEGIN (N=20 -> 40): comment out this block to revert =====
+    this->price[ScenarioNames::SCENARIO21] = 0.450;
+    this->price[ScenarioNames::SCENARIO22] = 0.003;
+    this->price[ScenarioNames::SCENARIO23] = 0.002;
+    this->price[ScenarioNames::SCENARIO24] = 0.420;
+    this->price[ScenarioNames::SCENARIO25] = 0.300;
+    this->price[ScenarioNames::SCENARIO26] = 0.012;
+    this->price[ScenarioNames::SCENARIO27] = 0.350;
+    this->price[ScenarioNames::SCENARIO28] = 0.004;
+    this->price[ScenarioNames::SCENARIO29] = 0.440;
+    this->price[ScenarioNames::SCENARIO30] = 0.006;
+    this->price[ScenarioNames::SCENARIO31] = 0.090;
+    this->price[ScenarioNames::SCENARIO32] = 0.170;
+    this->price[ScenarioNames::SCENARIO33] = 0.280;
+    this->price[ScenarioNames::SCENARIO34] = 0.001;
+    this->price[ScenarioNames::SCENARIO35] = 0.480;
+    this->price[ScenarioNames::SCENARIO36] = 0.008;
+    this->price[ScenarioNames::SCENARIO37] = 0.130;
+    this->price[ScenarioNames::SCENARIO38] = 0.230;
+    this->price[ScenarioNames::SCENARIO39] = 0.025;
+    this->price[ScenarioNames::SCENARIO40] = 0.380;
+    // ===== SCALE-UP END =====
 
     // first-stage vars: x1, x2, x3, x5 (shared across all scenarios)
     this->first_stage_IX = {
