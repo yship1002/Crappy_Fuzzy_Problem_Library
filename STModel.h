@@ -113,6 +113,16 @@ class STModel:public Ipopt::TNLP{
         virtual void buildDAG() = 0;
         virtual void buildFullModelDAG() = 0;
         void clearDAG();
+        /// Keep only the first num_scenarios scenarios (SCENARIO1..SCENARIOn) of the already-built
+        /// scenario_names and per-scenario data (perturb, perturb_coeffs), and set equal probability.
+        /// Throws if num_scenarios is < 1 or exceeds the number of scenarios the model defines.
+        void setScenarioCount(int num_scenarios);
+        /// Erase entries of a per-scenario map keyed by ScenarioNames whose scenario index is >= num_scenarios.
+        template<class Map>
+        static void trimScenarioMap(Map& m, int num_scenarios) {
+            for (auto it = m.begin(); it != m.end();)
+                it = (static_cast<int>(it->first) >= num_scenarios) ? m.erase(it) : std::next(it);
+        }
         void convertToCentralizedModel();
         double getconditionnumber(const double* coeffs ,int length);
         void generateMINLP(GRBModel* grbmodel);

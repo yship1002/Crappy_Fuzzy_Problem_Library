@@ -3,7 +3,7 @@ class ProcessModel:public STModel {
     public:
 
 
-        ProcessModel(BranchingStrategy branching_strategy);
+        ProcessModel(BranchingStrategy branching_strategy, int num_scenarios = 40); // 1..40
         ProcessModel(const ProcessModel& other)=default;
         ProcessModel()=default; // default constructor
         /// A vector of ScenarioNames

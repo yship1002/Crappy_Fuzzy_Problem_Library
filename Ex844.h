@@ -3,7 +3,7 @@ class Ex844Model:public STModel {
     public:
 
 
-        Ex844Model(BranchingStrategy branching_strategy);
+        Ex844Model(BranchingStrategy branching_strategy, int num_scenarios = 20); // 1..20
         Ex844Model(const Ex844Model& other)=default;
         Ex844Model()=default; // default constructor
 

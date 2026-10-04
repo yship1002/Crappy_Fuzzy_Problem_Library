@@ -2,7 +2,7 @@
 
 class CHPModel : public STModel {
 public:
-    CHPModel(BranchingStrategy branching_strategy);
+    CHPModel(BranchingStrategy branching_strategy, int num_scenarios = 8); // 1..8
     CHPModel(const CHPModel& other) = default;
     CHPModel() = default;
 

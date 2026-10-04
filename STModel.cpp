@@ -917,3 +917,15 @@ void STModel::finalize_solution(
     this->solution.uf.resize( m+1 );
     for( int j=0; j<m; j++ ) this->solution.uf[1+j] = - lambda[j];
 };
+
+
+void STModel::setScenarioCount(int num_scenarios) {
+    if (num_scenarios < 1 || num_scenarios > static_cast<int>(this->scenario_names.size())) {
+        throw std::invalid_argument("num_scenarios must be in [1, " + std::to_string(this->scenario_names.size()) +
+                                    "] for this model, got " + std::to_string(num_scenarios));
+    }
+    this->scenario_names.resize(num_scenarios);
+    trimScenarioMap(this->perturb, num_scenarios);
+    trimScenarioMap(this->perturb_coeffs, num_scenarios);
+    this->scenario_name = ScenarioNames::SCENARIO1;
+}

@@ -3,7 +3,7 @@ class Ex722Model:public STModel {
     public:
 
 
-        Ex722Model(BranchingStrategy branching_strategy);
+        Ex722Model(BranchingStrategy branching_strategy, int num_scenarios = 20); // max 20
         Ex722Model(const Ex722Model& other)=default;
         Ex722Model()=default; // default constructor
         /// A vector of ScenarioNames

@@ -17,7 +17,7 @@ static const int IDX_P_OUT    = 3; // second-stage offset 2
 static const int IDX_P_BUY    = 4; // second-stage offset 3
 static const int IDX_P_SELL   = 5; // second-stage offset 4
 
-CHPModel::CHPModel(BranchingStrategy branching_strategy) : STModel() {
+CHPModel::CHPModel(BranchingStrategy branching_strategy, int num_scenarios) : STModel() {
     this->branching_strategy = branching_strategy;
 
     this->scenario_names = {
@@ -27,6 +27,7 @@ CHPModel::CHPModel(BranchingStrategy branching_strategy) : STModel() {
         ScenarioNames::SCENARIO7, ScenarioNames::SCENARIO8,
     };
     this->scenario_name = ScenarioNames::SCENARIO1;
+    this->setScenarioCount(num_scenarios); // keep first num_scenarios of the 8 defined above
     this->probability = 1.0 / static_cast<double>(this->scenario_names.size());
 
     // Store scenario data in perturb_coeffs: [Qdot_dem, P_dem]

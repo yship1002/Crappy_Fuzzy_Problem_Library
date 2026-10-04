@@ -512,7 +512,7 @@ namespace {
     const double T1_BASE = 2.5, T2_BASE = 2.0;
 }
 
-Ex844Model::Ex844Model(BranchingStrategy branching_strategy):STModel() {
+Ex844Model::Ex844Model(BranchingStrategy branching_strategy, int num_scenarios):STModel() {
 
     this->branching_strategy = branching_strategy;
 
@@ -642,7 +642,13 @@ Ex844Model::Ex844Model(BranchingStrategy branching_strategy):STModel() {
         {ScenarioNames::SCENARIO20, 0.09}
     };
 
-    // 10 -> 20 scenarios: renormalise so the (old + new) probabilities sum to 1
+    // keep only the first num_scenarios of the 20 defined above (probabilities are renormalised below)
+    this->setScenarioCount(num_scenarios);
+    trimScenarioMap(this->perturb_a, num_scenarios);
+    trimScenarioMap(this->perturb_b, num_scenarios);
+    trimScenarioMap(this->prob, num_scenarios);
+
+    // renormalise so the (old + new) probabilities sum to 1
     {
         double total = 0.0;
         for (auto& kv : this->prob) total += kv.second;
