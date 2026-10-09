@@ -1,4 +1,5 @@
 #include "STModel.h"
+#include <algorithm>
 // Formats a PolCut as a human-readable inequality, e.g. "3x1 + 2x2 <= 3"
 static std::string cutToString(const mc::PolCut<mc::Interval>* pc) {
     const double* coeffs = pc->coef();
@@ -325,6 +326,86 @@ void STModel::generateLP(IloEnv* cplex_env,IloModel* cplexmodel,
 
 }
 
+
+size_t LPData::live_bytes=0;
+void STModel::generateLPData(LPData& out) {
+    // mirrors generateLP: same relaxation, written to plain arrays instead of Ilo objects
+    const int nvars = this->X[this->scenario_name].size();
+    std::rotate(this->F[this->scenario_name].begin(), this->F[this->scenario_name].begin() + 1, this->F[this->scenario_name].end());
+
+    mc::PolImg<mc::Interval> Env;
+    mc::PolVar<mc::Interval> PX[nvars];
+    for (int i = 0; i < this->first_stage_IX.size(); ++i) PX[i].set(&Env, this->X[this->scenario_name][i], this->first_stage_IX[i]);
+    for (int i = this->first_stage_IX.size(); i < nvars; ++i) PX[i].set(&Env, this->X[this->scenario_name][i], this->second_stage_IX[i - this->first_stage_IX.size()]);
+    mc::PolVar<mc::Interval> PF[this->F[this->scenario_name].size()];
+    this->DAG[this->scenario_name].eval(this->F[this->scenario_name].size(), this->F[this->scenario_name].data(), PF, nvars, this->X[this->scenario_name].data(), PX);
+
+    Env.options.SANDWICH_RTOL=1e-5;
+    Env.options.SANDWICH_MAXCUT= 100;
+    Env.generate_cuts(this->F[this->scenario_name].size(), PF);
+
+    auto c = Env.Cuts();
+    const int ncols = Env.Vars().size();
+    out.scenario = this->scenario_name;
+    out.first_stage_IX = this->first_stage_IX;
+    out.second_stage_IX = this->second_stage_IX;
+    out.n_first = this->first_stage_IX.size();
+    out.ncols = ncols;
+    out.obj_col = ncols - 1; // objective is always the last variable in our construction
+    out.col_lb.assign(ncols, 0.0);
+    out.col_ub.assign(ncols, 0.0);
+    for (auto v : Env.Vars()) { // Env.Vars() is ordered by z1,z2.. so use the id as column index
+        int v_idx = v.second->id().second;
+        out.col_lb[v_idx] = v.second->range().l();
+        out.col_ub[v_idx] = v.second->range().u();
+    }
+    out.rbeg.clear(); out.rind.clear(); out.rval.clear(); out.rrhs.clear();
+    out.rbeg.push_back(0);
+    std::vector<std::pair<int,double>> row;
+    auto flush = [&](double sign, double rhs) { // adds sign*row <= rhs with duplicate columns merged
+        for (auto &e : row) { out.rind.push_back(e.first); out.rval.push_back(sign * e.second); }
+        out.rrhs.push_back(rhs);
+        out.rbeg.push_back(static_cast<int>(out.rind.size()));
+    };
+    for (const auto& pc : c) {
+        const double* coeffs = pc->coef();
+        int n = pc->nvar();
+        auto v = pc->var();
+        row.clear();
+        for (int i = 0; i < n; ++i) {
+            // column index of the cut variable: same number the generateLP name parsing recovers (name = one letter + id)
+            int col_idx = v[i].id().second;
+            if (col_idx < 0 || col_idx >= ncols) throw std::runtime_error("Error in generating constraints from cuts.");
+            row.push_back({col_idx, coeffs[i]});
+        }
+        std::sort(row.begin(), row.end(), [](const std::pair<int,double>& a, const std::pair<int,double>& b){ return a.first < b.first; });
+        size_t w = 0;
+        for (size_t r = 0; r < row.size(); ++r) {
+            if (w > 0 && row[w-1].first == row[r].first) row[w-1].second += row[r].second;
+            else row[w++] = row[r];
+        }
+        row.resize(w);
+        if (pc->type() == 1) flush(1.0, pc->rhs());          // <=
+        else if (pc->type() == 2) flush(-1.0, -pc->rhs());   // >=
+        else { flush(1.0, pc->rhs()); flush(-1.0, -pc->rhs()); } // ==
+    }
+    for (size_t i = 0; i < sizeof(PF)/sizeof(PF[0])-1; ++i) {
+        int pf_idx = PF[i].id().second;
+        if (pf_idx >= 0 && pf_idx < ncols) {
+            row.assign(1, {pf_idx, 1.0});
+            flush(1.0, 0.0);
+        } else {
+            throw std::runtime_error("Error in generating constraints from cuts.");
+        }
+    }
+    out.nrows = static_cast<int>(out.rrhs.size());
+    out.infeasible = false;
+    out.has_basis = false;
+    out.cstat.clear();
+    out.rstat.clear();
+    out.account();
+    std::rotate(this->F[this->scenario_name].rbegin(), this->F[this->scenario_name].rbegin() + 1, this->F[this->scenario_name].rend()); // rotate back to original order
+}
 
 // void STModel::generateLP(GRBEnv* grb_env, GRBModel* grb_model,
 //                           std::vector<GRBVar>* grb_x) {

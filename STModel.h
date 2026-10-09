@@ -85,6 +85,43 @@ enum class ScenarioNames { SCENARIO1=0, SCENARIO2=1,
      SCENARIO92=91,SCENARIO93=92,SCENARIO94=93,SCENARIO95=94,SCENARIO96=95,SCENARIO97=96,SCENARIO98=97,
      SCENARIO99=98,SCENARIO100=99};
 enum class BranchingStrategy { relwidth, pseudo };
+/**
+ * @brief Plain-data copy of the polyhedral LP relaxation of one scenario on one box, no objective multiplier terms.
+ * Columns: 0..n_first-1 are the first stage variables, then the second stage variables and auxiliaries; obj_col is the
+ * column of the scenario objective. Rows are all of the form (row . x) <= rhs. It is built once per (scenario, box) and
+ * re-solved for any Lagrangean multiplier mu by changing only the objective coefficients on the first stage columns.
+ * The last optimal basis is stored as a warm start (feasible for any mu: the feasible set does not depend on mu).
+ */
+struct LPData {
+  ScenarioNames scenario=ScenarioNames::SCENARIO1;
+  std::vector<mc::Interval> first_stage_IX, second_stage_IX; // the box the relaxation was built for
+  int n_first=0, ncols=0, nrows=0, obj_col=0;
+  std::vector<double> col_lb, col_ub;
+  std::vector<int> rbeg, rind;          // row-wise sparse matrix, rbeg has nrows+1 entries
+  std::vector<double> rval, rrhs;
+  bool infeasible=false;                // the relaxation was found infeasible (independent of mu)
+  bool has_basis=false;
+  std::vector<int> cstat, rstat;        // basis of the last optimal solve
+  size_t accounted_bytes=0;             // bytes registered in live_bytes
+  static size_t live_bytes;             // total bytes held by all live LPData (cache budget)
+  size_t bytes() const {
+    return sizeof(LPData)+col_lb.capacity()*8*2+rbeg.capacity()*4+rind.capacity()*4+rval.capacity()*8+rrhs.capacity()*8
+           +cstat.capacity()*4+rstat.capacity()*4+(first_stage_IX.capacity()+second_stage_IX.capacity())*sizeof(mc::Interval);
+  }
+  void account() { live_bytes-=accounted_bytes; accounted_bytes=bytes(); live_bytes+=accounted_bytes; }
+  LPData()=default;
+  LPData(const LPData& o)=delete;
+  LPData& operator=(const LPData& o)=delete;
+  ~LPData() { live_bytes-=accounted_bytes; }
+  /// true if this relaxation was built for exactly this scenario and box
+  bool matches(ScenarioNames s,const std::vector<mc::Interval>& f,const std::vector<mc::Interval>& g) const {
+    if (s!=scenario || f.size()!=first_stage_IX.size() || g.size()!=second_stage_IX.size()) return false;
+    for (size_t i=0;i<f.size();++i) if (f[i].l()!=first_stage_IX[i].l() || f[i].u()!=first_stage_IX[i].u()) return false;
+    for (size_t i=0;i<g.size();++i) if (g[i].l()!=second_stage_IX[i].l() || g[i].u()!=second_stage_IX[i].u()) return false;
+    return true;
+  }
+};
+
 class STModel:public Ipopt::TNLP{
     public:
         STModel(const STModel& other)=default;
@@ -130,6 +167,8 @@ class STModel:public Ipopt::TNLP{
                               IloRangeArray* cplex_constraints,
                               IloObjective* cplex_obj,
                               IloNumVarArray* cplex_x);
+        /// Same relaxation as generateLP (current scenario_name / first_stage_IX / second_stage_IX) as plain data (see LPData)
+        void generateLPData(LPData& out);
         void generateLP(GRBEnv* grb_env, GRBModel* grb_model,
                           std::vector<GRBVar>* grb_x);
         void generateFullLP(IloEnv* cplex_env,IloModel* cplexmodel,
