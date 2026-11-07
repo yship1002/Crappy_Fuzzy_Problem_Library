@@ -1,16 +1,5 @@
 #include "Ex722.h"
 
-// Equality relaxation. With false, e1-e4 are the original equalities (each stored as c<=0 and -c<=0), which tie x2,x3,x4,x5 to (x0,x1):
-// 6 variables - 4 equalities = 2 degrees of freedom, so x2,x3,x4,x5 are not free.
-// With true, they become one-sided inequalities (every g<=0), so all six variables move independently:
-//   e1: a1*x1*x4 + x0        >= 1      (x4 covers the demand left by x0)
-//   e2: a2*x2*x5 + x1 - x0   >= 0      (x5 covers the flow x0-x1)
-//   e3: a3*x2*x4 + x2 + x0   <= 1      (budget: x0 and x2 cannot both be large; a larger x4 tightens it)
-//   e4: a4*x3*x5 + x3 - x0 + x1 - x2 <= 0   (x3, the revenue variable, is capped by what x0,x1,x2 make available, and a larger x5 lowers the cap)
-// The direction of e3 matters: with e3 as ">=" too, the optimum is the degenerate corner x0=x1=x2=1 (objective ~ -999994).
-// To REVERT to the original equality instance set this to false (the provided_UBD in test.cpp must then be -92551.4 again).
-static constexpr bool RELAX_EQUALITIES = true;
-
 Ex722Model::Ex722Model(BranchingStrategy branching_strategy, int num_scenarios):STModel() {
 
     this->branching_strategy = branching_strategy;
@@ -222,10 +211,7 @@ void Ex722Model::buildDAG() {
         // Python's _obj exactly.
         mc::FFVar objective = -1000000*this->probability*this->X[scenario_name][3]
                              + this->probability*rc*(this->X[scenario_name][4]+this->X[scenario_name][5]);
-        if (RELAX_EQUALITIES)
-            this->F[scenario_name]={objective,nc1,nc2,c3,c4,c5};
-        else
-            this->F[scenario_name]={objective,c1,c2,c3,c4,c5,nc1,nc2,nc3,nc4};
+        this->F[scenario_name]={objective,c1,c2,c3,c4,c5,nc1,nc2,nc3,nc4};
     }
 }
 void Ex722Model::buildFullModelDAG(){
@@ -290,8 +276,7 @@ void Ex722Model::buildFullModelDAG(){
         objective += -1000000*this->probability*this->X[ScenarioNames::SCENARIO1][3]
                    + this->probability*rc*(this->X[ScenarioNames::SCENARIO1][second_stage_start_idx]+this->X[ScenarioNames::SCENARIO1][second_stage_start_idx+1]);
 
-        std::vector<mc::FFVar> scenario_constraints = RELAX_EQUALITIES ? std::vector<mc::FFVar>{nc1,nc2,c3,c4,c5}
-                                                                       : std::vector<mc::FFVar>{c1,c2,c3,c4,nc1,nc2,nc3,nc4,c5};
+        std::vector<mc::FFVar> scenario_constraints = {c1,c2,c3,c4,nc1,nc2,nc3,nc4,c5};
         this->F[ScenarioNames::SCENARIO1].insert(this->F[ScenarioNames::SCENARIO1].end(), scenario_constraints.begin(), scenario_constraints.end());
     }
     this->F[ScenarioNames::SCENARIO1].insert(this->F[ScenarioNames::SCENARIO1].begin(), objective);
